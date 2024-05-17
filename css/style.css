@@ -3117,8 +3117,8 @@ sewera-septik .form-qwiz__user-contact,
  * These styles are required for noUiSlider to function.
  * You don't need to change these rules to apply your design.
  */
-.noUi-target,
-.noUi-target * {
+.sewera-septik .noUi-target,
+.sewera-septik .noUi-target * {
   -webkit-touch-callout: none;
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
   -webkit-user-select: none;
@@ -3135,8 +3135,8 @@ sewera-septik .form-qwiz__user-contact,
   position: relative;
 }
 
-.noUi-base,
-.noUi-connects {
+.sewera-septik .noUi-base,
+.sewera-septik .noUi-connects {
   width: 100%;
   height: 100%;
   position: relative;
@@ -3145,13 +3145,13 @@ sewera-septik .form-qwiz__user-contact,
 
 /* Wrapper for all connect elements.
   */
-.noUi-connects {
+.sewera-septik .noUi-connects {
   overflow: hidden;
   z-index: 0;
 }
 
-.noUi-connect,
-.noUi-origin {
+.sewera-septik .noUi-connect,
+.sewera-septik .noUi-origin {
   will-change: transform;
   position: absolute;
   z-index: 1;
@@ -3168,7 +3168,7 @@ sewera-septik .form-qwiz__user-contact,
 
 /* Offset direction
   */
-.noUi-txt-dir-rtl.noUi-horizontal .noUi-origin {
+.sewera-septik .noUi-txt-dir-rtl.noUi-horizontal .noUi-origin {
   left: 0;
   right: auto;
 }
@@ -3176,41 +3176,41 @@ sewera-septik .form-qwiz__user-contact,
 /* Give origins 0 height/width so they don't interfere with clicking the
   * connect elements.
   */
-.noUi-vertical .noUi-origin {
+.sewera-septik .noUi-vertical .noUi-origin {
   top: -100%;
   width: 0;
 }
 
-.noUi-horizontal .noUi-origin {
+.sewera-septik .noUi-horizontal .noUi-origin {
   height: 0;
 }
 
-.noUi-handle {
+.sewera-septik .noUi-handle {
   backface-visibility: hidden;
   position: absolute;
 }
 
-.noUi-touch-area {
+.sewera-septik .noUi-touch-area {
   height: 100%;
   width: 100%;
 }
 
-.noUi-state-tap .noUi-connect,
-.noUi-state-tap .noUi-origin {
+.sewera-septik .noUi-state-tap .noUi-connect,
+.sewera-septik .noUi-state-tap .noUi-origin {
   transition: transform 0.3s;
 }
 
-.noUi-state-drag * {
+.sewera-septik .noUi-state-drag * {
   cursor: inherit !important;
 }
 
 /* Slider size and handle placement;
   */
-.noUi-horizontal {
+.sewera-septik .noUi-horizontal {
   height: 2px;
 }
 
-.noUi-horizontal .noUi-handle {
+.sewera-septik .noUi-horizontal .noUi-handle {
   border-radius: 50%;
   width: 26px;
   height: 26px;
@@ -3218,18 +3218,18 @@ sewera-septik .form-qwiz__user-contact,
   top: -13px;
 }
 
-.noUi-vertical {
+.sewera-septik .noUi-vertical {
   width: 18px;
 }
 
-.noUi-vertical .noUi-handle {
+.sewera-septik .noUi-vertical .noUi-handle {
   width: 28px;
   height: 34px;
   right: -6px;
   bottom: -17px;
 }
 
-.noUi-txt-dir-rtl.noUi-horizontal .noUi-handle {
+.sewera-septik .noUi-txt-dir-rtl.noUi-horizontal .noUi-handle {
   left: -17px;
   right: auto;
 }
@@ -3237,7 +3237,7 @@ sewera-septik .form-qwiz__user-contact,
 /* Styling;
   * Giving the connect element a border radius causes issues with using transform: scale
   */
-.noUi-target {
+.sewera-septik .noUi-target {
   background: rgba(153, 153, 153, 0.6352941176);
 }
 
@@ -3247,15 +3247,15 @@ sewera-septik .form-qwiz__user-contact,
 
 /* Handles and cursors;
   */
-.noUi-draggable {
+.sewera-septik .noUi-draggable {
   cursor: ew-resize;
 }
 
-.noUi-vertical .noUi-draggable {
+.sewera-septik .noUi-vertical .noUi-draggable {
   cursor: ns-resize;
 }
 
-.noUi-handle {
+.sewera-septik .noUi-handle {
   border-radius: 3px;
   background: #ff6701;
   cursor: default;
@@ -3265,15 +3265,15 @@ sewera-septik .form-qwiz__user-contact,
   left: 17px;
 }
 
-.noUi-vertical .noUi-handle:before,
-.noUi-vertical .noUi-handle:after {
+.sewera-septik .noUi-vertical .noUi-handle:before,
+.sewera-septik .noUi-vertical .noUi-handle:after {
   width: 14px;
   height: 1px;
   left: 6px;
   top: 14px;
 }
 
-.noUi-vertical .noUi-handle:after {
+.sewera-septik .noUi-vertical .noUi-handle:after {
   top: 17px;
 }
 
@@ -3293,11 +3293,11 @@ sewera-septik .form-qwiz__user-contact,
   *
   */
 .noUi-pips,
-.noUi-pips * {
+.sewera-septik .noUi-pips * {
   box-sizing: border-box;
 }
 
-.noUi-pips {
+.sewera-septik .noUi-pips {
   position: absolute;
   color: #999;
 }
@@ -3305,13 +3305,13 @@ sewera-septik .form-qwiz__user-contact,
 /* Values;
   *
   */
-.noUi-value {
+.sewera-septik .noUi-value {
   position: absolute;
   white-space: nowrap;
   text-align: center;
 }
 
-.noUi-value-sub {
+.sewera-septik .noUi-value-sub {
   color: #ccc;
   font-size: 10px;
 }
@@ -3319,43 +3319,43 @@ sewera-septik .form-qwiz__user-contact,
 /* Markings;
   *
   */
-.noUi-marker {
+.sewera-septik .noUi-marker {
   display: none;
 }
 
-.noUi-marker-sub {
+.sewera-septik .noUi-marker-sub {
   background: #aaa;
 }
 
-.noUi-marker-large {
+.sewera-septik .noUi-marker-large {
   background: #aaa;
 }
 
 /* Horizontal layout;
   *
   */
-.noUi-pips-horizontal {
+.sewera-septik .noUi-pips-horizontal {
   height: 80px;
   top: -70px;
   left: 0;
   width: 100%;
 }
 
-.noUi-value-horizontal {
+.sewera-septik .noUi-value-horizontal {
   transform: translate(-50%, 50%);
 }
 
-.noUi-rtl .noUi-value-horizontal {
+.sewera-septik .noUi-rtl .noUi-value-horizontal {
   transform: translate(50%, 50%);
 }
 
-.noUi-marker-horizontal.noUi-marker {
+.sewera-septik .noUi-marker-horizontal.noUi-marker {
   margin-left: -1px;
   width: 2px;
   height: 5px;
 }
 
-.noUi-marker-horizontal.noUi-marker-sub {
+.sewera-septik .noUi-marker-horizontal.noUi-marker-sub {
   height: 10px;
 }
 
@@ -3366,61 +3366,60 @@ sewera-septik .form-qwiz__user-contact,
 /* Vertical layout;
   *
   */
-.noUi-pips-vertical {
+.sewera-septik .noUi-pips-vertical {
   padding: 0 10px;
   height: 100%;
   top: 0;
   left: 100%;
 }
 
-.noUi-value-vertical {
+.sewera-septik .noUi-value-vertical {
   transform: translate(0, -50%);
   padding-left: 25px;
 }
 
-.noUi-rtl .noUi-value-vertical {
+.sewera-septik .noUi-rtl .noUi-value-vertical {
   transform: translate(0, 50%);
 }
 
-.noUi-marker-vertical.noUi-marker {
+.sewera-septik .noUi-marker-vertical.noUi-marker {
   width: 5px;
   height: 2px;
   margin-top: -1px;
 }
 
-.noUi-marker-vertical.noUi-marker-sub {
+.sewera-septik .noUi-marker-vertical.noUi-marker-sub {
   width: 10px;
 }
 
-.noUi-marker-vertical.noUi-marker-large {
+.sewera-septik .noUi-marker-vertical.noUi-marker-large {
   width: 15px;
 }
 
-.noUi-tooltip {
+.sewera-septik .noUi-tooltip {
   display: block;
   position: absolute;
   border-radius: 3px;
-  background: #fff;
-  padding: 9px 0px;
+  padding: 9px 0px 0px;
   width: 42px;
-  height: 42px;
+  height: 48px;
   text-align: center;
   white-space: nowrap;
   box-shadow: 0px 8px 24px rgba(149, 157, 165, 0.2);
   border-radius: 4px;
 }
-.noUi-tooltip::after {
+.sewera-septik .noUi-tooltip::after {
   content: "";
-  display: inline-block;
-  border: 7px solid transparent;
-  border-top: 7px solid #fff;
+  background: url("../img/icons/tooltipIcon.svg") center top -15px no-repeat;
   position: absolute;
-  transform: translate(-50%, 0);
-  left: 50%;
-  top: 100%;
+  width: 100%;
+  height: 100%;
+  top: 0px;
+  left: 0;
+  z-index: -1;
 }
 
-.noUi-horizontal .noUi-tooltip {
+.sewera-septik .noUi-horizontal .noUi-tooltip {
   transform: translate(-50%, 0);
   left: 50%;
   bottom: 150%;
@@ -3432,13 +3431,13 @@ sewera-septik .form-qwiz__user-contact,
   right: 120%;
 }
 
-.noUi-horizontal .noUi-origin > .noUi-tooltip {
+.sewera-septik .noUi-horizontal .noUi-origin > .noUi-tooltip {
   transform: translate(50%, 0);
   left: auto;
   bottom: 10px;
 }
 
-.noUi-vertical .noUi-origin > .noUi-tooltip {
+.sewera-septik .noUi-vertical .noUi-origin > .noUi-tooltip {
   transform: translate(0, -18px);
   top: auto;
   right: 28px;
@@ -3822,6 +3821,15 @@ sewera-septik .form-qwiz__user-contact,
   }
 }
 @media (max-width: 767.98px) {
+  .sewera-septik .noUi-tooltip {
+    border-radius: 4px;
+    box-shadow: none;
+    width: 36px;
+  }
+  .sewera-septik .noUi-tooltip::after {
+    background-position: center;
+    background-image: url("../img/icons/tooltipMobileIcon.svg");
+  }
   .sewera-septik .fix-volt .form-order__title {
     padding-right: 80px;
   }
