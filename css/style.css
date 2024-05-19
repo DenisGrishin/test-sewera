@@ -89,7 +89,6 @@ h6 {
 }
 
 .sewera-septik .title-sectio_green-circle {
-  display: flex;
   column-gap: 5px;
 }
 
@@ -99,8 +98,7 @@ h6 {
   height: 8px;
   display: inline-block;
   border-radius: 5555px;
-  margin-bottom: 5px;
-  transform: translate(0px, 6px);
+  transform: translateY(-3px);
 }
 
 .sewera-septik .title-sectio_green-circle::before {
@@ -3575,6 +3573,8 @@ sewera-septik .form-qwiz__user-contact,
     padding: 13px 23px;
   }
   .sewera-septik .form-qwiz__left-finish {
+    flex-grow: 1;
+    min-width: 212px;
     padding: 15px;
   }
   .sewera-septik .form-qwiz__item-finish {
@@ -3819,6 +3819,9 @@ sewera-septik .form-qwiz__user-contact,
     background-size: 365px auto;
     background-position: center top 154px;
   }
+  .sewera-septik .qwiz-section__wrapper {
+    padding: 20px;
+  }
 }
 @media (max-width: 767.98px) {
   .sewera-septik .noUi-tooltip {
@@ -3854,7 +3857,11 @@ sewera-septik .form-qwiz__user-contact,
     padding: 24px 16px;
   }
   .sewera-septik .form-order__title {
+    display: flex;
     text-align: left;
+  }
+  .sewera-septik .form-order__title::before {
+    transform: translateY(6px);
   }
   .sewera-septik .form-order__title_br-show-mobile {
     display: -webkit-box;
@@ -4219,6 +4226,11 @@ sewera-septik .form-qwiz__user-contact,
 @media (max-width: 374.98px) {
   .sewera-septik .qwiz-section__wrapper {
     padding: 20px 15px;
+  }
+  .sewera-septik .form-order__btn_mobile-decor::before {
+    bottom: 141px;
+    left: 83%;
+    background-size: 150px;
   }
 }
 @media (max-width: 1023.98px) and (max-width: 767.98px) {
