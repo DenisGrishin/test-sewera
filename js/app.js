@@ -5486,30 +5486,30 @@ data-youtube - Атрибут для кода youtube
   }
 
   function resultSeptic() {
-    // 1.435
     let sum = (
       getAmountUserValue() +
       getValueItemPlumbing() / 1000 / 2
     ).toFixed(1);
-    // console.log('getValueItemPlumbing', getValueItemPlumbing());
-    // console.log('getAmountUserValue', getAmountUserValue());
-    console.log(sum);
 
-    // const res = dataSeptic.filter((it) => {
-    //   if (it.productivity == sum) {
-    //     return it;
-    //   }
-    // });
+    let minRange = getValueItemPlumbing() ? 0.2 : 0.1;
 
-    const res = filterRange(dataSeptic, sum - 0.2, +sum + 0.2);
-    console.log(res);
-    createObjRes(res);
+    const resFilterRange = filterRange(
+      dataSeptic,
+      sum - minRange,
+      +sum + minRange,
+    );
+    const valueRange = document.querySelector(".noUi-handle").ariaValueText;
+    // фильтар по юзерам
+    const res = resFilterRange.filter((it) => {
+      if (it.userValue == valueRange) {
+        return it;
+      }
+    });
 
     showReusltSeptik(res);
   }
-
+  // фильтар по дмарозону
   function filterRange(arr, a, b) {
-    // добавлены скобки вокруг выражения для улучшения читабельности
     return arr.filter(
       (item) =>
         a.toFixed(1) <= item.productivity && item.productivity <= b.toFixed(1),
@@ -5517,23 +5517,29 @@ data-youtube - Атрибут для кода youtube
   }
   // выводим данные в итоги
   function showReusltSeptik(res) {
-    const selectListRes = document.querySelectorAll(
+    createObjRes(res);
+    const listResSelector = document.querySelectorAll(
       ".form-qwiz__content-finish",
     );
+    const sumNameSelector = document.querySelector(".form-qwiz__sum-finish");
     let objRes = createObjRes(res);
 
+    const [arrRes, sumRes] = objRes;
+    debugger;
+    sumNameSelector.innerHTML = sumRes;
+
     if (objRes) {
-      for (let indx = 0; indx < selectListRes.length; indx++) {
-        const element = selectListRes[indx];
+      for (let indx = 0; indx < listResSelector.length; indx++) {
+        const element = listResSelector[indx];
         if (indx === 0) {
           createNewLinkSeptick(element, res);
           continue;
         }
-        element.innerHTML = objRes[indx];
+        element.innerHTML = arrRes[indx];
       }
     }
   }
-  // a_dramelech
+
   // собираем обьект с данынми
   function createObjRes(res) {
     if (res.length === 0) return;
@@ -5552,7 +5558,24 @@ data-youtube - Атрибут для кода youtube
     resObj.mounting = `${res[0].mounting} р.`;
     resObj.energyConsumption = `${res[0].energyConsumption} кВт/сутки`;
 
-    return Object.values(resObj);
+    let sumName = String(
+      Number(res[0].price.replace(/\s+/g, "")) +
+        Number(res[0].mounting.replace(/\s+/g, "")) +
+        9100,
+    )
+      .split("")
+      .map((el, indx) => {
+        if (indx === 2) {
+          el = `${el} `;
+          return el;
+        }
+        return el;
+      })
+      .join("");
+
+    let arrRes = Object.values(resObj);
+
+    return [arrRes, sumName];
   }
 
   // создаем ссылки на септике в итоге
@@ -5574,6 +5597,7 @@ data-youtube - Атрибут для кода youtube
 
   // 50+50+400+10+60+400+40+60 = 1,07 /  2 = 0.53 м3
   // потом складываем 0.9 + 1.07 =1.97м3
+  // написать функцию чтоб между цифрмаи был пробел 1 000 000
 
   // Подключение основного файла стилей
 
