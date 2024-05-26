@@ -557,6 +557,134 @@ data-spollers="768,min" - спойлеры будут работать толь�
       }
     }
   }
+  // Модуль "показать еще" =======================================================================================================================================================================================================================
+  /*
+Документация по работе в шаблоне:
+data-showmore-media = "768,min"
+data-showmore="size/items"
+data-showmore-content="размер/кол-во"
+data-showmore-button="скорость"
+Сниппет (HTML): showmore
+*/
+  function showMore() {
+    const showMoreBlocks = document.querySelectorAll("[data-showmore]");
+    let showMoreBlocksRegular;
+    let mdQueriesArray;
+
+    if (showMoreBlocks.length) {
+      // Получение обычных объектов
+      showMoreBlocksRegular = Array.from(showMoreBlocks).filter(
+        function (item, index, self) {
+          return !item.dataset.showmoreMedia;
+        },
+      );
+      // Инициализация обычных объектов
+      showMoreBlocksRegular.length ? initItems(showMoreBlocksRegular) : null;
+
+      document.querySelectorAll("[data-showmore-button]").forEach((element) => {
+        element.addEventListener("click", showMoreActions, true);
+      });
+      // window.addEventListener('resize', showMoreActions);
+    }
+    function initItemsMedia(mdQueriesArray) {
+      mdQueriesArray.forEach((mdQueriesItem) => {
+        initItems(mdQueriesItem.itemsArray, mdQueriesItem.matchMedia);
+      });
+    }
+    function initItems(showMoreBlocks, matchMedia) {
+      showMoreBlocks.forEach((showMoreBlock) => {
+        initItem(showMoreBlock, matchMedia);
+      });
+    }
+    function initItem(showMoreBlock, matchMedia = false) {
+      showMoreBlock = matchMedia ? showMoreBlock.item : showMoreBlock;
+      const showMoreContent = showMoreBlock.querySelector(
+        "[data-showmore-content]",
+      );
+      const showMoreButton = showMoreBlock.querySelector(
+        "[data-showmore-button]",
+      );
+      const hiddenHeight = getHeight(showMoreBlock, showMoreContent);
+
+      if (matchMedia.matches || !matchMedia) {
+        if (hiddenHeight < getOriginalHeight(showMoreContent)) {
+          _slideUp(showMoreContent, 0, hiddenHeight);
+          showMoreButton.hidden = false;
+        } else {
+          _slideDown(showMoreContent, 0, hiddenHeight);
+          showMoreButton.hidden = true;
+        }
+      } else {
+        _slideDown(showMoreContent, 0, hiddenHeight);
+        showMoreButton.hidden = true;
+      }
+    }
+    function getHeight(showMoreBlock, showMoreContent) {
+      let hiddenHeight = 0;
+      const showMoreType = showMoreBlock.dataset.showmore
+        ? showMoreBlock.dataset.showmore
+        : "size";
+      if (showMoreType === "items") {
+        const showMoreTypeValue = showMoreContent.dataset.showmoreContent
+          ? showMoreContent.dataset.showmoreContent
+          : 3;
+        const showMoreItems = showMoreContent.children;
+        for (let index = 1; index < showMoreItems.length; index++) {
+          const showMoreItem = showMoreItems[index - 1];
+          hiddenHeight += showMoreItem.offsetHeight;
+          if (index === showMoreTypeValue) break;
+        }
+      } else {
+        const showMoreTypeValue = showMoreContent.dataset.showmoreContent
+          ? showMoreContent.dataset.showmoreContent
+          : 150;
+        hiddenHeight = showMoreTypeValue;
+      }
+      return hiddenHeight;
+    }
+
+    function getOriginalHeight(showMoreContent) {
+      let hiddenHeight = showMoreContent.offsetHeight;
+      showMoreContent.style.removeProperty("height");
+      let originalHeight = showMoreContent.offsetHeight;
+      showMoreContent.style.height = `${hiddenHeight}px`;
+
+      return originalHeight;
+    }
+    function showMoreActions(e) {
+      const targetEvent = e.target;
+      const targetType = e.type;
+      if (targetType === "click") {
+        if (targetEvent.closest("[data-showmore-button]")) {
+          const showMoreButton = targetEvent.closest("[data-showmore-button]");
+          const showMoreBlock = showMoreButton.closest("[data-showmore]");
+          const showMoreContent = showMoreBlock.querySelector(
+            "[data-showmore-content]",
+          );
+          getOriginalHeight(showMoreContent);
+          const showMoreSpeed = showMoreBlock.dataset.showmoreButton
+            ? showMoreBlock.dataset.showmoreButton
+            : "500";
+          const hiddenHeight = getHeight(showMoreBlock, showMoreContent);
+          if (!showMoreContent.classList.contains("_slide")) {
+            showMoreBlock.classList.contains("_showmore-active")
+              ? _slideUp(showMoreContent, showMoreSpeed, hiddenHeight)
+              : _slideDown(showMoreContent, showMoreSpeed, hiddenHeight);
+            showMoreBlock.classList.toggle("_showmore-active");
+          }
+        }
+      } else if (targetType === "resize") {
+        showMoreBlocksRegular.length ? initItems(showMoreBlocksRegular) : null;
+        // mdQueriesArray.length ? initItemsMedia(mdQueriesArray) : null;
+      }
+
+      if (document.querySelector(".ya-map__tab") && targetType === "click") {
+        if (!e.target.matches(".ya-map__tab")) {
+          e.stopImmediatePropagation();
+        }
+      }
+    }
+  }
   // Модуь работы с табами =======================================================================================================================================================================================================================
   /*
 Для родителя табов пишем атрибут data-tabs
@@ -573,19 +701,22 @@ data-spollers="768,min" - спойлеры будут работать толь�
 */
   function tabs() {
     const tabs = document.querySelectorAll("[data-tabs]");
-    let tabsActiveHash = [];
+    let tabsActiveHash = [""];
 
     if (tabs.length > 0) {
-      const hash = location.hash.replace("#", "");
+      const hash = "#tab-0-1";
       if (hash.startsWith("tab-")) {
-        tabsActiveHash = hash.replace("tab-", "").split("-");
+        tabsActiveHash = "#tab-0-1";
       }
-      tabs.forEach((tabsBlock, index) => {
-        tabsBlock.classList.add("_tab-init");
-        tabsBlock.setAttribute("data-tabs-index", index);
-        tabsBlock.addEventListener("click", setTabsAction);
-        initTabs(tabsBlock);
-      });
+
+      setTimeout(() => {
+        tabs.forEach((tabsBlock, index) => {
+          tabsBlock.classList.add("_tab-init");
+          tabsBlock.setAttribute("data-tabs-index", index);
+          tabsBlock.addEventListener("click", setTabsAction);
+          initTabs(tabsBlock);
+        });
+      }, 30);
     }
 
     // Работа с контентом
@@ -593,6 +724,7 @@ data-spollers="768,min" - спойлеры будут работать толь�
       const tabsTitles = tabsBlock.querySelectorAll("[data-tabs-titles]>*");
       const tabsContent = tabsBlock.querySelectorAll("[data-tabs-body]>*");
       const tabsBlockIndex = tabsBlock.dataset.tabsIndex;
+
       const tabsActiveHashBlock = tabsActiveHash[0] == tabsBlockIndex;
 
       if (tabsActiveHashBlock) {
@@ -651,7 +783,24 @@ data-spollers="768,min" - спойлеры будут работать толь�
     }
     function setTabsAction(e) {
       const el = e.target;
+
+      if (
+        document
+          .querySelector(".ya-map__accardion-block ")
+          .matches("._showmore-active")
+      ) {
+        document
+          .querySelector(".ya-map__accardion-block ")
+          .classList.remove("_showmore-active");
+      }
+      if (el.closest(".block__more")) {
+        return;
+      }
       if (el.closest("[data-tabs-title]")) {
+        setTimeout(() => {
+          showMore();
+        }, 10);
+
         const tabTitle = el.closest("[data-tabs-title]");
         const tabsBlock = tabTitle.closest("[data-tabs]");
         if (
@@ -666,6 +815,7 @@ data-spollers="768,min" - спойлеры будут работать толь�
           }
 
           tabTitle.classList.add("_tab-active");
+
           setTabsStatus(tabsBlock);
         }
         e.preventDefault();
@@ -673,121 +823,6 @@ data-spollers="768,min" - спойлеры будут работать толь�
     }
   }
 
-  // Модуль "показать еще" =======================================================================================================================================================================================================================
-  /*
-Документация по работе в шаблоне:
-data-showmore-media = "768,min"
-data-showmore="size/items"
-data-showmore-content="размер/кол-во"
-data-showmore-button="скорость"
-Сниппет (HTML): showmore
-*/
-  function showMore() {
-    const showMoreBlocks = document.querySelectorAll("[data-showmore]");
-    let showMoreBlocksRegular;
-    let mdQueriesArray;
-    if (showMoreBlocks.length) {
-      // Получение обычных объектов
-      showMoreBlocksRegular = Array.from(showMoreBlocks).filter(
-        function (item, index, self) {
-          return !item.dataset.showmoreMedia;
-        },
-      );
-      // Инициализация обычных объектов
-      showMoreBlocksRegular.length ? initItems(showMoreBlocksRegular) : null;
-
-      document.addEventListener("click", showMoreActions);
-      window.addEventListener("resize", showMoreActions);
-    }
-    function initItemsMedia(mdQueriesArray) {
-      mdQueriesArray.forEach((mdQueriesItem) => {
-        initItems(mdQueriesItem.itemsArray, mdQueriesItem.matchMedia);
-      });
-    }
-    function initItems(showMoreBlocks, matchMedia) {
-      showMoreBlocks.forEach((showMoreBlock) => {
-        initItem(showMoreBlock, matchMedia);
-      });
-    }
-    function initItem(showMoreBlock, matchMedia = false) {
-      showMoreBlock = matchMedia ? showMoreBlock.item : showMoreBlock;
-      const showMoreContent = showMoreBlock.querySelector(
-        "[data-showmore-content]",
-      );
-      const showMoreButton = showMoreBlock.querySelector(
-        "[data-showmore-button]",
-      );
-      const hiddenHeight = getHeight(showMoreBlock, showMoreContent);
-      if (matchMedia.matches || !matchMedia) {
-        if (hiddenHeight < getOriginalHeight(showMoreContent)) {
-          _slideUp(showMoreContent, 0, hiddenHeight);
-          showMoreButton.hidden = false;
-        } else {
-          _slideDown(showMoreContent, 0, hiddenHeight);
-          showMoreButton.hidden = true;
-        }
-      } else {
-        _slideDown(showMoreContent, 0, hiddenHeight);
-        showMoreButton.hidden = true;
-      }
-    }
-    function getHeight(showMoreBlock, showMoreContent) {
-      let hiddenHeight = 0;
-      const showMoreType = showMoreBlock.dataset.showmore
-        ? showMoreBlock.dataset.showmore
-        : "size";
-      if (showMoreType === "items") {
-        const showMoreTypeValue = showMoreContent.dataset.showmoreContent
-          ? showMoreContent.dataset.showmoreContent
-          : 3;
-        const showMoreItems = showMoreContent.children;
-        for (let index = 1; index < showMoreItems.length; index++) {
-          const showMoreItem = showMoreItems[index - 1];
-          hiddenHeight += showMoreItem.offsetHeight;
-          if (index === showMoreTypeValue) break;
-        }
-      } else {
-        const showMoreTypeValue = showMoreContent.dataset.showmoreContent
-          ? showMoreContent.dataset.showmoreContent
-          : 150;
-        hiddenHeight = showMoreTypeValue;
-      }
-      return hiddenHeight;
-    }
-    function getOriginalHeight(showMoreContent) {
-      let hiddenHeight = showMoreContent.offsetHeight;
-      showMoreContent.style.removeProperty("height");
-      let originalHeight = showMoreContent.offsetHeight;
-      showMoreContent.style.height = `${hiddenHeight}px`;
-      return originalHeight;
-    }
-    function showMoreActions(e) {
-      const targetEvent = e.target;
-      const targetType = e.type;
-      if (targetType === "click") {
-        if (targetEvent.closest("[data-showmore-button]")) {
-          const showMoreButton = targetEvent.closest("[data-showmore-button]");
-          const showMoreBlock = showMoreButton.closest("[data-showmore]");
-          const showMoreContent = showMoreBlock.querySelector(
-            "[data-showmore-content]",
-          );
-          const showMoreSpeed = showMoreBlock.dataset.showmoreButton
-            ? showMoreBlock.dataset.showmoreButton
-            : "500";
-          const hiddenHeight = getHeight(showMoreBlock, showMoreContent);
-          if (!showMoreContent.classList.contains("_slide")) {
-            showMoreBlock.classList.contains("_showmore-active")
-              ? _slideUp(showMoreContent, showMoreSpeed, hiddenHeight)
-              : _slideDown(showMoreContent, showMoreSpeed, hiddenHeight);
-            showMoreBlock.classList.toggle("_showmore-active");
-          }
-        }
-      } else if (targetType === "resize") {
-        showMoreBlocksRegular.length ? initItems(showMoreBlocksRegular) : null;
-        // mdQueriesArray.length ? initItemsMedia(mdQueriesArray) : null;
-      }
-    }
-  }
   // Модуль попапов ===========================================================================================================================================================================================================================
   /*
 Документация по работе в шаблоне:
@@ -3388,6 +3423,87 @@ data-youtube - Атрибут для кода youtube
 
   function initSliders() {
     bildSliders();
+    // слайдер 'Виды скважин на воду'
+    if (document.querySelector(".types-wells__slider")) {
+      new Swiper(".types-wells__slider", {
+        observer: true,
+        watchSlidesProgress: true,
+        observeParents: true,
+        slidesPerView: 2,
+        spaceBetween: 20,
+        speed: 300,
+        autoHeight: false,
+
+        breakpoints: {
+          319.98: {
+            slidesPerView: 1.3,
+            spaceBetween: 15,
+          },
+          429.98: {
+            slidesPerView: 1.3,
+            spaceBetween: 10,
+          },
+
+          767.98: {
+            autoplay: false,
+            slidesPerView: 1.6,
+          },
+          1023.98: {
+            slidesPerView: 2,
+            spaceBetween: 20,
+            autoplay: false,
+          },
+          1279.98: {
+            slidesPerView: 2,
+            spaceBetween: 20,
+            autoplay: false,
+          },
+        },
+        on: {},
+      });
+    }
+    // слайдер 'Виды обустройства скважины под ключ'
+    if (document.querySelector(".types-arrangement__slider")) {
+      new Swiper(".types-arrangement__slider", {
+        observer: true,
+        watchSlidesProgress: true,
+        observeParents: true,
+        slidesPerView: 2,
+        spaceBetween: 20,
+        speed: 300,
+        autoHeight: false,
+
+        breakpoints: {
+          319.98: {
+            slidesPerView: 1.2,
+            spaceBetween: 15,
+          },
+          429.98: {
+            slidesPerView: 1.2,
+            spaceBetween: 10,
+          },
+          529.98: {
+            slidesPerView: 1.6,
+            spaceBetween: 10,
+          },
+          767.98: {
+            autoplay: false,
+            slidesPerView: 2.1,
+          },
+          1023.98: {
+            slidesPerView: 3,
+            spaceBetween: 20,
+            autoplay: false,
+          },
+          1279.98: {
+            slidesPerView: 3,
+            spaceBetween: 20,
+            autoplay: false,
+          },
+        },
+        on: {},
+      });
+    }
     // слайдер 'Выполненные работы'
     if (document.querySelector(".completed-work__slider")) {
       new Swiper(".completed-work__slider", {
@@ -3395,7 +3511,7 @@ data-youtube - Атрибут для кода youtube
         observeParents: true,
         slidesPerView: 2,
         spaceBetween: 30,
-        speed: 800,
+        speed: 300,
 
         navigation: {
           nextEl: ".completed-work__nav .completed-work__next",
@@ -3429,7 +3545,7 @@ data-youtube - Атрибут для кода youtube
         observeParents: true,
         slidesPerView: 3,
         spaceBetween: 30,
-        speed: 800,
+        speed: 300,
         autoHeight: false,
         navigation: {
           nextEl: ".brand-carusel__nav .brand-carusel__next",
@@ -3461,16 +3577,13 @@ data-youtube - Атрибут для кода youtube
     }
     // слайдер 'Популярные модели септиков'
     if (document.querySelector(".popular-models__slider")) {
-      new Swiper(".popular-models__slider", {
-        observer: true,
-        observeParents: true,
+      let pop = new Swiper(".popular-models__slider", {
         watchSlidesProgress: true,
         slidesPerView: 4,
         spaceBetween: 0,
-        speed: 800,
+        speed: 300,
 
-        loop: false,
-
+        loop: true,
         navigation: {
           nextEl: ".popular-models__nav .popular-models__next",
           prevEl: ".popular-models__nav .popular-models__prev",
@@ -3492,11 +3605,17 @@ data-youtube - Атрибут для кода youtube
           1024: { slidesPerView: 3 },
           1280: {
             slidesPerView: 4,
+            initialSlide: 0,
           },
         },
         on: {},
       });
+      setTimeout(() => {
+        pop.loopDestroy();
+        pop.loopCreate();
+      }, 1);
     }
+
     // слайдер телеграм
     if (document.querySelector(".submitted__slider-post")) {
       new Swiper(".submitted__slider-post", {
@@ -3505,7 +3624,7 @@ data-youtube - Атрибут для кода youtube
         slidesPerView: 3,
         spaceBetween: 30,
         autoHeight: false,
-        speed: 800,
+        speed: 300,
 
         navigation: {
           nextEl: ".submitted__nav .submitted__next",
@@ -3513,7 +3632,7 @@ data-youtube - Атрибут для кода youtube
         },
         breakpoints: {
           320: {
-            slidesPerView: "auto",
+            slidesPerView: 1.2,
             spaceBetween: 15,
           },
           430: { slidesPerView: 1.4, spaceBetween: 15 },
@@ -3537,7 +3656,7 @@ data-youtube - Атрибут для кода youtube
         slidesPerView: "2",
         spaceBetween: 30,
         autoHeight: false,
-        speed: 500,
+        speed: 300,
 
         // Arrows
         navigation: {
@@ -3571,7 +3690,7 @@ data-youtube - Атрибут для кода youtube
         observer: true,
         observeParents: true,
         slidesPerView: 3,
-        speed: 500,
+        speed: 300,
         navigation: {
           nextEl: ".submitted__magazine-nav .submitted__magazine-next",
           prevEl: ".submitted__magazine-nav .submitted__magazine-prev",
@@ -3596,15 +3715,194 @@ data-youtube - Атрибут для кода youtube
         on: {},
       });
     }
+    // слайдер 'Варианты анализа воды'
+    if (document.querySelector(".water-analysis__slider")) {
+      new Swiper(".water-analysis__slider", {
+        observer: true,
+        observeParents: true,
+        slidesPerView: 3,
+        spaceBetween: 30,
+        autoHeight: false,
+        speed: 300,
+
+        breakpoints: {
+          319.98: {
+            slidesPerView: 1.2,
+            spaceBetween: 20,
+          },
+
+          767.98: {
+            slidesPerView: 1.2,
+            spaceBetween: 30,
+          },
+          1023.98: { slidesPerView: 2 },
+        },
+
+        on: {},
+      });
+    }
+    // слайдер 'Что мы можем?'
+    if (document.querySelector("#we-doing")) {
+      new Swiper("#we-doing", {
+        observer: true,
+        observeParents: true,
+        slidesPerView: 4,
+        spaceBetween: 25,
+        autoHeight: false,
+        speed: 300,
+        loop: true,
+        autoplay: {
+          delay: 3000,
+        },
+        // Arrows
+        navigation: {
+          nextEl: ".we-doing__nav .we-doing__next",
+          prevEl: ".we-doing__nav .we-doing__prev",
+        },
+
+        breakpoints: {
+          319.98: {
+            slidesPerView: 1.1,
+            spaceBetween: 15,
+            loop: true,
+            autoplay: {
+              delay: 3000,
+            },
+            centeredSlides: true,
+          },
+          429.98: { slidesPerView: 1.1 },
+
+          767.98: {
+            slidesPerView: 2.3,
+            spaceBetween: 15,
+          },
+          1023.98: { slidesPerView: 3, spaceBetween: 20 },
+          1439.98: {
+            spaceBetween: 24,
+          },
+        },
+
+        on: {},
+      });
+    }
+    // слайдер 'Примеры работ'
+    if (document.querySelector("#work-examples")) {
+      new Swiper("#work-examples", {
+        observer: true,
+        observeParents: true,
+        slidesPerView: 4,
+        spaceBetween: 25,
+        autoHeight: false,
+        speed: 300,
+        loop: true,
+        autoplay: {
+          delay: 4000,
+        },
+        // Arrows
+        navigation: {
+          nextEl: ".work-examples__nav .work-examples__next",
+          prevEl: ".work-examples__nav .work-examples__prev",
+        },
+
+        breakpoints: {
+          319.98: {
+            slidesPerView: 1.1,
+            spaceBetween: 15,
+            loop: true,
+            autoplay: {
+              delay: 3000,
+            },
+            centeredSlides: true,
+          },
+          429.98: { slidesPerView: 1.2 },
+          529.98: { slidesPerView: 1.8 },
+
+          767.98: {
+            slidesPerView: 2.3,
+            spaceBetween: 15,
+          },
+          1023.98: { slidesPerView: 3, spaceBetween: 20 },
+          1439.98: {
+            spaceBetween: 24,
+          },
+        },
+
+        on: {},
+      });
+    }
+    // слайдер 'Варианты ухода за газоном'
+    if (document.querySelector(".lawn-options__slider")) {
+      new Swiper(".lawn-options__slider", {
+        observer: true,
+        observeParents: true,
+        slidesPerView: 3,
+        spaceBetween: 30,
+        autoHeight: false,
+        speed: 300,
+        pagination: {
+          el: ".so-discount__pagging",
+          clickable: true,
+        },
+
+        breakpoints: {
+          319.98: {
+            slidesPerView: 1.1,
+            spaceBetween: 30,
+          },
+          429.98: { slidesPerView: 1.28 },
+
+          767.98: {
+            slidesPerView: 2.25,
+            spaceBetween: 30,
+          },
+          1023.98: { slidesPerView: 3 },
+        },
+
+        on: {},
+      });
+    }
+    // слайдер 'Как выгоднее с нами работать?'
+    if (document.querySelector(".so-discount__slider")) {
+      new Swiper(".so-discount__slider", {
+        observer: true,
+        observeParents: true,
+        slidesPerView: 3,
+        spaceBetween: 30,
+        autoHeight: false,
+        speed: 300,
+        pagination: {
+          el: ".so-discount__pagging",
+          clickable: true,
+        },
+
+        breakpoints: {
+          319.98: {
+            slidesPerView: 1.1,
+            spaceBetween: 30,
+          },
+          429.98: { slidesPerView: 1.28 },
+
+          767.98: {
+            slidesPerView: 2.25,
+            spaceBetween: 30,
+          },
+          1023.98: { slidesPerView: 3 },
+        },
+
+        on: {},
+      });
+    }
     // слайдер c sewera
-    if (document.querySelector(".banner-gallery__slider")) {
-      new Swiper(".banner-gallery__slider", {
+    if (
+      document.querySelector(".banner-gallery__slider:not(.swiper-initialized)")
+    ) {
+      new Swiper(".banner-gallery__slider:not(.swiper-initialized)", {
         observer: true,
         observeParents: true,
         slidesPerView: 1,
         spaceBetween: 0,
         autoHeight: false,
-        speed: 800,
+        speed: 300,
         autoplay: {
           delay: 3000,
         },
@@ -3632,9 +3930,11 @@ data-youtube - Атрибут для кода youtube
   function initPopupSlider() {
     const pop = new Popup();
 
-    const containerSlider = document.querySelectorAll(".submitted__swiper-yt");
+    const containerSlider = document.querySelector(".submitted__swiper-yt");
 
-    containerSlider[0].addEventListener("click", function (event) {
+    if (!containerSlider) return;
+
+    containerSlider.addEventListener("click", function (event) {
       if (!event.target.closest(".submitted__slide-yt_video")) return;
 
       let slideTargetVideo = event.target.closest(".submitted__slide-yt_video")
@@ -3745,8 +4045,6 @@ data-youtube - Атрибут для кода youtube
       return "https://www.youtube.com/embed/" + id + query;
     }
   }
-
-  initSliders();
 
   /* инициализация карты */
   function initMap() {
@@ -3960,8 +4258,40 @@ data-youtube - Атрибут для кода youtube
         ],
       },
     ];
-    const tabsMap = document.querySelectorAll(".ya-map__tab");
+    let boreholes = [
+      {
+        id: 1,
+        type: "Feature",
+        geometry: {
+          type: "Point",
+          coordinates: ["55.462994", "37.411216"],
+        },
+        properties: {
+          iconClass: "blue",
+          clusterCaption: "Cкважина 123м",
+          balloonContentBody:
+            'Владимирская обл <br> Песчаный слой: 50-70 м <br> <div class="open-modal ya-btn-marker" data-id="#consultationForm2"> Заказать </div>',
+          iconContent: "123м",
+        },
+      },
+      {
+        id: 2,
+        type: "Feature",
+        geometry: {
+          type: "Point",
+          coordinates: ["55.452994", "37.431216"],
+        },
+        properties: {
+          iconClass: "orange",
+          balloonContentBody: "Контент оранжевой скважины 12м",
+          clusterCaption: "Cкважина 12м",
+          iconContent: "12м",
+        },
+      },
+    ];
+    const slectorBtn = document.querySelectorAll(".ya-map__tab");
 
+    const tabsMap = document.querySelectorAll("button[data-city-map]");
     var myMap = new ymaps.Map(
       "map",
       {
@@ -3972,10 +4302,18 @@ data-youtube - Атрибут для кода youtube
         searchControlProvider: "yandex#search",
       },
     );
-    // if (width < 767.98) {
-    //   myMap.behaviors.disable(['drag', 'rightMouseButtonMagnifier']);
-    // }
-    if (tabsMap) {
+
+    slectorBtn.forEach((element) => {
+      element.addEventListener("click", (e) => {
+        if (element.closest("._active-tab-map")) {
+          return;
+        }
+        slectorBtn.forEach((el) => el.classList.remove("_active-tab-map"));
+        element.classList.add("_active-tab-map");
+      });
+    });
+
+    if (tabsMap.length !== 0) {
       tabsMap.forEach((element) => {
         const dataCity = element.dataset.cityMap;
         let objCity = cityList.find((el) => dataCity === el.city);
@@ -3995,16 +4333,42 @@ data-youtube - Атрибут для кода youtube
         );
         myMap.geoObjects.add(myPolygon);
         myMap.geoObjects.add(new ymaps.Placemark(objCity.center, {}));
-
-        element.addEventListener("click", (e) => {
-          myMap.setCenter(objCity.center, objCity.zoom);
-          if (element.closest("._active-tab-map")) {
-            return;
-          }
-          tabsMap.forEach((el) => el.classList.remove("_active-tab-map"));
-          element.classList.add("_active-tab-map");
-        });
       });
+    } else {
+      myMap.geoObjects.add(new ymaps.Placemark([55.73, 37.6], {}));
+      let myPolygon = new ymaps.Polygon(
+        [
+          [
+            [54.80831947994278, 38.18433433925412],
+            [54.87945876925923, 38.52995859405644],
+            [55.122011885673516, 38.67767483903884],
+            [55.37773639221365, 38.95005546337981],
+            [55.69101620830514, 39.06854923170738],
+            [55.962220037403114, 39.09331426601756],
+            [56.118493229997256, 38.83962697728742],
+            [56.38328535103986, 38.538312268742686],
+            [56.72694946754399, 38.84094055277811],
+            [56.54218234666476, 37.45911829335503],
+            [56.484269925944716, 36.55340126947627],
+            [56.082994973012944, 35.26044765213379],
+            [55.528582146509564, 35.79574540554199],
+            [54.886906159423376, 36.2751232506904],
+            [54.80831947994278, 38.18433433925412],
+          ],
+        ],
+        {
+          hintContent: "Многоугольник",
+        },
+        {
+          fillColor: "#009CD9",
+          strokeWidth: 1,
+          strokeColor: "#0067A0",
+          strokeOpacity: 1,
+          fillOpacity: 0.2,
+        },
+      );
+
+      myMap.geoObjects.add(myPolygon);
     }
 
     // myMap.controls.remove('zoomControl'); // удаляем контрол зуммирования
@@ -4015,588 +4379,729 @@ data-youtube - Атрибут для кода youtube
     myMap.controls.remove("fullscreenControl"); // удаляем кнопку перехода в полноэкранный режим
     myMap.controls.remove("rulerControl"); // удаляем контрол правил
     myMap.behaviors.disable(["scrollZoom"]); // отключаем скролл карты (опционально)
+    // Создаем собственный макет с информацией о выбранном геообъекте.
+    let customItemContentLayout = ymaps.templateLayoutFactory.createClass(
+      // Флаг "raw" означает, что данные вставляют "как есть" без экранирования html.
+      '<div class="boreholeClasterMarker">{{ properties.balloonContentBody|raw }}</div>',
+    );
+
+    let customIconLayout = ymaps.templateLayoutFactory.createClass(
+      '<div class="boreholeMapMarker_{{ properties.iconClass|raw }}"><div class="mapMarkerPin"></div><div class="mapMarkerContent">{{ properties.iconContent|raw }}</div></div>',
+    );
+
+    let clusterBalloonContentLayoutWidth = 500;
+    let clusterBalloonContentLayoutHeight = 170;
+    let balloonMaxWidth = 500;
+
+    let bmapObjectManager = new ymaps.ObjectManager({
+      clusterize: true,
+      gridSize: 32,
+      clusterDisableClickZoom: true,
+      clusterOpenBalloonOnClick: true,
+      // Устанавливаем режим открытия балуна.
+      // В данном примере балун никогда не будет открываться в режиме панели.
+      clusterBalloonPanelMaxMapArea: 0,
+      // Устанавливаем размер макета контента балуна (в пикселях).
+      clusterBalloonContentLayoutWidth: clusterBalloonContentLayoutWidth,
+      clusterBalloonContentLayoutHeight: clusterBalloonContentLayoutHeight,
+      // Устанавливаем собственный макет.
+      clusterBalloonItemContentLayout: customItemContentLayout,
+      // Устанавливаем ширину левой колонки, в которой располагается список всех геообъектов кластера.
+      clusterBalloonLeftColumnWidth: 100,
+
+      clusterIconColor: "#000",
+    });
+
+    bmapObjectManager.objects.options.set({
+      iconLayout: customIconLayout,
+      iconShape: {
+        type: "Rectangle",
+        coordinates: [
+          [0, -30],
+          [40, 0],
+        ],
+      },
+    });
+
+    myMap.geoObjects.add(bmapObjectManager);
+
+    bmapObjectManager.add({
+      type: "FeatureCollection",
+      features: boreholes,
+    });
   }
   ymaps.ready(initMap);
+
   /* кнопка инфо  Модификации */
 
   // ===================================================================
-  const infoModelBtn = document.querySelectorAll(".card-model__info-btn");
-  if (infoModelBtn) {
-    infoModelBtn.forEach((element, indx) => {
-      element.addEventListener("click", function (e) {
-        element.classList.toggle("_show");
+  function tabModificationModel() {
+    const infoModelBtn = document.querySelectorAll(".card-model__info-btn");
+    if (infoModelBtn) {
+      infoModelBtn.forEach((element, indx) => {
+        // полуялоны емодели
+        element.addEventListener("click", function (e) {
+          element.classList.toggle("_show");
+        });
+        document.addEventListener("click", (e) => {
+          let target = e.target;
+
+          if (element.contains(target)) return;
+          if (!element.firstChild.contains(target)) {
+            element.classList.remove("_show");
+          }
+        });
       });
-      document.addEventListener("click", (e) => {
+    }
+    const dataModel = [
+      // 1
+      {
+        oneTopBtn: [
+          {
+            linkModel: "septik-akvalos-4",
+            id: "1",
+            img: "1",
+            name: "Септик Аквалос 4",
+            onePointList: "60",
+            threePointList: "250",
+            price: "106 200 ₽",
+            discount: "118 000 ₽",
+          },
+        ],
+        twoTopBtn: [
+          {
+            linkModel: "septik-akvalos-4-pr",
+
+            id: "1",
+            img: "1",
+            name: "Септик Аквалос 4 ПР",
+            onePointList: "60",
+            threePointList: "230",
+            price: "106 200 ₽",
+            discount: "118 000 ₽",
+          },
+        ],
+      },
+      // 2
+      {
+        oneTopBtn: [
+          {
+            linkModel: "septik-tver-0-35p",
+
+            id: "1",
+            img: "2-s",
+            name: "Септик Тверь 0,35 П",
+            onePointList: "30",
+            threePointList: "120",
+            price: "108 900 ₽",
+            discount: "",
+          },
+        ],
+        twoTopBtn: [
+          {
+            linkModel: "septik-tver-0-35-pn",
+            id: "1",
+            img: "2-p",
+            name: "Септик Тверь 0,35 ПН",
+            onePointList: "30",
+            threePointList: "110",
+            price: "118 800 ₽",
+            discount: "",
+          },
+        ],
+      },
+      // 3
+      {
+        oneTopBtn: [
+          {
+            linkModel: "septik-tver-0-5-p",
+            id: "1",
+            img: "3-s",
+            name: "Септик Тверь 0,5 П",
+            onePointList: "30",
+            threePointList: "120",
+            price: "118 800 ₽",
+            discount: "",
+          },
+          {
+            linkModel: "septik-tver-0-5-pm",
+            id: "2",
+            img: "3-s-pm",
+            name: "Септик Тверь 0,5 ПМ",
+            onePointList: "60",
+            threePointList: "110",
+            price: "136 900 ₽",
+            discount: "",
+          },
+          {
+            linkModel: "septik-tver-0-5-np",
+            id: "3",
+            img: "3-s",
+            name: "Септик Тверь 0,5 НП",
+            onePointList: "60",
+            threePointList: "120",
+            price: "131 800 ₽",
+            discount: "",
+          },
+          {
+            linkModel: "septik-tver-0-5-npm",
+            id: "4",
+            img: "3-s-pm",
+            name: "Септик Тверь 0,5 НПМ",
+            onePointList: "60",
+            threePointList: "120",
+            price: "151 600 ₽",
+            discount: "",
+          },
+        ],
+        twoTopBtn: [
+          {
+            linkModel: "septik-tver-0-5-pn",
+            id: "1",
+            img: "3-p",
+            name: "Септик Тверь 0,5 ПН",
+            onePointList: "30",
+            threePointList: "120",
+            price: "118 800 ₽",
+            discount: "",
+          },
+          {
+            linkModel: "septik-tver-0-5-pnm",
+            id: "2",
+            img: "3-p-pm",
+            name: "Септик Тверь 0,5 ПНМ",
+            onePointList: "60",
+            threePointList: "120",
+            price: "151 600 ₽",
+            discount: "",
+          },
+          {
+            linkModel: "septik-tver-0-5-npn",
+            id: "3",
+            img: "3-p",
+            name: "Септик Тверь 0,5 НПН",
+            onePointList: "30",
+            threePointList: "120",
+            price: "142 700 ₽",
+            discount: "",
+          },
+          {
+            linkModel: "septik-tver-0-5-npnm",
+            id: "4",
+            img: "3-p-mpn",
+            name: "Септик Тверь 0,8 НПНМ",
+            onePointList: "60",
+            threePointList: "120",
+            price: "164 900 ₽",
+            discount: "",
+          },
+        ],
+      },
+      // 4
+      {
+        oneTopBtn: [
+          {
+            linkModel: "septik-astra-5",
+            id: "1",
+            img: "4",
+            name: "Септик Юнилос Астра 5",
+            onePointList: "85",
+            threePointList: "250",
+            price: "123 250 ₽",
+            discount: "145 000 ₽",
+          },
+          {
+            linkModel: "septik-astra-5-midi",
+            id: "2",
+            img: "4-m",
+            name: "Септик Юнилос Астра 5 Миди",
+            onePointList: "100",
+            threePointList: "250",
+            price: "125 800 ₽",
+            discount: "148 000 ₽",
+          },
+          {
+            linkModel: "septik-astra-5-long",
+            id: "3",
+            img: "4-l",
+            name: "Септик Юнилос Астра 5 Лонг",
+            onePointList: "150",
+            threePointList: "250",
+            price: "141 950 ₽",
+            discount: "167 000 ₽",
+          },
+        ],
+        twoTopBtn: [
+          {
+            linkModel: "septik-astra-5-pr",
+            id: "1",
+            img: "4",
+            name: "Септик Юнилос Астра 5 Пр",
+            onePointList: "85",
+            threePointList: "250",
+            price: "127 500 ₽",
+            discount: "150 000 ₽",
+          },
+          {
+            linkModel: "septik-astra-5-midi-pr",
+            id: "2",
+            img: "4-m",
+            name: "Септик Юнилос Астра 5 Миди Пр",
+            onePointList: "100",
+            threePointList: "250",
+            price: "130 050 ₽",
+            discount: "153 000 ₽",
+          },
+          {
+            linkModel: "septik-astra-5-long-pr",
+            id: "3",
+            img: "4-l",
+            name: "Септик Юнилос Астра 5 Лонг Пр",
+            onePointList: "150",
+            threePointList: "250",
+            price: "146 200 ₽",
+            discount: "172 000",
+          },
+        ],
+      },
+      // 5
+      {
+        oneTopBtn: [
+          {
+            linkModel: "septik-topol-6",
+            id: "1",
+            img: "5",
+            name: "Септик Тополь 6",
+            onePointList: "85",
+            threePointList: "270",
+            price: "129 420 ₽",
+            discount: "143 800 ₽",
+          },
+          {
+            linkModel: "septik-topol-6-pljus",
+            id: "2",
+            img: "5-p",
+            name: "Септик Тополь 6 Плюс",
+            onePointList: " 135",
+            threePointList: "270",
+            price: "145 440 ₽",
+            discount: "161 600 ₽",
+          },
+        ],
+        twoTopBtn: [
+          {
+            linkModel: "septik-topol-6-pr",
+            id: "1",
+            img: "5-p",
+            name: "Септик Тополь 6 Пр",
+            onePointList: "85",
+            threePointList: "270",
+            price: "139 500 ₽",
+            discount: "155 000 ₽",
+          },
+          {
+            linkModel: "septik-topol-6-pr-pljus",
+            id: "2",
+            img: "5-p",
+            name: "Септик Тополь 6 Пр Плюс",
+            onePointList: "135",
+            threePointList: "270",
+            price: "157 320 ₽",
+            discount: "174 800 ₽",
+          },
+        ],
+      },
+      // 6
+      {
+        oneTopBtn: [
+          {
+            linkModel: "septik-tver-085-p",
+            id: "1",
+            img: "6-s",
+            name: "Септик Тверь 0,8 П",
+            onePointList: "30",
+            threePointList: "120",
+            price: "135 900 ₽",
+            discount: "",
+          },
+          {
+            linkModel: "septik-tver-085-pm",
+            id: "2",
+            img: "6-s-pm",
+            name: "Септик Тверь 0,8 ПМ",
+            onePointList: "60",
+            threePointList: "225",
+            price: "159 600 ₽",
+            discount: "",
+          },
+          {
+            linkModel: "septik-tver-085-np",
+            id: "3",
+            img: "6-s",
+            name: "Септик Тверь 0,8 НП",
+            onePointList: "102",
+            threePointList: "225",
+            price: "150 900 ₽",
+            discount: "",
+          },
+          {
+            linkModel: "septik-tver-085-npm",
+            id: "4",
+            img: "6-s-pm",
+            name: "Септик Тверь 0,8 НПМ",
+            onePointList: "132",
+            threePointList: "225",
+            price: "178 400 ₽",
+            discount: "",
+          },
+        ],
+        twoTopBtn: [
+          {
+            linkModel: "septik-tver-085-pn",
+            id: "1",
+            img: "6-p",
+            name: "Септик Тверь 0,8 ПН",
+            onePointList: "30",
+            threePointList: "630",
+            price: "150 700 ₽",
+            discount: "",
+          },
+          {
+            linkModel: "septik-tver-085-pnm",
+            id: "2",
+            img: "6-p-pm",
+            name: "Септик Тверь 0,8 ПНМ",
+            onePointList: "60",
+            threePointList: "225",
+            price: "178 400 ₽",
+            discount: "",
+          },
+          {
+            linkModel: "septik-tver-085-npn",
+            id: "3",
+            img: "6-p",
+            name: "Септик Тверь 0,8 НПН",
+            onePointList: "102",
+            threePointList: "225",
+            price: "163 900 ₽",
+            discount: "",
+          },
+          {
+            linkModel: "septik-tver-085-npnm",
+            id: "4",
+            img: "6-p-pm",
+            name: "Септик Тверь 0,8 НП",
+            onePointList: "132",
+            threePointList: "225",
+            price: "192 600 ₽",
+            discount: "",
+          },
+        ],
+      },
+      // 7
+      {
+        oneTopBtn: [
+          {
+            linkModel: "septik-akvalos-8",
+            id: "1",
+            img: "7",
+            name: "Септик Аквалос 8",
+            onePointList: "60",
+            threePointList: "700",
+            price: "130 050 ₽",
+            discount: "165 000 ₽",
+          },
+          {
+            linkModel: "septik-akvalos-8-mid",
+            id: "2",
+            img: "7-m",
+            name: "Септик Аквалос 8 Миди",
+            onePointList: "85",
+            threePointList: "700",
+            price: "153 900 ₽",
+            discount: "171 000 ₽",
+          },
+          {
+            linkModel: "septik-akvalos-8-long",
+            id: "3",
+            img: "7-l",
+            name: "Септик Аквалос 8 Лонг",
+            onePointList: "120",
+            threePointList: "700",
+            price: "167 400 ₽",
+            discount: "186 000 ₽",
+          },
+        ],
+        twoTopBtn: [
+          {
+            linkModel: "septik-akvalos-8-pr",
+            id: "1",
+            img: "7",
+            name: "Септик Аквалос 8 Пр",
+            onePointList: "60",
+            threePointList: "630",
+            price: "148 500 ₽",
+            discount: "165 000 ₽",
+          },
+          {
+            linkModel: "septik-akvalos-8-midi-pr",
+            id: "2",
+            img: "7-m",
+            name: "Септик Аквалос 8 Миди Пр",
+            onePointList: "85",
+            threePointList: "630",
+            price: "153 900 ₽",
+            discount: "171 000 ₽",
+          },
+          {
+            linkModel: "septik-akvalos-8-long-pr",
+            id: "3",
+            img: "7-l",
+            name: "Септик Аквалос 8 Лонг Пр",
+            onePointList: "120",
+            threePointList: "700",
+            price: "167 400 ₽",
+            discount: "186 000",
+          },
+        ],
+      },
+      // 8
+      {
+        oneTopBtn: [
+          {
+            linkModel: "septik-astra-8",
+            id: "1",
+            img: "4",
+            name: "Септик Юнилос Астра 8",
+            onePointList: "85",
+            threePointList: "350",
+            price: "149 600 ₽",
+            discount: "176 000 ₽",
+          },
+          {
+            linkModel: "septik-astra-8-midi",
+            id: "2",
+            img: "4-m",
+            name: "Септик Юнилос Астра 8 Миди",
+            onePointList: "100",
+            threePointList: "350",
+            price: "152 150 ₽",
+            discount: "179 000 ₽",
+          },
+          {
+            linkModel: "septik-astra-8-long",
+            id: "3",
+            img: "4-l",
+            name: "Септик Юнилос Астра 8 Лонг",
+            onePointList: "150",
+            threePointList: "350",
+            price: "173 400 ₽",
+            discount: "204 000 ₽",
+          },
+        ],
+        twoTopBtn: [
+          {
+            linkModel: "septik-astra-8-pr",
+            id: "1",
+            img: "4",
+            name: "Септик Юнилос Астра 8 Пр",
+            onePointList: "85",
+            threePointList: "350",
+            price: "153 850 ₽",
+            discount: "181 850 ₽",
+          },
+          {
+            linkModel: "septik-astra-8-midi-pr",
+            id: "2",
+            img: "4-m",
+            name: "Септик Юнилос Астра 8 Миди Пр",
+            onePointList: "100",
+            threePointList: "350",
+            price: "156 400 ₽",
+            discount: "184 000 ₽",
+          },
+          {
+            linkModel: "septik-astra-8-long-pr",
+            id: "3",
+            img: "4-l",
+            name: "Септик Юнилос Астра 8 Лонг Пр",
+            onePointList: "150",
+            threePointList: "350",
+            price: "167 400 ₽",
+            discount: "177 650 ₽",
+          },
+        ],
+      },
+      // 9
+      {
+        oneTopBtn: [
+          {
+            linkModel: "septik-tver-1-p",
+            id: "1",
+            img: "9-s",
+            name: "Септик Тверь 1,1 П",
+            onePointList: "30",
+            threePointList: "330",
+            price: "152 475 ₽",
+            discount: "160 500 ₽",
+          },
+          {
+            linkModel: "septik-tver-1-pm",
+            id: "2",
+            img: "9-s-pm",
+            name: "Септик Тверь 1,1 ПМ",
+            onePointList: " 60",
+            threePointList: "330",
+            price: "184 300 ₽",
+            discount: "",
+          },
+          {
+            linkModel: "septik-tver-1-np",
+            id: "3",
+            img: "9-s",
+            name: "Септик Тверь 1,1 НП",
+            onePointList: "102",
+            threePointList: "330",
+            price: "174 900 ₽",
+            discount: "",
+          },
+          {
+            linkModel: "septik-tver-1-npm",
+            id: "4",
+            img: "9-s-pm",
+            name: "Септик Тверь 1,1 НПМ",
+            onePointList: "132",
+            threePointList: "225",
+            price: "199 800 ₽",
+            discount: "",
+          },
+        ],
+        twoTopBtn: [
+          {
+            linkModel: "septik-tver-1-pn",
+            id: "1",
+            img: "9-p",
+            name: "Септик Тверь 1,1 ПН",
+            onePointList: "30",
+            threePointList: "330",
+            price: "174 900 ₽",
+            discount: "",
+          },
+          {
+            linkModel: "septik-tver-1-pnm",
+            id: "2",
+            img: "9-p-pm",
+            name: "Септик Тверь 1,1 ПНМ",
+            onePointList: "60",
+            threePointList: "330",
+            price: "199 800 ₽",
+            discount: "",
+          },
+          {
+            linkModel: "septik-tver-1-pnm",
+            id: "3",
+            img: "9-p",
+            name: "Септик Тверь 1,1 НПН",
+            onePointList: "102",
+            threePointList: "330",
+            price: "189 400 ₽",
+            discount: "",
+          },
+          {
+            linkModel: "septik-tver-1-npnm",
+            id: "4",
+            img: "9-p-pm",
+            name: "Септик Тверь 1,1 НП",
+            onePointList: "132",
+            threePointList: "330",
+            price: "251 900 ₽",
+            discount: "",
+          },
+        ],
+      },
+    ];
+    const slidesModel = document.querySelector(".popular-models__swiper");
+    if (slidesModel) {
+      slidesModel.addEventListener("click", function (e) {
         let target = e.target;
-
-        if (element.contains(target)) return;
-        if (!element.firstChild.contains(target)) {
-          element.classList.remove("_show");
-        }
-      });
-    });
-  }
-
-  const dataModel = [
-    // 1
-    {
-      oneTopBtn: [
-        {
-          id: "1",
-          img: "1",
-          name: "Септик Аквалос 4",
-          onePointList: "60",
-          threePointList: "250",
-          price: "106 200 ₽",
-          discount: "118 000 ₽",
-        },
-      ],
-      twoTopBtn: [
-        {
-          id: "1",
-          img: "1",
-          name: "Септик Аквалос 4 ПР",
-          onePointList: "60",
-          threePointList: "230",
-          price: "106 200 ₽",
-          discount: "118 000 ₽",
-        },
-      ],
-    },
-    // 2
-    {
-      oneTopBtn: [
-        {
-          id: "1",
-          img: "2-с",
-          name: "Септик Тверь 0,35 П",
-          onePointList: "30",
-          threePointList: "120",
-          price: "108 900 ₽",
-          discount: "",
-        },
-      ],
-      twoTopBtn: [
-        {
-          id: "1",
-          img: "2-п",
-          name: "Септик Тверь 0,35 ПН",
-          onePointList: "30",
-          threePointList: "110",
-          price: "118 800 ₽",
-          discount: "",
-        },
-      ],
-    },
-    // 3
-    {
-      oneTopBtn: [
-        {
-          id: "1",
-          img: "3-c",
-          name: "Септик Тверь 0,5 П",
-          onePointList: "30",
-          threePointList: "120",
-          price: "118 800 ₽",
-          discount: "",
-        },
-        {
-          id: "2",
-          img: "3-с-пм",
-          name: "Септик Тверь 0,5 ПМ",
-          onePointList: "60",
-          threePointList: "110",
-          price: "136 900 ₽",
-          discount: "",
-        },
-        {
-          id: "3",
-          img: "3-c",
-          name: "Септик Тверь 0,5 НП",
-          onePointList: "60",
-          threePointList: "120",
-          price: "131 800 ₽",
-          discount: "",
-        },
-        {
-          id: "4",
-          img: "3-с-пм",
-          name: "Септик Тверь 0,5 НПМ",
-          onePointList: "60",
-          threePointList: "120",
-          price: "151 600 ₽",
-          discount: "",
-        },
-      ],
-      twoTopBtn: [
-        {
-          id: "1",
-          img: "3-п",
-          name: "Септик Тверь 0,5 ПН",
-          onePointList: "30",
-          threePointList: "120",
-          price: "118 800 ₽",
-          discount: "",
-        },
-        {
-          id: "2",
-          img: "3-п-пм",
-          name: "Септик Тверь 0,5 ПНМ",
-          onePointList: "60",
-          threePointList: "120",
-          price: "151 600 ₽",
-          discount: "",
-        },
-        {
-          id: "3",
-          img: "3-п",
-          name: "Септик Тверь 0,5 НПН",
-          onePointList: "30",
-          threePointList: "120",
-          price: "142 700 ₽",
-          discount: "",
-        },
-        {
-          id: "4",
-          img: "3-п-пмн",
-          name: "Септик Тверь 0,8 НПНМ",
-          onePointList: "60",
-          threePointList: "120",
-          price: "164 900 ₽",
-          discount: "",
-        },
-      ],
-    },
-    // 4
-    {
-      oneTopBtn: [
-        {
-          id: "1",
-          img: "4",
-          name: "Септик Юнилос Астра 5",
-          onePointList: "85",
-          threePointList: "250",
-          price: "123 250 ₽",
-          discount: "145 000 ₽",
-        },
-        {
-          id: "2",
-          img: "4-м",
-          name: "Септик Юнилос Астра 5 Миди",
-          onePointList: "100",
-          threePointList: "250",
-          price: "125 800 ₽",
-          discount: "148 000 ₽",
-        },
-        {
-          id: "3",
-          img: "4-л",
-          name: "Септик Юнилос Астра 5 Лонг",
-          onePointList: "150",
-          threePointList: "250",
-          price: "141 950 ₽",
-          discount: "167 000 ₽",
-        },
-      ],
-      twoTopBtn: [
-        {
-          id: "1",
-          img: "4",
-          name: "Септик Юнилос Астра 5 Пр",
-          onePointList: "85",
-          threePointList: "250",
-          price: "127 500 ₽",
-          discount: "150 000 ₽",
-        },
-        {
-          id: "2",
-          img: "4-м",
-          name: "Септик Юнилос Астра 5 Миди Пр",
-          onePointList: "100",
-          threePointList: "250",
-          price: "130 050 ₽",
-          discount: "153 000 ₽",
-        },
-        {
-          id: "3",
-          img: "4-л",
-          name: "Септик Юнилос Астра 5 Лонг Пр",
-          onePointList: "150",
-          threePointList: "250",
-          price: "146 200 ₽",
-          discount: "172 000",
-        },
-      ],
-    },
-    // 5
-    {
-      oneTopBtn: [
-        {
-          id: "1",
-          img: "5",
-          name: "Септик Тополь 6",
-          onePointList: "85",
-          threePointList: "270",
-          price: "129 420 ₽",
-          discount: "143 800 ₽",
-        },
-        {
-          id: "2",
-          img: "5-п",
-          name: "Септик Тополь 6 Плюс",
-          onePointList: " 135",
-          threePointList: "270",
-          price: "145 440 ₽",
-          discount: "161 600 ₽",
-        },
-      ],
-      twoTopBtn: [
-        {
-          id: "1",
-          img: "5-п",
-          name: "Септик Тополь 6 Пр",
-          onePointList: "85",
-          threePointList: "270",
-          price: "139 500 ₽",
-          discount: "155 000 ₽",
-        },
-        {
-          id: "2",
-          img: "5-п",
-          name: "Септик Тополь 6 Пр Плюс",
-          onePointList: "135",
-          threePointList: "270",
-          price: "157 320 ₽",
-          discount: "174 800 ₽",
-        },
-      ],
-    },
-    // 6
-    {
-      oneTopBtn: [
-        {
-          id: "1",
-          img: "6-с",
-          name: "Септик Тверь 0,8 П",
-          onePointList: "30",
-          threePointList: "120",
-          price: "135 900 ₽",
-          discount: "",
-        },
-        {
-          id: "2",
-          img: "6-с-пм",
-          name: "Септик Тверь 0,8 ПМ",
-          onePointList: "60",
-          threePointList: "225",
-          price: "159 600 ₽",
-          discount: "",
-        },
-        {
-          id: "3",
-          img: "6-с",
-          name: "Септик Тверь 0,8 НП",
-          onePointList: "102",
-          threePointList: "225",
-          price: "150 900 ₽",
-          discount: "",
-        },
-        {
-          id: "4",
-          img: "6-с-пм",
-          name: "Септик Тверь 0,8 НПМ",
-          onePointList: "132",
-          threePointList: "225",
-          price: "178 400 ₽",
-          discount: "",
-        },
-      ],
-      twoTopBtn: [
-        {
-          id: "1",
-          img: "6-п",
-          name: "Септик Тверь 0,8 ПН",
-          onePointList: "30",
-          threePointList: "630",
-          price: "150 700 ₽",
-          discount: "",
-        },
-        {
-          id: "2",
-          img: "6-п-пм",
-          name: "Септик Тверь 0,8 ПНМ",
-          onePointList: "60",
-          threePointList: "225",
-          price: "178 400 ₽",
-          discount: "",
-        },
-        {
-          id: "3",
-          img: "6-п",
-          name: "Септик Тверь 0,8 НПН",
-          onePointList: "102",
-          threePointList: "225",
-          price: "163 900 ₽",
-          discount: "",
-        },
-        {
-          id: "4",
-          img: "6-п-пм",
-          name: "Септик Тверь 0,8 НП",
-          onePointList: "132",
-          threePointList: "225",
-          price: "192 600 ₽",
-          discount: "",
-        },
-      ],
-    },
-    // 7
-    {
-      oneTopBtn: [
-        {
-          id: "1",
-          img: "7",
-          name: "Септик Аквалос 8",
-          onePointList: "60",
-          threePointList: "700",
-          price: "130 050 ₽",
-          discount: "165 000 ₽",
-        },
-        {
-          id: "2",
-          img: "7-м",
-          name: "Септик Аквалос 8 Миди",
-          onePointList: "85",
-          threePointList: "700",
-          price: "153 900 ₽",
-          discount: "171 000 ₽",
-        },
-        {
-          id: "3",
-          img: "7-л",
-          name: "Септик Аквалос 8 Лонг",
-          onePointList: "120",
-          threePointList: "700",
-          price: "167 400 ₽",
-          discount: "186 000 ₽",
-        },
-      ],
-      twoTopBtn: [
-        {
-          id: "1",
-          img: "7",
-          name: "Септик Аквалос 8 Пр",
-          onePointList: "60",
-          threePointList: "630",
-          price: "148 500 ₽",
-          discount: "165 000 ₽",
-        },
-        {
-          id: "2",
-          img: "7-м",
-          name: "Септик Аквалос 8 Миди Пр",
-          onePointList: "85",
-          threePointList: "630",
-          price: "153 900 ₽",
-          discount: "171 000 ₽",
-        },
-        {
-          id: "3",
-          img: "7-л",
-          name: "Септик Аквалос 8 Лонг Пр",
-          onePointList: "120",
-          threePointList: "700",
-          price: "167 400 ₽",
-          discount: "186 000",
-        },
-      ],
-    },
-    // 8
-    {
-      oneTopBtn: [
-        {
-          id: "1",
-          img: "4",
-          name: "Септик Юнилос Астра 8",
-          onePointList: "85",
-          threePointList: "350",
-          price: "149 600 ₽",
-          discount: "176 000 ₽",
-        },
-        {
-          id: "2",
-          img: "4-м",
-          name: "Септик Юнилос Астра 8 Миди",
-          onePointList: "100",
-          threePointList: "350",
-          price: "152 150 ₽",
-          discount: "179 000 ₽",
-        },
-        {
-          id: "3",
-          img: "4-л",
-          name: "Септик Юнилос Астра 8 Лонг",
-          onePointList: "150",
-          threePointList: "350",
-          price: "173 400 ₽",
-          discount: "204 000 ₽",
-        },
-      ],
-      twoTopBtn: [
-        {
-          id: "1",
-          img: "4",
-          name: "Септик Юнилос Астра 8 Пр",
-          onePointList: "85",
-          threePointList: "350",
-          price: "153 850 ₽",
-          discount: "181 850 ₽",
-        },
-        {
-          id: "2",
-          img: "4-м",
-          name: "Септик Юнилос Астра 8 Миди Пр",
-          onePointList: "100",
-          threePointList: "350",
-          price: "156 400 ₽",
-          discount: "184 000 ₽",
-        },
-        {
-          id: "3",
-          img: "4-л",
-          name: "Септик Юнилос Астра 8 Лонг Пр",
-          onePointList: "150",
-          threePointList: "350",
-          price: "167 400 ₽",
-          discount: "177 650 ₽",
-        },
-      ],
-    },
-    // 9
-    {
-      oneTopBtn: [
-        {
-          id: "1",
-          img: "9-с",
-          name: "Септик Тверь 1,1 П",
-          onePointList: "30",
-          threePointList: "330",
-          price: "152 475 ₽",
-          discount: "160 500 ₽",
-        },
-        {
-          id: "2",
-          img: "9-с-пм",
-          name: "Септик Тверь 1,1 ПМ",
-          onePointList: " 60",
-          threePointList: "330",
-          price: "184 300 ₽",
-          discount: "",
-        },
-        {
-          id: "3",
-          img: "9-с",
-          name: "Септик Тверь 1,1 НП",
-          onePointList: "102",
-          threePointList: "330",
-          price: "174 900 ₽",
-          discount: "",
-        },
-        {
-          id: "4",
-          img: "9-с-пм",
-          name: "Септик Тверь 1,1 НПМ",
-          onePointList: "132",
-          threePointList: "225",
-          price: "199 800 ₽",
-          discount: "",
-        },
-      ],
-      twoTopBtn: [
-        {
-          id: "1",
-          img: "9-п",
-          name: "Септик Тверь 1,1 ПН",
-          onePointList: "30",
-          threePointList: "330",
-          price: "174 900 ₽",
-          discount: "",
-        },
-        {
-          id: "2",
-          img: "9-п-пм",
-          name: "Септик Тверь 1,1 ПНМ",
-          onePointList: "60",
-          threePointList: "330",
-          price: "199 800 ₽",
-          discount: "",
-        },
-        {
-          id: "3",
-          img: "9-п",
-          name: "Септик Тверь 1,1 НПН",
-          onePointList: "102",
-          threePointList: "330",
-          price: "189 400 ₽",
-          discount: "",
-        },
-        {
-          id: "4",
-          img: "9-п-пм",
-          name: "Септик Тверь 1,1 НП",
-          onePointList: "132",
-          threePointList: "330",
-          price: "251 900 ₽",
-          discount: "",
-        },
-      ],
-    },
-  ];
-  const slidesModel = document.querySelectorAll(".popular-models__slide");
-  if (slidesModel) {
-    slidesModel.forEach((element, indx) => {
-      element.addEventListener("click", function (e) {
-        const nameModel = element.querySelector(".card-model__name");
-        const priceModel = element.querySelector(".card-model__current-price");
-        const discountModel = element.querySelector(
-          ".card-model__discount-price",
-        );
-        const imgModel = element.querySelector(".card-model__img img");
-        const listModel = element.querySelector(".card-model__list");
-        const topBtn = element.querySelector(".card-model__top-btns");
-        const bottomBtn = element.querySelector(".card-model__bottom-btns");
-        const likeBtn = element.querySelector(".card-model__favorite");
-
-        let target = e.target;
-        let activeBottomBtn = "1";
-
-        if (
-          target.closest(".card-model__name") ||
-          target.closest(".card-model__img")
-        ) {
-          e.stopPropagation();
-        }
-
         selectTab(target, ".card-model__top-btn");
         selectTab(target, ".card-model__bottom-btn");
+
+        let activeBottomBtn = "1";
+        let activeTopBtn = "1";
+        const slideModel = document.querySelectorAll(".popular-models__slide");
+        let findIndxSlide;
+        let indxSlide;
+
+        if (target.closest("[data-top-id]")) {
+          for (let z = 0; z < slideModel.length; z++) {
+            const element = slideModel[z];
+            if (
+              element.dataset.slideId ===
+              target.closest("[data-top-id]").dataset.topId
+            ) {
+              findIndxSlide = slideModel[+element.dataset.swiperSlideIndex + 4];
+              indxSlide = element.dataset.swiperSlideIndex;
+              activeTopBtn = searchActiveBtn(
+                findIndxSlide.querySelector(".card-model__top-btns"),
+              );
+              if (findIndxSlide.querySelector(".card-model__bottom-btns")) {
+                activeBottomBtn = searchActiveBtn(
+                  findIndxSlide.querySelector(".card-model__bottom-btns"),
+                );
+              }
+            }
+          }
+        }
+
+        if (target.closest("[data-bottom-id]")) {
+          for (let i = 0; i < slideModel.length; i++) {
+            const element = slideModel[i];
+            if (
+              element.dataset.slideId ===
+              target.closest("[data-bottom-id]").dataset.bottomId
+            ) {
+              findIndxSlide = slideModel[+element.dataset.swiperSlideIndex + 4];
+              indxSlide = element.dataset.slideId;
+              activeTopBtn = searchActiveBtn(
+                findIndxSlide.querySelector(".card-model__top-btns"),
+              );
+              activeBottomBtn = searchActiveBtn(target.parentElement);
+              break;
+            }
+          }
+        }
+        if (!findIndxSlide) return;
+        const topBtn = findIndxSlide.querySelector(".card-model__top-btns");
+        const nameModel = findIndxSlide.querySelector(".card-model__name");
+        const priceModel = findIndxSlide.querySelector(
+          ".card-model__current-price",
+        );
+        const discountModel = findIndxSlide.querySelector(
+          ".card-model__discount-price",
+        );
+        const imgModel = findIndxSlide.querySelector(".card-model__img img");
+        const listModel = findIndxSlide.querySelector(".card-model__list");
+        const likeBtn = findIndxSlide.querySelector(".card-model__favorite");
+
         if (target.closest(".card-model__favorite")) {
           likeBtn.classList.toggle("_active");
         }
+        activeTopBtn = searchActiveBtn(topBtn);
 
-        let activeTopBtn = searchActiveBtn(topBtn);
-        if (bottomBtn) {
-          activeBottomBtn = searchActiveBtn(bottomBtn);
-        }
-        // element.dataset.swiperSlideIndex
-
-        let findObjModel = dataModel[indx][activeTopBtn].find(
+        let findObjModel = dataModel[indxSlide][activeTopBtn].find(
           (it) => it.id == activeBottomBtn,
         );
 
         if (findObjModel.name && nameModel) {
           nameModel.innerHTML = "";
           nameModel.innerHTML = findObjModel.name;
+          nameModel.setAttribute(
+            "href",
+            `https://sewera.ru/products/${findObjModel.linkModel}`,
+          );
         }
+
         if (findObjModel.price && priceModel) {
           priceModel.innerHTML = "";
           priceModel.innerHTML = findObjModel.price;
@@ -4629,41 +5134,39 @@ data-youtube - Атрибут для кода youtube
         listModel.children[3].firstElementChild.innerHTML =
           activeTopBtn === "oneTopBtn" ? "Самотеком" : "Принудительный";
       });
-    });
-  }
-  // ================================================================================================
-  // ================================================================================================
-  // ================================================================================================
-  /* добавдляем класс _active-btn */
-  function selectTab(target, selectorBtn) {
-    if (target.closest(selectorBtn) && !target.closest("._active-btn")) {
-      Array.from(target.parentElement.children).forEach((el, i) => {
-        el.classList.remove("_active-btn");
-      });
-      target.classList.add("_active-btn");
     }
-  }
-  // созадние пути для картнки
-  function createImgSrc(img, btn) {
-    if (btn) {
-      const endIndxSrc = img.src.lastIndexOf("/");
-      img.src = img.src.slice(0, endIndxSrc + 1) + btn + ".webp";
-    }
-  }
-
-  /* поиск активного  класса в topBtn */
-  function searchActiveBtn(selectorBtn) {
-    let activeTopBtn;
-    Array.from(selectorBtn.children).forEach((el) => {
-      if (el.closest("._active-btn")) {
-        let keys = Object.keys(el.dataset);
-        activeTopBtn = el.dataset[keys[0]];
+    /* добавдляем класс _active-btn */
+    function selectTab(target, selectorBtn) {
+      if (target.closest(selectorBtn) && !target.closest("._active-btn")) {
+        Array.from(target.parentElement.children).forEach((el, i) => {
+          el.classList.remove("_active-btn");
+        });
+        target.classList.add("_active-btn");
       }
-    });
+    }
+    // созадние пути для картнки
+    function createImgSrc(img, btn) {
+      if (btn) {
+        const endIndxSrc = img.src.lastIndexOf("/");
+        img.src = img.src.slice(0, endIndxSrc + 1) + btn + ".webp";
+      }
+    }
 
-    return activeTopBtn;
+    /* поиск активного  класса в topBtn */
+    function searchActiveBtn(selectorBtn) {
+      let activeTopBtn;
+
+      Array.from(selectorBtn.children).forEach((el) => {
+        if (el.closest("._active-btn")) {
+          let keys = Object.keys(el.dataset);
+          activeTopBtn = el.dataset[keys[0]];
+        }
+      });
+
+      return activeTopBtn;
+    }
   }
-
+  tabModificationModel();
   function rangeInit() {
     const arbitraryValuesForSlider = [
       "1",
@@ -4693,7 +5196,7 @@ data-youtube - Атрибут для кода youtube
       let textTo = priceSlider.getAttribute("data-to");
 
       initialize(priceSlider, {
-        start: 1,
+        start: 3,
         step: 1,
         range: {
           min: [0],
@@ -4710,51 +5213,34 @@ data-youtube - Атрибут для кода youtube
           format: format,
         },
       });
-      // priceSlider.noUiSlider.on('change', function () {
-      //   resultSeptic();
-      // });
     }
   }
   rangeInit();
 
   function initQwiz() {
     const qwizFrom = document.querySelector("#services_quiz_form");
-
+    const qwizCalc = document.querySelector("#calc-septik");
     if (qwizFrom) {
       const checkBlock = document.querySelector(".form-qwiz");
       const inputChecks = document.querySelectorAll(".form-qwiz__input");
       const steps = document.querySelectorAll(".form-qwiz__step");
       const prevBtn = document.querySelector(".qwiz-section__prev-btn");
       const nextBtn = document.querySelector(".qwiz-section__next-btn");
-      const bottomPanel = document.querySelector(".qwiz-section__bottom");
-      const navigatePanel = document.querySelector(".qwiz-section__navigate ");
+      const panelNavigate = document.querySelector(".qwiz-section__bottom");
       const stepCurrentNumber = document.querySelector(
         ".qwiz-section__current-step",
       );
-      const radioBtn = document.querySelectorAll(
-        'input[name="Нужен дренажный колодец?"]',
-      );
-
       const restartBtn = document.querySelector(".form-qwiz__restart-btn");
+      const finishStep = document.querySelector(".qwiz-section__finish-step");
       let currentStep = 0;
       let isCheck = false;
-      let statusQuestion = "";
-
-      radioBtn.forEach((radio) => {
-        radio.addEventListener("change", () => (statusQuestion = radio.value));
-      });
 
       nextBtn.addEventListener("click", nextStep);
       prevBtn.addEventListener("click", prevStep);
       checkBlock.addEventListener("click", isClickCheck);
-      if (document.querySelector(".qwiz-section__finish-step")) {
-        document.querySelector(".qwiz-section__finish-step").innerHTML = `/${
-          steps.length - 1
-        }`;
-      }
-
+      if (finishStep) finishStep.innerHTML = `/${steps.length - 1}`;
       // кнопка заказать занова
-      if (restartBtn) {
+      if (restartBtn)
         restartBtn.addEventListener("click", function (e) {
           currentStep = 0;
           isCheck = false;
@@ -4763,18 +5249,17 @@ data-youtube - Атрибут для кода youtube
           prevBtn.disabled = true;
           steps[0].classList.add("_current");
           steps[steps.length - 1].classList.remove("_current");
-          bottomPanel.style.display = "flex";
+          panelNavigate.style.display = "flex";
           stepCurrentNumber.parentNode.style.display = "flex";
           stepCurrentNumber.parentNode.classList.remove("_ready");
           inputChecks.forEach((inpt) => (inpt.checked = false));
         });
-      }
 
       function isClickCheck(e) {
         let target = e.target;
-
         if (target.classList.contains("form-qwiz__input")) {
           isValidateFormService();
+
           if (!isCheck && currentStep === steps.length - 3) {
             nextBtn.classList.add("_disabled");
             nextBtn.disabled = true;
@@ -4793,11 +5278,7 @@ data-youtube - Атрибут для кода youtube
 
         isValidateFormService();
 
-        if (currentStep === 1) {
-          prevBtn.style.display = "inline-block";
-          navigatePanel.style.justifyContent = "space-between";
-        }
-
+        console.log(currentStep);
         if (isCheck && currentStep === steps.length - 2) {
           stepCurrentNumber.parentNode.classList.add("_ready");
         }
@@ -4806,53 +5287,26 @@ data-youtube - Атрибут для кода youtube
           nextBtn.classList.add("_disabled");
           nextBtn.disabled = true;
         }
-        // скрывает каунт в конце
-        // if (steps.length - 1 === currentStep) {
-        // stepCurrentNumber.parentNode.style.display = 'none';
-        // }
-
         if (steps.length - 1 === currentStep) {
-          navigatePanel.style.display = "none";
-        }
-        if (bottomPanel && steps.length - 2 === currentStep) {
-          bottomPanel.style.display = "none";
+          stepCurrentNumber.parentNode.style.display = "none";
         }
 
-        if (
-          steps[currentStep].closest("._additional-question") &&
-          !statusQuestion
-        ) {
-          switchCurrentClassName(currentStep - 1, currentStep + 1, nextBtn);
-          currentStep = 5;
-          editCountStepText(`Шаг ${currentStep}`);
+        if (steps.length - 2 === currentStep) {
+          panelNavigate.style.display = "none";
+        }
+
+        if (steps.length === currentStep) {
+          steps[currentStep - 1].style.display = "none";
           return;
         }
+
+        stepCurrentNumber.innerHTML = currentStep + 1;
+
         prevBtn.classList.remove("_disabled");
         prevBtn.disabled = false;
-        //прибаляем шаги +1
-        if (statusQuestion) {
-          editCountStepText(`Шаг ${currentStep}`);
-        } else {
-          editCountStepText(`Шаг ${currentStep + 1}`);
-        }
-
-        // на последнем шагу добавляет текст 'Итоги'
-        if (steps.length === currentStep + 1) {
-          resultSeptic();
-          editCountStepText("Итоги");
-        }
-        //есди есть доп.вопрос добавляем 'Дополнительный вопрос'
-        if (
-          steps[currentStep].closest("._additional-question") &&
-          statusQuestion
-        ) {
-          editCountStepText("Дополнительный вопрос");
-          switchCurrentClassName(currentStep - 1, currentStep, prevBtn);
-          return;
-        }
-        switchCurrentClassName(currentStep - 1, currentStep, prevBtn);
+        steps[currentStep - 1].classList.remove("_current");
+        steps[currentStep].classList.add("_current");
       }
-
       // шаг назад
       function prevStep(e) {
         if (currentStep === steps.length - 2) {
@@ -4866,6 +5320,252 @@ data-youtube - Атрибут для кода youtube
         if (prevBtn.classList.contains("_disabled")) {
           return;
         }
+        currentStep--;
+        stepCurrentNumber.innerHTML = currentStep + 1;
+
+        if (currentStep === 0) {
+          prevBtn.classList.add("_disabled");
+          prevBtn.disabled = true;
+        }
+        nextBtn.disabled = false;
+        steps[currentStep + 1].classList.remove("_current");
+        steps[currentStep].classList.add("_current");
+      }
+
+      // валидация чекбокса
+      function isValidateFormService() {
+        for (let i = 0; i < inputChecks.length; i++) {
+          const element = inputChecks[i];
+          if (element.checked) {
+            isCheck = true;
+            return;
+          }
+        }
+        isCheck = false;
+        return;
+      }
+      qwizFrom.addEventListener("submit", function (e) {
+        e.preventDefault();
+        var th = $("#services_quiz_form");
+        $(".load__preloader").fadeIn("", function () {
+          $.ajax({
+            type: "POST",
+            url: "/index.php?route=common/footer/quiz_submit",
+            data: th.serialize(),
+            dataType: "json",
+          }).done(function (json) {
+            if (json["success"]) {
+              $(".load__preloader").fadeOut("slow");
+              nextStep();
+            }
+          });
+        });
+        return false;
+      });
+    }
+    if (qwizCalc) {
+      const inputChecks = document.querySelectorAll(".form-qwiz__input");
+      const steps = document.querySelectorAll(".form-qwiz__step");
+      const prevBtn = document.querySelector(".qwiz-section__prev-btn");
+      const nextBtn = document.querySelector(".qwiz-section__next-btn");
+      const bottomPanel = document.querySelector(".qwiz-section__bottom");
+      const navigatePanel = document.querySelector(".qwiz-section__navigate ");
+      const stepCurrentNumber = document.querySelector(
+        ".qwiz-section__current-step",
+      );
+      const radioBtn = document.querySelectorAll(
+        'input[name="Место отвода воды из септика"]',
+      );
+      const oneRadioBtns = document.querySelectorAll(
+        'input[name="Глубина залегания трубы"]',
+      );
+      const twoRadioBtns = document.querySelectorAll(
+        'input[name="Место отвода воды из септика"]',
+      );
+      const threeRadioBtns = document.querySelectorAll(
+        'input[name="Количество колец"]',
+      );
+      const restartBtn = document.querySelector(".form-qwiz__restart-btn");
+      let currentStep = 0;
+      let isCheck = true;
+      let statusQuestion = false;
+
+      radioBtn.forEach((radio) => {
+        radio.addEventListener("change", () => {
+          if (radio.value === "Дренажный колодец") {
+            statusQuestion = true;
+            return;
+          }
+          statusQuestion = false;
+        });
+      });
+
+      nextBtn.addEventListener("click", nextStep);
+      prevBtn.addEventListener("click", prevStep);
+
+      if (document.querySelector(".qwiz-section__finish-step")) {
+        document.querySelector(".qwiz-section__finish-step").innerHTML = `/${
+          steps.length - 1
+        }`;
+      }
+
+      // кнопка заказать занова
+      if (restartBtn) {
+        restartBtn.addEventListener("click", function (e) {
+          currentStep = 0;
+          stepCurrentNumber.innerHTML = "Шаг 1";
+          prevBtn.classList.add("_disabled");
+          steps[0].classList.add("_current");
+          steps[steps.length - 1].classList.remove("_current");
+          navigatePanel.style.display = "flex";
+          prevBtn.style.display = "none";
+          document.querySelector(".qwiz-section__progress-step").style.display =
+            "flex";
+          navigatePanel.style.justifyContent = "flex-end";
+          deleteCheck(oneRadioBtns);
+          deleteCheck(twoRadioBtns);
+          deleteCheck(threeRadioBtns);
+        });
+      }
+
+      // ==============================================================================
+
+      function deleteCheck(selector) {
+        selector.forEach((el) => {
+          el.checked = false;
+        });
+      }
+
+      function checkRadioValue(selector) {
+        let res = false;
+        selector.forEach((el) => {
+          if (el.checked) {
+            res = true;
+          }
+        });
+        return res;
+      }
+
+      function eventRadio(selector) {
+        if (selector) {
+          selector.forEach((it) => {
+            it.addEventListener("click", () => clickRadioCheck(selector));
+          });
+        }
+      }
+
+      function clickRadioCheck(slector) {
+        checkRadioValue(slector);
+        nextBtn.classList.remove("_disabled");
+      }
+      eventRadio(oneRadioBtns);
+      eventRadio(twoRadioBtns);
+      eventRadio(threeRadioBtns);
+      // шаг вперед
+      function nextStep(e) {
+        let isOneRadio = checkRadioValue(oneRadioBtns);
+        let isTwoRadio = checkRadioValue(twoRadioBtns);
+        let isThreeRadio = checkRadioValue(threeRadioBtns);
+        console.log(currentStep);
+
+        if (currentStep == 2 && !statusQuestion) {
+          nextBtn.classList.remove("_disabled");
+        }
+        // ==== 3
+        if (currentStep === 2 && !isThreeRadio && statusQuestion) {
+          nextBtn.classList.add("_disabled");
+        }
+        if (currentStep === 3 && !isThreeRadio) {
+          return;
+        }
+        // ==== 2
+        if (currentStep === 1 && !isTwoRadio) {
+          nextBtn.classList.add("_disabled");
+        }
+        if (currentStep === 2 && !isTwoRadio) {
+          return;
+        }
+        // ==== 1
+        if (currentStep === 0 && !isOneRadio) {
+          nextBtn.classList.add("_disabled");
+        }
+
+        if (currentStep === 1 && !isOneRadio) {
+          return;
+        }
+        ++currentStep;
+
+        isValidateFormService();
+
+        if (steps.length === currentStep + 1) {
+          document.querySelector(".qwiz-section__progress-step").style.display =
+            "none";
+        }
+
+        if (steps.length - 2 === currentStep) {
+          navigatePanel.style.display = "none";
+        }
+        if (currentStep === 1) {
+          prevBtn.style.display = "inline-block";
+          navigatePanel.style.justifyContent = "space-between";
+        }
+
+        if (isCheck && currentStep === steps.length - 2) {
+          stepCurrentNumber.parentNode.classList.add("_ready");
+        }
+
+        if (steps.length - 1 === currentStep) {
+          navigatePanel.style.display = "none";
+        }
+        if (bottomPanel && steps.length - 2 === currentStep) {
+          bottomPanel.style.display = "none";
+        }
+
+        if (
+          steps[currentStep].closest("._additional-question") &&
+          !statusQuestion
+        ) {
+          switchCurrentClassName(currentStep - 1, currentStep + 1, nextBtn);
+          currentStep = 4;
+          editCountStepText(`Шаг ${currentStep}`);
+          return;
+        }
+        prevBtn.classList.remove("_disabled");
+        prevBtn.disabled = false;
+        //прибаляем шаги +1
+        if (statusQuestion) {
+          editCountStepText(`Шаг ${currentStep}`);
+        } else {
+          editCountStepText(`Шаг ${currentStep + 1}`);
+        }
+
+        // на последнем шагу добавляет текст 'Итоги'
+        if (steps.length - 1 === currentStep + 1) {
+          showReusltSeptik();
+          editCountStepText("Итоги");
+        }
+        //есди есть доп.вопрос добавляем 'Дополнительный вопрос'
+        if (
+          steps[currentStep].closest("._additional-question") &&
+          statusQuestion
+        ) {
+          editCountStepText("Дополнительный вопрос");
+
+          switchCurrentClassName(currentStep - 1, currentStep, prevBtn);
+          return;
+        }
+        switchCurrentClassName(currentStep - 1, currentStep, prevBtn);
+      }
+
+      // шаг назад
+      function prevStep(e) {
+        let isTwoRadio = checkRadioValue(twoRadioBtns);
+        if (currentStep == 3 && isTwoRadio) {
+          nextBtn.classList.remove("_disabled");
+        }
+        if (currentStep == 1) {
+          nextBtn.classList.remove("_disabled");
+        }
 
         currentStep--;
 
@@ -4875,7 +5575,7 @@ data-youtube - Атрибут для кода youtube
           !statusQuestion
         ) {
           switchCurrentClassName(currentStep + 1, currentStep - 1, nextBtn);
-          currentStep = 3;
+          currentStep = 2;
           editCountStepText(`Шаг ${currentStep + 1}`);
           return;
         }
@@ -4886,12 +5586,6 @@ data-youtube - Атрибут для кода youtube
           statusQuestion
         ) {
           editCountStepText("Дополнительный вопрос");
-        }
-        if (
-          steps[currentStep].closest("._additional-question") &&
-          statusQuestion
-        ) {
-          editCountStepText(`Шаг ${currentStep}`);
         } else {
           editCountStepText(`Шаг ${currentStep + 1}`);
         }
@@ -4927,27 +5621,26 @@ data-youtube - Атрибут для кода youtube
         steps[stepRemove].classList.remove("_current");
         steps[stepAdd].classList.add("_current");
       }
-      //   qwizFrom.addEventListener('submit', function (e) {
-      //     e.preventDefault();
-      //     var th = $('#services_quiz_form');
-      //     $('.load__preloader').fadeIn('', function () {
-      //       $.ajax({
-      //         type: 'POST',
-      //         url: '/index.php?route=common/footer/quiz_submit',
-      //         data: th.serialize(),
-      //         dataType: 'json',
-      //       }).done(function (json) {
-      //         if (json['success']) {
-      //           $('.load__preloader').fadeOut('slow');
-      //           nextStep();
-      //         }
-      //       });
-      //     });
-      //     return false;
-      //   });
+      qwizCalc.addEventListener("submit", function (e) {
+        e.preventDefault();
+        var th = $("#calc-septik");
+        $(".load__preloader").fadeIn("", function () {
+          $.ajax({
+            type: "POST",
+            url: "/index.php?route=common/footer/quiz_submit",
+            data: th.serialize(),
+            dataType: "json",
+          }).done(function (json) {
+            if (json["success"]) {
+              $(".load__preloader").fadeOut("slow");
+              nextStep();
+            }
+          });
+        });
+        return false;
+      });
     }
   }
-
   initQwiz();
   // кнопеи сантехники
   function countPlumbingItems(params) {
@@ -4959,7 +5652,7 @@ data-youtube - Атрибут для кода youtube
           let target = e.target;
 
           if (target.closest("._plus-plumbing")) {
-            if (element.children[1].innerHTML >= 9) return;
+            if (element.children[1].innerHTML >= 5) return;
             element.children[1].innerHTML++;
           }
           if (target.closest("._minus-plumbing")) {
@@ -4972,503 +5665,6 @@ data-youtube - Атрибут для кода youtube
   }
   countPlumbingItems();
 
-  const dataSeptic = [
-    // akvalos
-
-    {
-      linkSeptik: "septik-akvalos-2",
-      nameSeptik: "Септик Аквалос 2",
-      pipeDepth: "30",
-      userValue: "2",
-      salvoReleaseVolume: "120",
-      energyConsumption: "1,37",
-      productivity: "0.4",
-      price: "82 800",
-      mounting: "27 000",
-    },
-    {
-      linkSeptik: "septik-akvalos-3",
-      nameSeptik: "Аквалос 3",
-      pipeDepth: "50",
-      userValue: "2",
-      salvoReleaseVolume: "220",
-      energyConsumption: "1,37",
-      productivity: "0.6",
-      price: "93 150",
-      mounting: "27 000",
-    },
-    {
-      linkSeptik: "septik-akvalos-4",
-
-      nameSeptik: "Аквалос 4",
-      pipeDepth: "60",
-      userValue: "4",
-      salvoReleaseVolume: "250",
-      energyConsumption: "1,37",
-      productivity: "0.8",
-      price: "106 200",
-      mounting: "27 000",
-    },
-    {
-      linkSeptik: "septik-akvalos-4-gorizontalnij",
-      nameSeptik: "Аквалос 4 Гориз.",
-      pipeDepth: "30",
-      userValue: "4",
-      salvoReleaseVolume: "250",
-      energyConsumption: "0,9",
-      productivity: "0.8",
-      price: "120 600",
-      mounting: "32 000",
-    },
-    {
-      linkSeptik: "septik-akvalos-5",
-      nameSeptik: "Аквалос 5",
-      pipeDepth: "60",
-      userValue: "5",
-      salvoReleaseVolume: "390",
-      energyConsumption: "1,37",
-      productivity: "0.9",
-      price: "116 100",
-      mounting: "34 000",
-    },
-    {
-      linkSeptik: "septik-akvalos-5-gorizontalnij",
-      nameSeptik: "Аквалос 5 Гориз.",
-      pipeDepth: "30",
-      userValue: "5",
-      salvoReleaseVolume: "300",
-      energyConsumption: "0,9",
-      productivity: "0.9",
-      price: "130 050",
-    },
-    {
-      linkSeptik: "septik-akvalos-7",
-      nameSeptik: "Аквалос 7",
-      pipeDepth: "60",
-      userValue: "7",
-      salvoReleaseVolume: "550",
-      energyConsumption: "1,37",
-      productivity: "1.2",
-      price: "140 400",
-      mounting: "38 000",
-    },
-    {
-      linkSeptik: "septik-akvalos-7-gorizontalnij",
-      nameSeptik: "Аквалос 7 Гориз.",
-      pipeDepth: "30",
-      userValue: "7",
-      salvoReleaseVolume: "550",
-      energyConsumption: "0,9",
-      productivity: "1.2",
-      price: "158 400",
-      mounting: "40 000",
-    },
-    {
-      linkSeptik: "septik-akvalos-8",
-      nameSeptik: "Аквалос 8",
-      pipeDepth: "60",
-      userValue: "8",
-      salvoReleaseVolume: "700",
-      energyConsumption: "1,57",
-      productivity: "1.6",
-      price: "148 500",
-      mounting: "40 000",
-    },
-    {
-      linkSeptik: "septik-akvalos-10",
-      nameSeptik: "Аквалос 10",
-      pipeDepth: "60",
-      userValue: "10",
-      salvoReleaseVolume: "900",
-      energyConsumption: "2,57",
-      productivity: "2.0",
-      price: "194 400",
-      mounting: "49 000",
-    },
-    {
-      linkSeptik: "septik-akvalos-10-gorizontalnij",
-      nameSeptik: "Аквалос 10 Гориз.",
-      pipeDepth: "30",
-      userValue: "10",
-      salvoReleaseVolume: "800",
-      energyConsumption: "0,9",
-      productivity: "2.0",
-      price: "201 600",
-      mounting: "51 000",
-    },
-    {
-      linkSeptik: "septik-akvalos-15",
-      nameSeptik: "Аквалос 15",
-      pipeDepth: "60",
-      userValue: "15",
-      salvoReleaseVolume: "1125",
-      energyConsumption: "2,57",
-      productivity: "3.0",
-      price: "253 800",
-      mounting: "55 000",
-    },
-    {
-      linkSeptik: "septik-akvalos-20",
-      nameSeptik: "Аквалос 20",
-      pipeDepth: "60",
-      userValue: "20",
-      salvoReleaseVolume: "1350",
-      energyConsumption: "1,5",
-      productivity: "4.0",
-      price: "323 100",
-      mounting: "60 000",
-    },
-
-    //topas
-
-    {
-      linkSeptik: "septik-topas-4",
-      nameSeptik: "Топас 4",
-      pipeDepth: "60",
-      userValue: "4",
-      salvoReleaseVolume: "175",
-      energyConsumption: "1",
-      productivity: "0.8",
-      price: "122 310",
-      mounting: "27 000",
-    },
-    {
-      linkSeptik: "septik-topas-5",
-      nameSeptik: "Топас 5",
-      pipeDepth: "60",
-      userValue: "5",
-      salvoReleaseVolume: "220",
-      energyConsumption: "1",
-      productivity: "1",
-      price: "143 550",
-      mounting: "34 000",
-    },
-    {
-      linkSeptik: "septik-topas-6",
-
-      nameSeptik: "Топас 6",
-      pipeDepth: "60",
-      userValue: "6",
-      salvoReleaseVolume: "250",
-      energyConsumption: "1",
-      productivity: "1.15",
-      price: "144 810",
-      mounting: "34 000",
-    },
-    {
-      linkSeptik: "septik-topas-8",
-      nameSeptik: "Топас 8",
-      pipeDepth: "60",
-      userValue: "8",
-      salvoReleaseVolume: "440",
-      energyConsumption: "1",
-      productivity: "1.5",
-      price: "166 410",
-      mounting: "40 000",
-    },
-    {
-      linkSeptik: "septik-topas-9",
-      nameSeptik: "Топас 9",
-      pipeDepth: "60",
-      userValue: "9",
-      salvoReleaseVolume: "510",
-      energyConsumption: "1",
-      productivity: "0.7",
-      price: "168 390",
-      mounting: "40 000",
-    },
-    {
-      linkSeptik: "septik-topas-10",
-      nameSeptik: "Топас 10",
-      pipeDepth: "60",
-      userValue: "10",
-      salvoReleaseVolume: "760",
-      energyConsumption: "2",
-      productivity: "2",
-      price: "226 710",
-      mounting: "49 000",
-    },
-    {
-      linkSeptik: "septik-topas-12",
-      nameSeptik: "Топас 12",
-      pipeDepth: "60",
-      userValue: "12",
-      salvoReleaseVolume: "830",
-      energyConsumption: "2",
-      productivity: "2.2",
-      price: "228 870",
-      mounting: "55 000",
-    },
-
-    //	 astra
-
-    {
-      linkSeptik: "septik-astra-3",
-      nameSeptik: "Астра 3",
-      pipeDepth: "60",
-      userValue: "3",
-      salvoReleaseVolume: "130",
-      energyConsumption: "1",
-      productivity: "0.6",
-      price: "102 000",
-      mounting: "27 000",
-    },
-    {
-      linkSeptik: "septik-astra-4",
-      nameSeptik: "Астра 4",
-      pipeDepth: "60",
-      userValue: "4",
-      salvoReleaseVolume: "150",
-      energyConsumption: "1",
-      productivity: "0.8",
-      price: "106 250",
-      mounting: "27 000",
-    },
-
-    {
-      linkSeptik: "septik-astra-5",
-      nameSeptik: "Астра 5",
-      pipeDepth: "60",
-      userValue: "5",
-      salvoReleaseVolume: "250",
-      energyConsumption: "1.5",
-      productivity: "1",
-      price: "123 250",
-      mounting: "34 000",
-    },
-    {
-      linkSeptik: "septik-astra-6",
-
-      nameSeptik: "Астра 6",
-      pipeDepth: "60",
-      userValue: "6",
-      salvoReleaseVolume: "280",
-      energyConsumption: "1.5",
-      productivity: "1.2",
-      price: "130 050",
-      mounting: "34 000",
-    },
-    {
-      linkSeptik: "septik-astra-7",
-      nameSeptik: "Астра 7",
-      pipeDepth: "60",
-      userValue: "8",
-      salvoReleaseVolume: "300",
-      energyConsumption: "1.5",
-      productivity: "1.4",
-      price: "136 850",
-      mounting: "38 000",
-    },
-    {
-      linkSeptik: "septik-astra-8",
-      nameSeptik: "Астра 8",
-      pipeDepth: "60",
-      userValue: "8",
-      salvoReleaseVolume: "350",
-      energyConsumption: "1.5",
-      productivity: "1.6",
-      price: "148 699",
-      mounting: "40 000",
-    },
-    {
-      linkSeptik: "septik-astra-9",
-      nameSeptik: "Астра 9",
-      pipeDepth: "60",
-      userValue: "9",
-      salvoReleaseVolume: "450",
-      energyConsumption: "1.5",
-      productivity: "1.8",
-      price: "169 150",
-      mounting: "40 000",
-    },
-    {
-      linkSeptik: "septik-astra-10",
-      nameSeptik: "Астра 10",
-      pipeDepth: "60",
-      userValue: "10",
-      salvoReleaseVolume: "550",
-      energyConsumption: "1.5",
-      productivity: "2",
-      price: "196 350",
-      mounting: "49 000",
-    },
-    {
-      linkSeptik: "septik-astra-15",
-      nameSeptik: "Астра 15",
-      pipeDepth: "60",
-      userValue: "15",
-      salvoReleaseVolume: "600",
-      energyConsumption: "2.4",
-      productivity: "3",
-      price: "255 000",
-      mounting: "55 000",
-    },
-
-    // Малахит
-
-    {
-      linkSeptik: "septik-malahit-4",
-      nameSeptik: "Малахит 4",
-      pipeDepth: "60",
-      userValue: "4",
-      salvoReleaseVolume: "220",
-      energyConsumption: "1.2",
-      productivity: "0.9",
-      price: "116 494",
-      mounting: "27 000",
-    },
-
-    {
-      linkSeptik: "septik-malahit-5",
-      nameSeptik: "Малахит 5",
-      pipeDepth: "60",
-      userValue: "5",
-      salvoReleaseVolume: "263",
-      energyConsumption: "1.5",
-      productivity: "1",
-      price: "137 694",
-      mounting: "34 000",
-    },
-    {
-      linkSeptik: "septik-malahit-6",
-
-      nameSeptik: "Малахит 6",
-      pipeDepth: "60",
-      userValue: "6",
-      salvoReleaseVolume: "290",
-      energyConsumption: "1.5",
-      productivity: "1.2",
-      price: "153 594",
-      mounting: "34 000",
-    },
-    {
-      linkSeptik: "septik-malahit-8",
-      nameSeptik: "Малахит 8",
-      pipeDepth: "60",
-      userValue: "8",
-      salvoReleaseVolume: "420",
-      energyConsumption: "1.7",
-      productivity: "1.6",
-      price: "185 394",
-      mounting: "40 000",
-    },
-    {
-      linkSeptik: "septik-malahit-10",
-
-      nameSeptik: "Малахит 10",
-      pipeDepth: "60",
-      userValue: "10",
-      salvoReleaseVolume: "500",
-      energyConsumption: "1.7",
-      productivity: "2",
-      price: "222 494",
-      mounting: "49 000",
-    },
-    {
-      linkSeptik: "septik-malahit-12",
-      nameSeptik: "Малахит 12",
-      pipeDepth: "60",
-      userValue: "12",
-      salvoReleaseVolume: "645",
-      energyConsumption: "1.7",
-      productivity: "2.5",
-      price: "243 694",
-      mounting: "55 000",
-    },
-
-    // евролос
-
-    {
-      linkSeptik: "septik-evrolos-bio-3",
-      nameSeptik: "Евролос БИО 3",
-      pipeDepth: "60",
-      userValue: "3",
-      salvoReleaseVolume: "150",
-      energyConsumption: "1",
-      productivity: "0.6",
-      price: "116 900",
-      mounting: "27 000",
-    },
-    {
-      linkSeptik: "septik-evrolos-bio-4",
-      nameSeptik: "Евролос БИО 4",
-      pipeDepth: "60",
-      userValue: "4",
-      salvoReleaseVolume: "180",
-      energyConsumption: "1.2",
-      productivity: "0.8",
-      price: "122 300",
-      mounting: "27 000",
-    },
-
-    {
-      linkSeptik: "septik-evrolos-bio-5",
-      nameSeptik: "Евролос БИО 5",
-      pipeDepth: "60",
-      userValue: "5",
-      salvoReleaseVolume: "210",
-      energyConsumption: "1.5",
-      productivity: "1",
-      price: "129 400",
-      mounting: "34 000",
-    },
-    {
-      linkSeptik: "septik-evrolos-bio-6",
-
-      nameSeptik: "Евролос БИО 6",
-      pipeDepth: "60",
-      userValue: "6",
-      salvoReleaseVolume: "270",
-      energyConsumption: "1.5",
-      productivity: "1.3",
-      price: "142 500",
-      mounting: "34 000",
-    },
-    {
-      linkSeptik: "septik-evrolos-bio-8",
-      nameSeptik: "Евролос БИО 8",
-      pipeDepth: "60",
-      userValue: "8",
-      salvoReleaseVolume: "370",
-      energyConsumption: "1.5",
-      productivity: "1.6",
-      price: "166 800",
-      mounting: "40 000",
-    },
-    {
-      linkSeptik: "septik-evrolos-bio-10",
-
-      nameSeptik: "Евролос БИО 10",
-      pipeDepth: "60",
-      userValue: "10",
-      salvoReleaseVolume: "550",
-      energyConsumption: "1.7",
-      productivity: "2",
-      price: "208 700",
-      mounting: "49 000",
-    },
-    {
-      linkSeptik: "septik-malahit-12",
-      nameSeptik: "Евролос БИО 12",
-      pipeDepth: "60",
-      userValue: "12",
-      salvoReleaseVolume: "680",
-      energyConsumption: "1.7",
-      productivity: "2.4",
-      price: "228 600",
-      mounting: "55 000",
-    },
-  ];
-
-  // расчет сколько нужноь производительности септика на n кол-во людей
-  function getAmountUserValue() {
-    const valueRange = document.querySelector(".noUi-handle");
-    let res = (+valueRange.ariaValueText * 150 * 1.2) / 1000;
-    if (res <= 0.4) {
-      res = 0.4;
-    }
-    return res;
-  }
   // расчет производительности на всю сантехнику дома (раковины, ванна, туалет и т.д)
   function getValueItemPlumbing() {
     const selectorsCount = document.querySelectorAll(
@@ -5485,119 +5681,989 @@ data-youtube - Атрибут для кода youtube
     return resSum;
   }
 
-  function resultSeptic() {
-    let sum = (
-      getAmountUserValue() +
-      getValueItemPlumbing() / 1000 / 2
-    ).toFixed(1);
-
-    let minRange = getValueItemPlumbing() ? 0.2 : 0.1;
-
-    const resFilterRange = filterRange(
-      dataSeptic,
-      sum - minRange,
-      +sum + minRange,
-    );
-    const valueRange = document.querySelector(".noUi-handle").ariaValueText;
-    // фильтар по юзерам
-    const res = resFilterRange.filter((it) => {
-      if (it.userValue == valueRange) {
-        return it;
-      }
-    });
-
-    showReusltSeptik(res);
-  }
-  // фильтар по дмарозону
-  function filterRange(arr, a, b) {
-    return arr.filter(
-      (item) =>
-        a.toFixed(1) <= item.productivity && item.productivity <= b.toFixed(1),
-    );
-  }
   // выводим данные в итоги
   function showReusltSeptik(res) {
-    createObjRes(res);
     const listResSelector = document.querySelectorAll(
       ".form-qwiz__content-finish",
     );
-    const sumNameSelector = document.querySelector(".form-qwiz__sum-finish");
-    let objRes = createObjRes(res);
+    const result = collectDate();
 
-    const [arrRes, sumRes] = objRes;
-    debugger;
-    sumNameSelector.innerHTML = sumRes;
+    listResSelector[0].innerHTML = result.onePoint;
+    listResSelector[1].innerHTML = result.threePoint;
+    listResSelector[2].innerHTML = result.twoPoint;
 
-    if (objRes) {
-      for (let indx = 0; indx < listResSelector.length; indx++) {
-        const element = listResSelector[indx];
-        if (indx === 0) {
-          createNewLinkSeptick(element, res);
-          continue;
-        }
-        element.innerHTML = arrRes[indx];
-      }
+    listResSelector[4].innerHTML = result.fourPoint;
+    if (!result.extraPoint) {
+      listResSelector[3].parentElement.remove();
+    } else {
+      listResSelector[3].innerHTML = result.extraPoint;
     }
   }
 
-  // собираем обьект с данынми
-  function createObjRes(res) {
-    if (res.length === 0) return;
+  function collectDate() {
+    const onePoint = document.querySelector(".noUi-handle").ariaValueText;
+    const twoPoint = document.querySelectorAll(
+      'input[name="Глубина залегания трубы"]',
+    );
+    const threePoint = document.querySelectorAll(
+      'input[name="Место отвода воды из септика"]',
+    );
 
-    const resObj = {};
-    const valueRange = document.querySelector(".noUi-handle").ariaValueText;
-
-    resObj.link = "";
-    resObj.userValue = valueRange;
-    resObj.plannedSalvoRelease = `${getValueItemPlumbing()} л`;
-    resObj.salvoReleaseVolume = `${res[0].salvoReleaseVolume} л`;
-    resObj.price = `~${res[0].price} р.`;
-    resObj.pipeDepth = `${res[0].pipeDepth} см`;
-    resObj.deliveryPrice = "9100 р.";
-    resObj.productivity = `${res[0].productivity} м3`;
-    resObj.mounting = `${res[0].mounting} р.`;
-    resObj.energyConsumption = `${res[0].energyConsumption} кВт/сутки`;
-
-    let sumName = String(
-      Number(res[0].price.replace(/\s+/g, "")) +
-        Number(res[0].mounting.replace(/\s+/g, "")) +
-        9100,
-    )
-      .split("")
-      .map((el, indx) => {
-        if (indx === 2) {
-          el = `${el} `;
-          return el;
+    const extraPoint = document.querySelectorAll(
+      'input[name="Количество колец"]',
+    );
+    const res = {
+      onePoint,
+      twoPoint: "",
+      threePoint: "",
+      fourPoint: "",
+      extraPoint: "",
+    };
+    if (twoPoint) {
+      twoPoint.forEach((el) => {
+        if (el.checked) {
+          res.twoPoint = el.value;
         }
-        return el;
-      })
-      .join("");
+      });
+    }
+    if (threePoint) {
+      threePoint.forEach((el) => {
+        if (el.checked) {
+          res.threePoint = el.value;
+        }
+      });
+    }
+    if (extraPoint) {
+      extraPoint.forEach((el) => {
+        if (el.checked) {
+          res.extraPoint = el.value;
+        }
+      });
+    }
+    res.fourPoint = getValueItemPlumbing();
 
-    let arrRes = Object.values(resObj);
-
-    return [arrRes, sumName];
+    return res;
   }
+  // ========================================================================
+  // ========================================================================
+  // select
+  // ========================================================================
+  // ========================================================================
+  // Подключение функционала "Чертогов Фрилансера"
 
-  // создаем ссылки на септике в итоге
-  function createNewLinkSeptick(listLink, res) {
-    let theFirstChild = listLink.firstChild;
-    for (let i = 0; i < 3; i++) {
-      let newLink = document.createElement("a");
-      if (res[i]) {
-        newLink.setAttribute(
-          "href",
-          `https://sewera.ru/products/${res[i].linkSeptik}`,
+  // import { formValidate } from '../files/forms/forms.js';
+
+  // Подключение файла стилей
+  // Базовые стили поключаются в src/scss/forms.scss
+  // Файл базовых стилей src/scss/forms/select.scss
+
+  /*
+Документация:
+Снипет (HTML): sel
+*/
+  /*
+// Настройки
+Для селекта (select):
+class="имя класса" - модификатор к конкретному селекту
+multiple - мультивыбор
+data-tags - режим тегов, только для (только для multiple)
+data-scroll - включит прокрутку для выпадающего списка, дополнительно можно подключить кастомный скролл simplebar в app.js. Указанное число для атрибута ограничит высоту
+data-checkbox - стилизация элементов по checkbox (только для multiple)
+data-show-selected - отключает скрытие выбранного элемента
+data-search - позволяет искать по выпадающему списку
+data-open - селект открыт сразу
+data-submit - отправляет форму при изменении селекта
+
+Для плейсхолдера (Плейсхолдер - это option с value=""):
+data-label для плейсхолдера, добавляет label к селекту
+data-show для плейсхолдера, показывает его в списке (только для единичного выбора)
+
+Для элемента (option):
+data-class="имя класса" - добавляет класс
+data-asset="путь к картинке или текст" - добавляет структуру 2х колонок и данными
+data-href="адрес ссылки" - добавляет ссылку в элемент списка
+data-href-blank - откроет ссылку в новом окне
+*/
+
+  /*
+// Возможные доработки:
+попап на мобилке
+*/
+
+  // Класс построения Select
+  class SelectConstructor {
+    constructor(props, data = null) {
+      let defaultConfig = {
+        init: true,
+        logging: true,
+      };
+      this.config = Object.assign(defaultConfig, props);
+      // CSS классы модуля
+      this.selectClasses = {
+        classSelect: "select", // Главный блок
+        classSelectBody: "select__body", // Тело селекта
+        classSelectTitle: "select__title", // Заголовок
+        classSelectValue: "select__value", // Значение в заголовке
+        classSelectLabel: "select__label", // Лабел
+        classSelectInput: "select__input", // Поле ввода
+        classSelectText: "select__text", // Оболочка текстовых данных
+        classSelectLink: "select__link", // Ссылка в элементе
+        classSelectOptions: "select__options", // Выпадающий список
+        classSelectOptionsScroll: "select__scroll", // Оболочка при скролле
+        classSelectOption: "select__option", // Пункт
+        classSelectContent: "select__content", // Оболочка контента в заголовке
+        classSelectRow: "select__row", // Ряд
+        classSelectData: "select__asset", // Дополнительные данные
+        classSelectDisabled: "_select-disabled", // Запрешен
+        classSelectTag: "_select-tag", // Класс тега
+        classSelectOpen: "_select-open", // Список открыт
+        classSelectActive: "_select-active", // Список выбран
+        classSelectFocus: "_select-focus", // Список в фокусе
+        classSelectMultiple: "_select-multiple", // Мультивыбор
+        classSelectCheckBox: "_select-checkbox", // Стиль чекбокса
+        classSelectOptionSelected: "_select-selected", // Выбранный пункт
+      };
+      this._this = this;
+      // Запуск инициализации
+      if (this.config.init) {
+        // Получение всех select на странице
+        const selectItems = data
+          ? document.querySelectorAll(data)
+          : document.querySelectorAll("select");
+        if (selectItems.length) {
+          this.selectsInit(selectItems);
+        } else {
+        }
+      }
+    }
+    // Конструктор CSS класса
+    getSelectClass(className) {
+      return `.${className}`;
+    }
+    // Геттер элементов псевдоселекта
+    getSelectElement(selectItem, className) {
+      return {
+        originalSelect: selectItem.querySelector("select"),
+        selectElement: selectItem.querySelector(this.getSelectClass(className)),
+      };
+    }
+    // Функция инициализации всех селектов
+    selectsInit(selectItems) {
+      selectItems.forEach((originalSelect, index) => {
+        this.selectInit(originalSelect, index + 1);
+      });
+      // Обработчики событий...
+      // ...при клике
+      document.addEventListener(
+        "click",
+        function (e) {
+          this.selectsActions(e);
+        }.bind(this),
+      );
+      // ...при нажатии клавиши
+      document.addEventListener(
+        "keydown",
+        function (e) {
+          this.selectsActions(e);
+        }.bind(this),
+      );
+      // ...при фокусе
+      document.addEventListener(
+        "focusin",
+        function (e) {
+          this.selectsActions(e);
+        }.bind(this),
+      );
+      // ...при потере фокуса
+      document.addEventListener(
+        "focusout",
+        function (e) {
+          this.selectsActions(e);
+        }.bind(this),
+      );
+    }
+    // Функция инициализации конкретного селекта
+    selectInit(originalSelect, index) {
+      const _this = this;
+      // Создаем оболочку
+      let selectItem = document.createElement("div");
+      selectItem.classList.add(this.selectClasses.classSelect);
+      // Выводим оболочку перед оригинальным селектом
+      originalSelect.parentNode.insertBefore(selectItem, originalSelect);
+      // Помещаем оригинальный селект в оболочку
+      selectItem.appendChild(originalSelect);
+      // Скрываем оригинальный селект
+      originalSelect.hidden = true;
+
+      // Присваиваем уникальный ID
+      index ? (originalSelect.dataset.id = index) : null;
+
+      // Конструктор косновных элементов
+      selectItem.insertAdjacentHTML(
+        "beforeend",
+        `<div class="${this.selectClasses.classSelectBody}"><div hidden class="${this.selectClasses.classSelectOptions}"></div></div>`,
+      );
+      // Запускаем конструктор псевдоселекта
+      this.selectBuild(originalSelect);
+
+      // Работа с плейсхолдером
+      if (this.getSelectPlaceholder(originalSelect)) {
+        // Запоминаем плейсхолдер
+        originalSelect.dataset.placeholder =
+          this.getSelectPlaceholder(originalSelect).value;
+        // Если включен режим label
+        if (this.getSelectPlaceholder(originalSelect).label.show) {
+          const selectItemTitle = this.getSelectElement(
+            selectItem,
+            this.selectClasses.classSelectTitle,
+          ).selectElement;
+          selectItemTitle.insertAdjacentHTML(
+            "afterbegin",
+            `<span class="${this.selectClasses.classSelectLabel}">${
+              this.getSelectPlaceholder(originalSelect).label.text
+                ? this.getSelectPlaceholder(originalSelect).label.text
+                : this.getSelectPlaceholder(originalSelect).value
+            }</span>`,
+          );
+        }
+      }
+      // Запоминаем скорость
+      originalSelect.dataset.speed = originalSelect.dataset.speed
+        ? originalSelect.dataset.speed
+        : "150";
+      // Событие при изменении оригинального select
+
+      originalSelect.addEventListener("change", function (e) {
+        _this.selectChange(e);
+      });
+    }
+    // Конструктор псевдоселекта
+    selectBuild(originalSelect) {
+      const selectItem = originalSelect.parentElement;
+      // Добавляем ID селекта
+      selectItem.dataset.id = originalSelect.dataset.id;
+      // Получаем класс оригинального селекта, создаем модификатор и добавляем его
+      selectItem.classList.add(
+        originalSelect.getAttribute("class")
+          ? `select_${originalSelect.getAttribute("class")}`
+          : "",
+      );
+      // Если множественный выбор, добавляем класс
+      originalSelect.multiple
+        ? selectItem.classList.add(this.selectClasses.classSelectMultiple)
+        : selectItem.classList.remove(this.selectClasses.classSelectMultiple);
+      // Cтилизация элементов под checkbox (только для multiple)
+      originalSelect.hasAttribute("data-checkbox") && originalSelect.multiple
+        ? selectItem.classList.add(this.selectClasses.classSelectCheckBox)
+        : selectItem.classList.remove(this.selectClasses.classSelectCheckBox);
+      // Сеттер значения заголовка селекта
+      this.setSelectTitleValue(selectItem, originalSelect);
+      // Сеттер элементов списка (options)
+      this.setOptions(selectItem, originalSelect);
+      // Если включена опция поиска data-search, запускаем обработчик
+      originalSelect.hasAttribute("data-search")
+        ? this.searchActions(selectItem)
+        : null;
+      // Если указана настройка data-open, открываем селект
+      originalSelect.hasAttribute("data-open")
+        ? this.selectAction(selectItem)
+        : null;
+      // Обработчик disabled
+      this.selectDisabled(selectItem, originalSelect);
+    }
+    // Функция реакций на события
+    selectsActions(e) {
+      const targetElement = e.target;
+      const targetType = e.type;
+      if (
+        targetElement.closest(
+          this.getSelectClass(this.selectClasses.classSelect),
+        ) ||
+        targetElement.closest(
+          this.getSelectClass(this.selectClasses.classSelectTag),
+        )
+      ) {
+        const selectItem = targetElement.closest(".select")
+          ? targetElement.closest(".select")
+          : document.querySelector(
+              `.${this.selectClasses.classSelect}[data-id="${
+                targetElement.closest(
+                  this.getSelectClass(this.selectClasses.classSelectTag),
+                ).dataset.selectId
+              }"]`,
+            );
+        const originalSelect = this.getSelectElement(selectItem).originalSelect;
+        if (targetType === "click") {
+          if (!originalSelect.disabled) {
+            if (
+              targetElement.closest(
+                this.getSelectClass(this.selectClasses.classSelectTag),
+              )
+            ) {
+              // Обработка клика на тег
+              const targetTag = targetElement.closest(
+                this.getSelectClass(this.selectClasses.classSelectTag),
+              );
+              const optionItem = document.querySelector(
+                `.${this.selectClasses.classSelect}[data-id="${targetTag.dataset.selectId}"] .select__option[data-value="${targetTag.dataset.value}"]`,
+              );
+              this.optionAction(selectItem, originalSelect, optionItem);
+            } else if (
+              targetElement.closest(
+                this.getSelectClass(this.selectClasses.classSelectTitle),
+              )
+            ) {
+              // Обработка клика на заголовок селекта
+              this.selectAction(selectItem);
+            } else if (
+              targetElement.closest(
+                this.getSelectClass(this.selectClasses.classSelectOption),
+              )
+            ) {
+              // Обработка клика на элемент селекта
+              const optionItem = targetElement.closest(
+                this.getSelectClass(this.selectClasses.classSelectOption),
+              );
+              this.optionAction(selectItem, originalSelect, optionItem);
+            }
+          }
+        } else if (targetType === "focusin" || targetType === "focusout") {
+          if (
+            targetElement.closest(
+              this.getSelectClass(this.selectClasses.classSelect),
+            )
+          ) {
+            targetType === "focusin"
+              ? selectItem.classList.add(this.selectClasses.classSelectFocus)
+              : selectItem.classList.remove(
+                  this.selectClasses.classSelectFocus,
+                );
+          }
+        } else if (targetType === "keydown" && e.code === "Escape") {
+          this.selectsСlose();
+        }
+      } else {
+        this.selectsСlose();
+      }
+    }
+    // Функция закрытия всех селектов
+    selectsСlose() {
+      const selectActiveItems = document.querySelectorAll(
+        `${this.getSelectClass(
+          this.selectClasses.classSelect,
+        )}${this.getSelectClass(this.selectClasses.classSelectOpen)}`,
+      );
+      if (selectActiveItems.length) {
+        selectActiveItems.forEach((selectActiveItem) => {
+          this.selectAction(selectActiveItem);
+        });
+      }
+    }
+    // Функция открытия/закрытия конкретного селекта
+    selectAction(selectItem) {
+      const originalSelect = this.getSelectElement(selectItem).originalSelect;
+      const selectOptions = this.getSelectElement(
+        selectItem,
+        this.selectClasses.classSelectOptions,
+      ).selectElement;
+      if (!selectOptions.classList.contains("_slide")) {
+        selectItem.classList.toggle(this.selectClasses.classSelectOpen);
+        _slideToggle(selectOptions, originalSelect.dataset.speed);
+      }
+    }
+    // Сеттер значения заголовка селекта
+    setSelectTitleValue(selectItem, originalSelect) {
+      const selectItemBody = this.getSelectElement(
+        selectItem,
+        this.selectClasses.classSelectBody,
+      ).selectElement;
+      const selectItemTitle = this.getSelectElement(
+        selectItem,
+        this.selectClasses.classSelectTitle,
+      ).selectElement;
+      if (selectItemTitle) selectItemTitle.remove();
+      selectItemBody.insertAdjacentHTML(
+        "afterbegin",
+        this.getSelectTitleValue(selectItem, originalSelect),
+      );
+    }
+    // Конструктор значения заголовка
+    getSelectTitleValue(selectItem, originalSelect) {
+      // Получаем выбранные текстовые значения
+      let selectTitleValue = this.getSelectedOptionsData(
+        originalSelect,
+        2,
+      ).html;
+      // Обработка значений мультивыбора
+      // Если включен режим тегов (указана настройка data-tags)
+      if (originalSelect.multiple && originalSelect.hasAttribute("data-tags")) {
+        selectTitleValue = this.getSelectedOptionsData(originalSelect)
+          .elements.map(
+            (option) =>
+              `<span role="button" data-select-id="${
+                selectItem.dataset.id
+              }" data-value="${
+                option.value
+              }" class="_select-tag">${this.getSelectElementContent(
+                option,
+              )}</span>`,
+          )
+          .join("");
+        // Если вывод тегов во внешний блок
+        if (
+          originalSelect.dataset.tags &&
+          document.querySelector(originalSelect.dataset.tags)
+        ) {
+          document.querySelector(originalSelect.dataset.tags).innerHTML =
+            selectTitleValue;
+          if (originalSelect.hasAttribute("data-search"))
+            selectTitleValue = false;
+        }
+      }
+      // Значение(я) или плейсхолдер
+      selectTitleValue = selectTitleValue.length
+        ? selectTitleValue
+        : originalSelect.dataset.placeholder;
+      // Если есть значение, добавляем класс
+      this.getSelectedOptionsData(originalSelect).values.length
+        ? selectItem.classList.add(this.selectClasses.classSelectActive)
+        : selectItem.classList.remove(this.selectClasses.classSelectActive);
+      // Возвращаем поле ввода для поиска или текст
+      if (originalSelect.hasAttribute("data-search")) {
+        // Выводим поле ввода для поиска
+
+        return `<div class="${this.selectClasses.classSelectTitle}"><span class="${this.selectClasses.classSelectValue}"><input autocomplete="off" type="text" placeholder="${selectTitleValue}" data-placeholder="${selectTitleValue}" class="${this.selectClasses.classSelectInput}"></span></div>`;
+      } else {
+        // Если выбран элемент со своим классом
+        const customClass =
+          this.getSelectedOptionsData(originalSelect).elements.length &&
+          this.getSelectedOptionsData(originalSelect).elements[0].dataset.class
+            ? ` ${
+                this.getSelectedOptionsData(originalSelect).elements[0].dataset
+                  .class
+              }`
+            : "";
+        // Выводим текстовое значение
+        return `<button type="button" class="${this.selectClasses.classSelectTitle}"><span class="${this.selectClasses.classSelectValue}"><span class="${this.selectClasses.classSelectContent}${customClass}">${selectTitleValue}</span></span></button>`;
+      }
+    }
+    // Конструктор данных для значения заголовка
+    getSelectElementContent(selectOption) {
+      // Если для элемента указан вывод картинки или текста, перестраиваем конструкцию
+      const selectOptionData = selectOption.dataset.asset
+        ? `${selectOption.dataset.asset}`
+        : "";
+      const selectOptionDataHTML =
+        selectOptionData.indexOf("img") >= 0
+          ? `<img src="${selectOptionData}" alt="">`
+          : selectOptionData;
+      let selectOptionContentHTML = ``;
+      selectOptionContentHTML += selectOptionData
+        ? `<span class="${this.selectClasses.classSelectRow}">`
+        : "";
+      selectOptionContentHTML += selectOptionData
+        ? `<span class="${this.selectClasses.classSelectData}">`
+        : "";
+      selectOptionContentHTML += selectOptionData ? selectOptionDataHTML : "";
+      selectOptionContentHTML += selectOptionData ? `</span>` : "";
+      selectOptionContentHTML += selectOptionData
+        ? `<span class="${this.selectClasses.classSelectText}">`
+        : "";
+      selectOptionContentHTML += selectOption.textContent;
+      selectOptionContentHTML += selectOptionData ? `</span>` : "";
+      selectOptionContentHTML += selectOptionData ? `</span>` : "";
+      return selectOptionContentHTML;
+    }
+    // Получение данных плейсхолдера
+    getSelectPlaceholder(originalSelect) {
+      const selectPlaceholder = Array.from(originalSelect.options).find(
+        (option) => !option.value,
+      );
+      if (selectPlaceholder) {
+        return {
+          value: selectPlaceholder.textContent,
+          show: selectPlaceholder.hasAttribute("data-show"),
+          label: {
+            show: selectPlaceholder.hasAttribute("data-label"),
+            text: selectPlaceholder.dataset.label,
+          },
+        };
+      }
+    }
+    // Получение данных из выбранных элементов
+    getSelectedOptionsData(originalSelect, type) {
+      // Получаем все выбранные объекты из select
+      let selectedOptions = [];
+      if (originalSelect.multiple) {
+        // Если мультивыбор
+        // Убираем плейсхолдер, получаем остальные выбранные элементы
+        selectedOptions = Array.from(originalSelect.options)
+          .filter((option) => option.value)
+          .filter((option) => option.selected);
+      } else {
+        // Если единичный выбор
+        selectedOptions.push(
+          originalSelect.options[originalSelect.selectedIndex],
         );
-        newLink.setAttribute("target", "_blank");
-        newLink.innerHTML = `${res[i].nameSeptik}, `;
-        listLink.insertBefore(newLink, theFirstChild);
+      }
+      return {
+        elements: selectedOptions.map((option) => option),
+        values: selectedOptions
+          .filter((option) => option.value)
+          .map((option) => option.value),
+        html: selectedOptions.map((option) =>
+          this.getSelectElementContent(option),
+        ),
+      };
+    }
+    // Конструктор элементов списка
+    getOptions(originalSelect) {
+      // Настрока скролла элементов
+      let selectOptionsScroll = originalSelect.hasAttribute("data-scroll")
+        ? `data-simplebar`
+        : "";
+      let selectOptionsScrollHeight = originalSelect.dataset.scroll
+        ? `style="max-height:${originalSelect.dataset.scroll}px"`
+        : "";
+      // Получаем элементы списка
+      let selectOptions = Array.from(originalSelect.options);
+      if (selectOptions.length > 0) {
+        let selectOptionsHTML = ``;
+        // Если указана настройка data-show, показываем плейсхолдер в списке
+        if (
+          (this.getSelectPlaceholder(originalSelect) &&
+            !this.getSelectPlaceholder(originalSelect).show) ||
+          originalSelect.multiple
+        ) {
+          selectOptions = selectOptions.filter((option) => option.value);
+        }
+        // Строим и выводим основную конструкцию
+        selectOptionsHTML += selectOptionsScroll
+          ? `<div ${selectOptionsScroll} ${selectOptionsScrollHeight} class="${this.selectClasses.classSelectOptionsScroll}">`
+          : "";
+        selectOptions.forEach((selectOption) => {
+          // Получаем конструкцию конкретного элемента списка
+          selectOptionsHTML += this.getOption(selectOption, originalSelect);
+        });
+        selectOptionsHTML += selectOptionsScroll ? `</div>` : "";
+        return selectOptionsHTML;
       }
     }
-  } // CONCATENATED MODULE: ./src/js/app.js
+    // Конструктор конкретного элемента списка
+    getOption(selectOption, originalSelect) {
+      // Если элемент выбран и включен режим мультивыбора, добавляем класс
+      const selectOptionSelected =
+        selectOption.selected && originalSelect.multiple
+          ? ` ${this.selectClasses.classSelectOptionSelected}`
+          : "";
+      // Если элемент выбрани нет настройки data-show-selected, скрываем элемент
+      const selectOptionHide =
+        selectOption.selected &&
+        !originalSelect.hasAttribute("data-show-selected")
+          ? `hidden`
+          : ``;
+      // Если для элемента указан класс добавляем
+      const selectOptionClass = selectOption.dataset.class
+        ? ` ${selectOption.dataset.class}`
+        : "";
+      // Если указан режим ссылки
+      const selectOptionLink = selectOption.dataset.href
+        ? selectOption.dataset.href
+        : false;
+      const selectOptionLinkTarget = selectOption.hasAttribute(
+        "data-href-blank",
+      )
+        ? `target="_blank"`
+        : "";
+      // Строим и возвращаем конструкцию элемента
+      let selectOptionHTML = ``;
+      selectOptionHTML += selectOptionLink
+        ? `<a ${selectOptionLinkTarget} ${selectOptionHide} href="${selectOptionLink}" data-value="${selectOption.value}" class="${this.selectClasses.classSelectOption}${selectOptionClass}${selectOptionSelected}">`
+        : `<button ${selectOptionHide} class="${this.selectClasses.classSelectOption}${selectOptionClass}${selectOptionSelected}" data-value="${selectOption.value}" type="button">`;
+      selectOptionHTML += this.getSelectElementContent(selectOption);
+      selectOptionHTML += selectOptionLink ? `</a>` : `</button>`;
+      return selectOptionHTML;
+    }
+    // Сеттер элементов списка (options)
+    setOptions(selectItem, originalSelect) {
+      // Получаем объект тела псевдоселекта
+      const selectItemOptions = this.getSelectElement(
+        selectItem,
+        this.selectClasses.classSelectOptions,
+      ).selectElement;
+      // Запускаем конструктор элементов списка (options) и добавляем в тело псевдоселекта
+      selectItemOptions.innerHTML = this.getOptions(originalSelect);
+    }
+    // Обработчик клика на элемент списка
+    optionAction(selectItem, originalSelect, optionItem) {
+      if (originalSelect.multiple) {
+        // Если мультивыбор
+        // Выделяем классом элемент
+        optionItem.classList.toggle(
+          this.selectClasses.classSelectOptionSelected,
+        );
+        // Очищаем выбранные элементы
+        const originalSelectSelectedItems =
+          this.getSelectedOptionsData(originalSelect).elements;
+        originalSelectSelectedItems.forEach((originalSelectSelectedItem) => {
+          originalSelectSelectedItem.removeAttribute("selected");
+        });
+        // Выбираем элементы
+        const selectSelectedItems = selectItem.querySelectorAll(
+          this.getSelectClass(this.selectClasses.classSelectOptionSelected),
+        );
+        selectSelectedItems.forEach((selectSelectedItems) => {
+          originalSelect
+            .querySelector(
+              `option[value="${selectSelectedItems.dataset.value}"]`,
+            )
+            .setAttribute("selected", "selected");
+        });
+      } else {
+        // Если единичный выбор
+        // Если не указана настройка data-show-selected, скрываем выбранный элемент
+        if (!originalSelect.hasAttribute("data-show-selected")) {
+          // Сначала все показать
+          if (
+            selectItem.querySelector(
+              `${this.getSelectClass(
+                this.selectClasses.classSelectOption,
+              )}[hidden]`,
+            )
+          ) {
+            selectItem.querySelector(
+              `${this.getSelectClass(
+                this.selectClasses.classSelectOption,
+              )}[hidden]`,
+            ).hidden = false;
+          }
+          // Скрываем выбранную
+          optionItem.hidden = true;
+        }
+        originalSelect.value = optionItem.hasAttribute("data-value")
+          ? optionItem.dataset.value
+          : optionItem.textContent;
+        this.selectAction(selectItem);
+      }
+      // Обновляем заголовок селекта
+      this.setSelectTitleValue(selectItem, originalSelect);
+      // Вызываем реакцию на изменение селекта
+      this.setSelectChange(originalSelect);
+    }
+    // Реакция на измененение оригинального select
+    selectChange(e) {
+      const originalSelect = e.target;
+      this.selectBuild(originalSelect);
+      this.setSelectChange(originalSelect);
+    }
+    // Обработчик изменения в селекте
+    setSelectChange(originalSelect) {
+      if (
+        originalSelect.dataset.id == 1 &&
+        document.querySelector(".calc-wells__btn")
+      ) {
+        document.querySelector(".calc-wells__btn").classList.remove("_disable");
+        document.querySelector(".calc-wells__btn").disabled = false;
+      } // Моментальная валидация селекта
+      if (originalSelect.hasAttribute("data-validate")) {
+        // formValidate.validateInput(originalSelect);
+      }
+      // При изменении селекта отправляем форму
 
-  // 50+50+400+10+60+400+40+60 = 1,07 /  2 = 0.53 м3
-  // потом складываем 0.9 + 1.07 =1.97м3
-  // написать функцию чтоб между цифрмаи был пробел 1 000 000
+      if (originalSelect.hasAttribute("data-submit") && originalSelect.value) {
+        let tempButton = document.createElement("button");
+        tempButton.type = "submit";
+        originalSelect.closest("form").append(tempButton);
+        tempButton.click();
+        tempButton.remove();
+      }
+      const selectItem = originalSelect.parentElement;
+      // Вызов коллбэк функции
+      this.selectCallback(selectItem, originalSelect);
+    }
+    // Обработчик disabled
+    selectDisabled(selectItem, originalSelect) {
+      if (originalSelect.disabled) {
+        selectItem.classList.add(this.selectClasses.classSelectDisabled);
+        this.getSelectElement(
+          selectItem,
+          this.selectClasses.classSelectTitle,
+        ).selectElement.disabled = true;
+      } else {
+        selectItem.classList.remove(this.selectClasses.classSelectDisabled);
+        this.getSelectElement(
+          selectItem,
+          this.selectClasses.classSelectTitle,
+        ).selectElement.disabled = false;
+      }
+    }
+    // Обработчик поиска по элементам списка
+    searchActions(selectItem) {
+      const originalSelect = this.getSelectElement(selectItem).originalSelect;
+      const selectInput = this.getSelectElement(
+        selectItem,
+        this.selectClasses.classSelectInput,
+      ).selectElement;
+      const selectOptions = this.getSelectElement(
+        selectItem,
+        this.selectClasses.classSelectOptions,
+      ).selectElement;
+      const selectOptionsItems = selectOptions.querySelectorAll(
+        `.${this.selectClasses.classSelectOption}`,
+      );
+      const _this = this;
+      selectInput.addEventListener("input", function () {
+        selectOptionsItems.forEach((selectOptionsItem) => {
+          if (
+            selectOptionsItem.textContent
+              .toUpperCase()
+              .indexOf(selectInput.value.toUpperCase()) >= 0
+          ) {
+            selectOptionsItem.hidden = false;
+          } else {
+            selectOptionsItem.hidden = true;
+          }
+        });
+        // Если список закрыт открываем
+        selectOptions.hidden === true ? _this.selectAction(selectItem) : null;
+      });
+    }
+    // Коллбэк функция
+    selectCallback(selectItem, originalSelect) {
+      document.dispatchEvent(
+        new CustomEvent("selectCallback", {
+          detail: {
+            select: originalSelect,
+          },
+        }),
+      );
+    }
+  }
+  const selectCalc = new SelectConstructor();
+  // ==============================================================
+  // ==============================================================
+  // калькуляторо для скважины
+  // ==============================================================
+  // ==============================================================
+
+  function initCalcWells() {
+    if (document.querySelector(".calc-wells")) {
+      const oneSelect = document.querySelector('select[data-id="1"]');
+      const twoSelect = document.querySelector(
+        'select[name="Вид обустроства"]',
+      );
+      const threeSelect = document.querySelector(
+        'select[name="Район бурения"]',
+      );
+      const inptCalc = document.querySelector(".calc-wells__inpt");
+      const slectAreaCalc = document.querySelector(".calc-wells__select");
+      const inptBtn = document.querySelector("#int");
+      const calcBtn = document.querySelector("#calc");
+      const sumBtn = document.querySelector(".calc-wells__btn");
+      const imgBlock = document.querySelector(".calc-wells__bg-img");
+      const finishBlock = document.querySelector(".calc-wells__finish");
+
+      const sumBlock = document.querySelector(".calc-wells__sum");
+      let isActiv = true;
+      let res = 0;
+
+      isShowCaclTab();
+
+      // преключаем между "Глубина скважины" и "Район бурения"
+      function isShowCaclTab() {
+        inptBtn.addEventListener("click", (e) =>
+          cliclBtn(calcBtn, inptBtn, inptCalc, slectAreaCalc, true),
+        );
+        calcBtn.addEventListener("click", (e) =>
+          cliclBtn(inptBtn, calcBtn, slectAreaCalc, inptCalc, false),
+        );
+        function cliclBtn(
+          removeSelector,
+          addSelector,
+          isHiddenCalc,
+          isHiddenInpt,
+          booleanValue,
+        ) {
+          removeSelector.classList.remove("_active");
+          addSelector.classList.add("_active");
+          isHiddenInpt.hidden = true;
+          isHiddenCalc.hidden = false;
+          isActiv = booleanValue;
+        }
+      }
+
+      // кнопка "Рассчитать"
+      sumBtn.addEventListener("click", resultCalc);
+      function resultCalc(e) {
+        let depthValue = isActiv
+          ? inptCalc.value
+          : findValueOption(threeSelect);
+        let wellsValue =
+          oneSelect.value === "Артезианская скважина" ? 3350 : 3250;
+        let arrangementValue = twoSelect.value ? twoSelect.value : "";
+
+        if (depthValue < 40) {
+          depthValue = 40;
+        }
+        if (depthValue > 80) {
+          wellsValue = wellsValue + 100;
+        }
+
+        res = String(+wellsValue * +depthValue + +arrangementValue);
+
+        const newRes = res
+          .split("")
+          .reverse()
+          .map((it, indx) => {
+            if (indx == 0) return it;
+            if (indx % 3 == 0) {
+              return `${it} `;
+            }
+            return it;
+          })
+          .reverse()
+          .join("");
+
+        if (res) {
+          if (windowSizeUser()) {
+            animatBlcok();
+          } else {
+            finishBlock.classList.add("_animat-mob");
+          }
+          finishBlock.hidden = false;
+          sumBlock.innerHTML = `${newRes} р.`;
+        }
+      }
+      // события  на ввод макс.глубину 250
+      inptCalc.addEventListener("input", (event) => {
+        const num = 250;
+        if (event.target.value > num) {
+          event.target.value = num;
+          event.target.max = num;
+        }
+      });
+      // берем значения с "Район бурения"
+      function findValueOption(select) {
+        const option = select.querySelector(`option[value="${select.value}"]`);
+        return option.dataset.valueDepth;
+      }
+      function animatBlcok() {
+        imgBlock.classList.add("_animat");
+        finishBlock.classList.add("_animat");
+      }
+    }
+  }
+
+  function windowSizeUser() {
+    if (window.matchMedia("(min-width: 767.98px)").matches) {
+      return true;
+    } else {
+      pageNavigation();
+      return false;
+    }
+  }
+
+  window.addEventListener("resize", windowSizeUser);
+
+  initCalcWells();
+  // ==========================================================================
+  // ==========================================================================
+  // ==========================================================================
+  function pageNavigation() {
+    // data-goto - указать ID блока
+    // data-goto-header - учитывать header
+    // data-goto-speed - скорость (только если используется доп плагин)
+    // Работаем при клике на пункт
+    document.addEventListener("click", pageNavigationAction);
+    // Если подключен scrollWatcher, подсвечиваем текущий пукт меню
+    document.addEventListener("watcherCallback", pageNavigationAction);
+    // Основная функция
+    function pageNavigationAction(e) {
+      if (e.type === "click") {
+        const targetElement = e.target;
+        if (targetElement.closest("[data-goto]")) {
+          const gotoLink = targetElement.closest("[data-goto]");
+          const gotoLinkSelector = gotoLink.dataset.goto
+            ? gotoLink.dataset.goto
+            : "";
+          const noHeader = gotoLink.hasAttribute("data-goto-header")
+            ? true
+            : false;
+          const gotoSpeed = gotoLink.dataset.gotoSpeed
+            ? gotoLink.dataset.gotoSpeed
+            : "500";
+          gotoBlock(gotoLinkSelector, noHeader, gotoSpeed);
+          e.preventDefault();
+        }
+      } else if (e.type === "watcherCallback") {
+        if (e.detail) {
+          const entry = e.detail.entry;
+          const targetElement = entry.target;
+          // Обработка пунктов навигации, если указано значение navigator подсвечиваем текущий пукт меню
+          if (targetElement.dataset.watch === "navigator") {
+            const navigatorItem = targetElement.id;
+            const navigatorActiveItem = document.querySelector(
+              `[data-goto]._navigator-active`,
+            );
+            const navigatorCurrentItem = document.querySelector(
+              `[data-goto="${navigatorItem}"]`,
+            );
+            if (entry.isIntersecting) {
+              // Видим объект
+              // navigatorActiveItem ? navigatorActiveItem.classList.remove('_navigator-active') : null;
+              navigatorCurrentItem
+                ? navigatorCurrentItem.classList.add("_navigator-active")
+                : null;
+            } else {
+              // Не видим объект
+              navigatorCurrentItem
+                ? navigatorCurrentItem.classList.remove("_navigator-active")
+                : null;
+            }
+          }
+        }
+      }
+    }
+  }
+  // Модуль плавной проктутки к блоку
+  let gotoBlock = (targetBlock, noHeader = false, speed = 500, offset = 0) => {
+    const targetBlockElement = document.querySelector(targetBlock);
+    if (targetBlockElement) {
+      let headerItem = "";
+      let headerItemHeight = 0;
+      if (noHeader) {
+        headerItem = "header.header";
+        headerItemHeight = document.querySelector(headerItem).offsetHeight;
+      }
+      let options = {
+        speedAsDuration: true,
+        speed: speed,
+        header: headerItem,
+        offset: offset,
+        easing: "easeOutQuad",
+      };
+      // Закрываем меню, если оно открыто
+      document.documentElement.classList.contains("menu-open")
+        ? menuClose()
+        : null;
+
+      if (typeof SmoothScroll !== "undefined") {
+        // Прокрутка с использованием дополнения
+        new SmoothScroll().animateScroll(targetBlockElement, "", options);
+      } else {
+        // Прокрутка стандартными средствами
+        let targetBlockElementPosition =
+          targetBlockElement.getBoundingClientRect().top + scrollY;
+        window.scrollTo({
+          top: headerItemHeight
+            ? targetBlockElementPosition - headerItemHeight
+            : targetBlockElementPosition,
+          behavior: "smooth",
+        });
+      }
+    } else {
+    }
+  }; // CONCATENATED MODULE: ./src/js/app.js
 
   // Подключение основного файла стилей
 
@@ -5630,7 +6696,8 @@ data-youtube - Атрибут для кода youtube
 Сниппет (HTML): pl
 */
   initPopups();
-
+  /* Модуль работы с select. */
+  // flsForms.formSelect();
   // Модуль работы с ползунком  ===================================================================================================================================================================================================================================================================================
   /*
 Подключение и настройка выполняется в файле js/files/forms/range.js
