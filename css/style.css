@@ -159,11 +159,18 @@ body {
   }
 }
 .sewera-septik .select__input {
+  font-weight: 500;
   border-bottom: 0 !important;
 }
 .sewera-septik .select__input::placeholder {
   color: #102938 !important;
   font-weight: 500;
+}
+@media (max-width: 1023.98px) {
+  .sewera-septik .select__input::placeholder {
+    font-size: 14px;
+    line-height: 1.4;
+  }
 }
 .sewera-septik .select__row {
   display: inline-flex;
@@ -184,26 +191,6 @@ body {
 .sewera-septik ._disable {
   opacity: 0.6;
   cursor: not-allowed;
-}
-
-.ssss {
-  width: 300px;
-  height: 444px;
-  background-color: blue;
-  overflow: hidden;
-}
-
-.as {
-  width: 200px;
-  height: 400px;
-  background-color: green;
-}
-
-.ass {
-  position: absolute;
-  background-color: red;
-  width: 400px;
-  height: 100px;
 }
 
 .sewera-septik .boreholeMapMarker_orange,
@@ -235,6 +222,7 @@ body {
 
 .sewera-septik .ya-btn-marker::after {
   content: "";
+  cursor: pointer;
   display: inline-block;
   background: url("../img/icons/arrow-table.svg") 0 0/cover no-repeat;
   width: 11px;
@@ -646,8 +634,18 @@ body {
   margin-bottom: 24px;
 }
 
+.sewera-septik .banner__wrapper.page-bl {
+  overflow: visible;
+  position: relative;
+}
+
 .sewera-septik .wells-page-bg-img {
-  background-position: bottom -100px right -240px;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  right: -44%;
+  background-position: bottom -100px right 0px;
   background-size: 919px auto;
   background-repeat: no-repeat;
 }
@@ -4304,10 +4302,11 @@ sewera-septik .form-qwiz__user-contact,
 .calc-wells__inpt {
   padding: 15.4px 20px;
   width: 100%;
+  font-weight: 500;
   border-radius: 4px;
 }
 .calc-wells__inpt::placeholder {
-  font-weight: 400;
+  font-weight: 500;
 }
 .calc-wells__inpt::-webkit-outer-spin-button, .calc-wells__inpt::-webkit-inner-spin-button {
   -webkit-appearance: none;
@@ -4540,8 +4539,9 @@ sewera-septik .form-qwiz__user-contact,
 }
 @media (max-width: 1279.98px) {
   .sewera-septik .wells-page-bg-img {
+    right: -40%;
     background-size: 80% auto;
-    background-position: bottom -100px right -340px;
+    background-position: bottom -100px right 0px;
   }
   .sewera-septik .form-order__btn_mobile-decor::before {
     bottom: 41px;
@@ -4848,6 +4848,7 @@ sewera-septik .form-qwiz__user-contact,
     margin-bottom: 174px !important;
   }
   .sewera-septik .wells-page-bg-img {
+    right: 0;
     background-size: 400px auto;
     background-position: center top 180px;
   }

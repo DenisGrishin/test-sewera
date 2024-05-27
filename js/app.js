@@ -5881,6 +5881,12 @@ data-href-blank - откроет ссылку в новом окне
           this.selectsActions(e);
         }.bind(this),
       );
+      document.addEventListener(
+        "input",
+        function (e) {
+          this.selectsActions(e);
+        }.bind(this),
+      );
     }
     // Функция инициализации конкретного селекта
     selectInit(originalSelect, index) {
@@ -5961,6 +5967,7 @@ data-href-blank - откроет ссылку в новом окне
       // Сеттер элементов списка (options)
       this.setOptions(selectItem, originalSelect);
       // Если включена опция поиска data-search, запускаем обработчик
+
       originalSelect.hasAttribute("data-search")
         ? this.searchActions(selectItem)
         : null;
@@ -5975,6 +5982,7 @@ data-href-blank - откроет ссылку в новом окне
     selectsActions(e) {
       const targetElement = e.target;
       const targetType = e.type;
+
       if (
         targetElement.closest(
           this.getSelectClass(this.selectClasses.classSelect),
@@ -6024,28 +6032,51 @@ data-href-blank - откроет ссылку в новом окне
               const optionItem = targetElement.closest(
                 this.getSelectClass(this.selectClasses.classSelectOption),
               );
+
               this.optionAction(selectItem, originalSelect, optionItem);
             }
           }
-        } else if (targetType === "focusin" || targetType === "focusout") {
+        } else if (targetType === "focusin") {
           if (
             targetElement.closest(
               this.getSelectClass(this.selectClasses.classSelect),
             )
           ) {
-            targetType === "focusin"
-              ? selectItem.classList.add(this.selectClasses.classSelectFocus)
-              : selectItem.classList.remove(
-                  this.selectClasses.classSelectFocus,
-                );
+            // document.querySelector('.select__input').select();
+            // document.querySelector('.select__input').value = '';
+            const selectOptions = this.getSelectElement(
+              selectItem,
+              this.selectClasses.classSelectOptions,
+            ).selectElement;
+            const selectOptionsItems = selectOptions.querySelectorAll(
+              `.${this.selectClasses.classSelectOption}`,
+            );
+            // selectOptionsItems.forEach((element) => {
+            //   element.hidden = false;
+            // });
+            selectItem.classList.add(this.selectClasses.classSelectFocus);
+            // targetType === 'focusin'
+            //   ? selectItem.classList.add(this.selectClasses.classSelectFocus)
+            //   : selectItem.classList.remove(this.selectClasses.classSelectFocus);
+          }
+        } else if (targetType === "focusout") {
+          if (
+            targetElement.closest(
+              this.getSelectClass(this.selectClasses.classSelect),
+            )
+          ) {
+            selectItem.classList.remove(this.selectClasses.classSelectFocus);
           }
         } else if (targetType === "keydown" && e.code === "Escape") {
           this.selectsСlose();
+        } else if (targetType === "input") {
+          this.searchActions(selectItem);
         }
       } else {
         this.selectsСlose();
       }
     }
+
     // Функция закрытия всех селектов
     selectsСlose() {
       const selectActiveItems = document.querySelectorAll(
@@ -6131,8 +6162,8 @@ data-href-blank - откроет ссылку в новом окне
       // Возвращаем поле ввода для поиска или текст
       if (originalSelect.hasAttribute("data-search")) {
         // Выводим поле ввода для поиска
-
-        return `<div class="${this.selectClasses.classSelectTitle}"><span class="${this.selectClasses.classSelectValue}"><input autocomplete="off" type="text" placeholder="${selectTitleValue}" data-placeholder="${selectTitleValue}" class="${this.selectClasses.classSelectInput}"></span></div>`;
+        // value="${selectTitleValue}"
+        return `<div class="${this.selectClasses.classSelectTitle}"><span class="${this.selectClasses.classSelectValue}"><input  autocomplete="off" type="text" placeholder="${selectTitleValue}"  data-placeholder="${selectTitleValue}" class="${this.selectClasses.classSelectInput}"></span></div>`;
       } else {
         // Если выбран элемент со своим классом
         const customClass =
@@ -6399,6 +6430,7 @@ data-href-blank - откроет ссылку в новом окне
     }
     // Обработчик поиска по элементам списка
     searchActions(selectItem) {
+      // debugger;
       const originalSelect = this.getSelectElement(selectItem).originalSelect;
       const selectInput = this.getSelectElement(
         selectItem,
@@ -6412,21 +6444,23 @@ data-href-blank - откроет ссылку в новом окне
         `.${this.selectClasses.classSelectOption}`,
       );
       const _this = this;
-      selectInput.addEventListener("input", function () {
-        selectOptionsItems.forEach((selectOptionsItem) => {
-          if (
-            selectOptionsItem.textContent
-              .toUpperCase()
-              .indexOf(selectInput.value.toUpperCase()) >= 0
-          ) {
-            selectOptionsItem.hidden = false;
-          } else {
-            selectOptionsItem.hidden = true;
-          }
-        });
-        // Если список закрыт открываем
-        selectOptions.hidden === true ? _this.selectAction(selectItem) : null;
+
+      // selectInput.addEventListener('input', function () {
+      selectOptionsItems.forEach((selectOptionsItem) => {
+        // debugger;
+        if (
+          selectOptionsItem.textContent
+            .toUpperCase()
+            .indexOf(selectInput.value.toUpperCase()) >= 0
+        ) {
+          selectOptionsItem.hidden = false;
+        } else {
+          selectOptionsItem.hidden = true;
+        }
       });
+      // Если список закрыт открываем
+      selectOptions.hidden === true ? _this.selectAction(selectItem) : null;
+      // });
     }
     // Коллбэк функция
     selectCallback(selectItem, originalSelect) {
@@ -6439,7 +6473,9 @@ data-href-blank - откроет ссылку в новом окне
       );
     }
   }
+
   const selectCalc = new SelectConstructor();
+
   // ==============================================================
   // ==============================================================
   // калькуляторо для скважины
@@ -6508,7 +6544,7 @@ data-href-blank - откроет ссылку в новом окне
         if (depthValue > 80) {
           wellsValue = wellsValue + 100;
         }
-
+        console.log(depthValue);
         res = String(+wellsValue * +depthValue + +arrangementValue);
 
         const newRes = res
