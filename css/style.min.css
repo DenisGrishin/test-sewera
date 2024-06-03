@@ -3449,10 +3449,10 @@ sewera-septik .form-qwiz__user-contact {
   content: '';
   background-color: #fff;
   position: absolute;
-  width: 550px;
+  width: 1000px;
   height: 100%;
   top: 0;
-  left: -520px;
+  left: -968px;
   z-index: 99;
 }
 .sewera-septik ._awp::after {
