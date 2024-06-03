@@ -4271,6 +4271,8 @@ sewera-septik .form-qwiz__user-contact,
 }
 .sewera-septik .calc-wells__block {
   margin-bottom: 20px;
+  position: relative;
+  z-index: 99;
 }
 @media (max-width: 1023.98px) {
   .sewera-septik .calc-wells__block {
@@ -4374,9 +4376,9 @@ sewera-septik .form-qwiz__user-contact,
   }
 }
 .sewera-septik .calc-wells__btn {
-  padding: 13px 20px;
   position: relative;
-  z-index: 22;
+  z-index: 99;
+  padding: 13px 20px;
 }
 @media (max-width: 767.98px) {
   .sewera-septik .calc-wells__btn {

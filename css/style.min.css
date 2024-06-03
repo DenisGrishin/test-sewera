@@ -577,12 +577,12 @@ html {
 }
 .sewera-septik .artz-wells-page-bg-img {
   background-position: bottom 0px right -40px;
-  background-size: 567px auto;
+  background-size: 507px auto;
   background-repeat: no-repeat;
 }
 .sewera-septik .pesok-wells-page-bg-img {
-  background-position: bottom 0px right -40px;
-  background-size: 675px auto;
+  background-position: bottom 0px right -90px;
+  background-size: 635px auto;
   background-repeat: no-repeat;
 }
 .sewera-septik .wells-page-bg-img {
@@ -3525,7 +3525,7 @@ sewera-septik .form-qwiz__user-contact {
 }
 .sewera-septik .calc-wells__block {
   position: relative;
-  /* z-index: 99; */
+  /* z-index: 2; */
   margin-bottom: 20px;
 }
 .sewera-septik .calc-wells__search-icon {
@@ -3554,7 +3554,7 @@ sewera-septik .form-qwiz__user-contact {
   z-index: 1;
 }
 .sewera-septik .calc-wells__block_mb-big {
-  margin-bottom: 36px;
+  margin-bottom: 0px;
 }
 .sewera-septik .calc-wells__title-block {
   opacity: 0.6;
@@ -3623,7 +3623,7 @@ sewera-septik .form-qwiz__user-contact {
 }
 .sewera-septik .calc-wells__btn {
   position: relative;
-  z-index: 99;
+  z-index: 1;
   padding: 13px 20px;
 }
 .sewera-septik .calc-wells__right {
@@ -4357,6 +4357,9 @@ sewera-septik .form-qwiz__user-contact {
     font-size: 14px;
     line-height: 1.4;
   }
+  .sewera-septik .calc-wells__block_mn {
+    margin-bottom: 0;
+  }
   .sewera-septik .calc-wells__block_mb-big {
     margin-bottom: 46px;
   }
@@ -4730,6 +4733,9 @@ sewera-septik .form-qwiz__user-contact {
   .sewera-septik .qwiz-section__wrapper {
     padding: 20px;
   }
+  .sewera-septik .calc-wells__btn {
+    margin-top: 46px !important;
+  }
 }
 @media (max-width: 1023.98px) and (max-width: 767.98px) {
   .sewera-septik .banner__right::before {
@@ -4755,6 +4761,12 @@ sewera-septik .form-qwiz__user-contact {
   }
 }
 @media (max-width: 767.98px) {
+  .sewera-septik ._awp .calc-wells__right {
+    width: auto !important;
+  }
+  .sewera-septik .calc-wells__left::before {
+    display: none;
+  }
   .sewera-septik .calc-wells__hidden-desk {
     display: none;
   }
