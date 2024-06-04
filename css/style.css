@@ -740,7 +740,12 @@ html {
 }
 
 .sewera-septik .artz-wells-page-bg-img {
-  background-position: bottom 0px right -40px;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  right: -7%;
+  background-position: bottom 0px right 0;
   background-size: 567px auto;
   background-repeat: no-repeat;
 }
@@ -4659,7 +4664,7 @@ sewera-septik .form-qwiz__user-contact {
     background-position: bottom -100px right 0;
   }
   .sewera-septik .artz-wells-page-bg-img {
-    background-position: bottom 10px right -140px;
+    background-position: bottom 20px right -100px;
   }
   .sewera-septik .form-order__btn_mobile-decor::before {
     bottom: 41px;
@@ -5416,7 +5421,7 @@ sewera-septik .form-qwiz__user-contact {
   }
   .sewera-septik .artz-wells-page-bg-img {
     right: 0;
-    background-size: 340px auto;
+    background-size: 330px auto;
     background-position: center top 100px;
   }
   .sewera-septik .select__title {
