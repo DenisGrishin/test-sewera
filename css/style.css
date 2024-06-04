@@ -751,8 +751,13 @@ html {
 }
 
 .sewera-septik .pesok-wells-page-bg-img {
-  background-position: bottom 0px right -110px;
-  background-size: 655px auto;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  right: -13%;
+  background-position: bottom -10px right 0;
+  background-size: 720px auto;
   background-repeat: no-repeat;
 }
 
@@ -4292,7 +4297,7 @@ sewera-septik .form-qwiz__user-contact {
   width: 524px;
   height: 100%;
   top: 0;
-  background-image: url(../img/banner-img-artz.png) !important;
+  background-image: url(/catalog/view/theme/sewera/skvazhini/img/banner-img-artz.png) !important;
   background-size: contain;
   background-repeat: no-repeat;
   background-position: 0 0;
@@ -4630,7 +4635,7 @@ sewera-septik .form-qwiz__user-contact {
 @media (max-width: 1279.98px) {
   .sewera-septik .pesok-wells-page-bg-img {
     background-size: 770px auto;
-    background-position: bottom 0px right -230px;
+    background-position: bottom 0px right -200px;
   }
   .sewera-septik .completed-work__slide {
     padding: 20px 40px;
@@ -4697,6 +4702,9 @@ sewera-septik .form-qwiz__user-contact {
     left: 38% !important;
     width: 660px !important;
   }
+  .sewera-septik .banner__wells-padding {
+    padding: 30px 0 40px !important;
+  }
   .sewera-septik .calc-wells__bg-img_artzk {
     top: 5% !important;
     background-size: 450px auto !important;
@@ -4704,6 +4712,7 @@ sewera-septik .form-qwiz__user-contact {
   .sewera-septik .pesok-wells-page-bg-img {
     background-size: 340px auto;
     background-position: center top 150px;
+    right: 0;
   }
   .sewera-septik .select__input::-webkit-input-placeholder {
     font-size: 14px;
@@ -5253,10 +5262,10 @@ sewera-septik .form-qwiz__user-contact {
     margin-bottom: 4.125rem;
   }
   .sewera-septik .banner__left-blcok {
-    padding-top: 3rem;
+    padding-top: 30px !important;
   }
   .sewera-septik .banner__left-blcok {
-    padding-bottom: 3rem;
+    padding-bottom: 40px !important;
   }
   .sewera-septik .banner__form-wrapper {
     padding-left: 0.9375rem;
