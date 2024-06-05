@@ -4703,19 +4703,14 @@ sewera-septik .form-qwiz__user-contact {
 }
 @media (max-width: 1279.98px) {
   .sewera-septik .types-wells__slide_obustroystva {
-    height: 730px;
+    height: 750px;
   }
   .sewera-septik .types-wells__wrapper-slide_obustroystva {
     padding: 20px;
+    row-gap: 0;
   }
   .sewera-septik .types-wells__slide_obustroystva:has(._showmore-active) {
-    height: 830px;
-  }
-  .sewera-septik .types-wells__left-blog_obustroystva {
-    justify-content: space-between;
-  }
-  .sewera-septik .types-wells__block {
-    flex: none;
+    height: 850px;
   }
   .sewera-septik .banner__form_mb {
     padding: 15px 20px;
@@ -4801,6 +4796,7 @@ sewera-septik .form-qwiz__user-contact {
     height: 750px;
   }
   .sewera-septik .types-wells__wrapper-slide_obustroystva {
+    row-gap: 10px;
     justify-content: normal;
   }
   .sewera-septik .types-wells__block {
