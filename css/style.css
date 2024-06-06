@@ -3892,10 +3892,15 @@ sewera-septik .form-qwiz__user-contact {
 
 .sewera-septik .types-wells__slide_obustroystva {
   height: 670px;
+  transition: all 0.3s ease 0s;
 }
 
 .sewera-septik .types-wells__slide_obustroystva:has(._showmore-active) {
-  height: 100%;
+  height: 770px;
+}
+
+.sewera-septik .types-wells__wrapper-slide_obustroystva:has(._showmore-active) {
+  justify-content: space-between;
 }
 
 .sewera-septik .types-wells__wrapper-slide {
@@ -3999,6 +4004,11 @@ sewera-septik .form-qwiz__user-contact {
   padding: 13px 20px;
 }
 
+.sewera-septik .types-wells__btn_obustroystva {
+  align-self: flex-start;
+  margin-top: 20px;
+}
+
 .sewera-septik .types-wells__right-blog {
   -webkit-box-flex: 0;
   -ms-flex: 0 1 240px;
@@ -4024,7 +4034,6 @@ sewera-septik .form-qwiz__user-contact {
   justify-content: center;
   align-items: center;
   min-height: 305px;
-  flex: 1 1;
 }
 .sewera-septik .types-wells__right-blog_obustroystva img {
   max-width: 240px;
@@ -4704,6 +4713,9 @@ sewera-septik .form-qwiz__user-contact {
   }
 }
 @media (max-width: 1279.98px) {
+  .sewera-septik .types-wells__slide_obustroystva:has(._showmore-active) {
+    height: 860px;
+  }
   .sewera-septik .types-wells__slide_obustroystva {
     height: 710px;
   }
@@ -4777,6 +4789,12 @@ sewera-septik .form-qwiz__user-contact {
   }
 }
 @media (max-width: 1023.98px) {
+  .sewera-septik .types-wells__slide_obustroystva:has(._showmore-active) {
+    height: 650px;
+  }
+  .sewera-septik .types-wells__btn_obustroystva {
+    align-self: stretch;
+  }
   .sewera-septik ._showmore-active .types-wells__content {
     font-size: 14px;
     line-height: 1.4;
@@ -5509,6 +5527,9 @@ sewera-septik .form-qwiz__user-contact {
   }
 }
 @media (max-width: 767.98px) {
+  .sewera-septik .types-wells__slide_obustroystva:has(._showmore-active) {
+    height: 740px;
+  }
   .sewera-septik .types-wells__slide_obustroystva {
     height: 640px;
   }
@@ -6511,6 +6532,9 @@ sewera-septik .form-qwiz__user-contact {
   }
 }
 @media (max-width: 374.98px) {
+  .sewera-septik .types-wells__slide_obustroystva:has(._showmore-active) {
+    height: 840px;
+  }
   .sewera-septik .types-wells__slide_obustroystva {
     height: 710px;
   }
