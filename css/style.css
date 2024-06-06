@@ -199,7 +199,7 @@ html {
   display: flex;
   width: 9px;
   height: 17px;
-  background: url(../img/icons/selectButton.svg) 0 0 no-repeat;
+  background: url(/catalog/view/theme/sewera/skvazhini/img/selectButton.svg) 0 0 no-repeat;
 }
 
 ._select-open .sewera-septik .select__value:before {
@@ -549,10 +549,6 @@ html {
   text-wrap: nowrap;
 }
 
-.sewera-septik .banner__text_arz-well-mb {
-  margin-bottom: 20px;
-}
-
 .sewera-septik .banner__br-none-tablet {
   display: none;
 }
@@ -575,6 +571,7 @@ html {
   -webkit-box-align: center;
   -ms-flex-align: center;
   align-items: center;
+  padding: 30px 20px !important;
 }
 
 .sewera-septik .banner__form,
@@ -682,13 +679,12 @@ html {
   padding: 107px 0 !important;
 }
 
-.banner__obustroystva-padding {
-  padding: 160px 0 !important;
+.sewera-septik .wells-page-bg-img + .banner__wells-padding {
+  padding: 49px 0 !important;
 }
 
 .sewera-septik .banner__left-blcok_wide .banner__form {
   background-color: #fff;
-  padding: 23px 2.2857142857% !important;
 }
 
 .sewera-septik .banner__button_small {
@@ -739,7 +735,11 @@ html {
 }
 
 .sewera-septik .banner__text_mb-big {
-  margin-bottom: 45px;
+  margin-bottom: 30px;
+}
+
+.sewera-septik .banner__text_arz-well-mb {
+  margin-bottom: 30px !important;
 }
 
 .sewera-septik .banner__wrapper.page-bl {
@@ -755,12 +755,6 @@ html {
   right: -7%;
   background-position: bottom 0px right 0;
   background-size: 567px auto;
-  background-repeat: no-repeat;
-}
-
-.sewera-septik .obustroystva-wells-page-bg-img {
-  background-position: bottom 90px right -30px;
-  background-size: 530px auto;
   background-repeat: no-repeat;
 }
 
@@ -780,8 +774,8 @@ html {
   width: 100%;
   height: 100%;
   top: 0;
-  right: -48%;
-  background-position: bottom -10px right 0;
+  right: -464px;
+  background-position: bottom -105px right 0;
   background-size: 919px auto;
   background-repeat: no-repeat;
 }
@@ -873,7 +867,6 @@ html {
 
 .sewera-septik .banner__form_mb {
   margin-bottom: 20px;
-  padding: 30px 20px;
 }
 
 .sewera-septik .table-price__wrapper {
@@ -3883,6 +3876,10 @@ sewera-septik .form-qwiz__user-contact {
   display: block;
 }
 
+.sewera-septik .types-wells__slide {
+  height: auto;
+}
+
 .sewera-septik .types-wells__wrapper-slide {
   padding: 30px;
   border-radius: 8px;
@@ -3893,22 +3890,6 @@ sewera-septik .form-qwiz__user-contact {
   -moz-column-gap: 30px;
   column-gap: 30px;
   height: 100%;
-}
-
-.sewera-septik .types-wells__slide_obustroystva {
-  height: 680px;
-  border-radius: 8px;
-  transition: height 0.5s ease 0s;
-}
-
-.sewera-septik .types-wells__wrapper-slide_obustroystva {
-  flex-direction: column-reverse;
-  justify-content: space-between;
-  row-gap: 10px;
-}
-
-.sewera-septik .types-wells__slide_obustroystva:has(._showmore-active) {
-  height: 800px;
 }
 
 .sewera-septik .types-wells__left-blog {
@@ -3937,28 +3918,11 @@ sewera-septik .form-qwiz__user-contact {
   left: 0;
   font-size: 24px;
   line-height: 1.35;
-  text-wrap: wrap !important;
-}
-
-.sewera-septik .types-wells__left-blog_obustroystva {
-  padding-top: 0;
-}
-
-.sewera-septik .types-wells__left-blog_obustroystva a {
-  position: static !important;
   text-wrap: nowrap;
 }
 
 .sewera-septik .types-wells__info-list {
   margin-bottom: 0 !important;
-}
-
-.sewera-septik .types-wells__block {
-  flex: 1 1;
-}
-
-.sewera-septik ._showmore-active .types-wells____more {
-  margin-top: 10px;
 }
 
 .sewera-septik .types-wells__info-list li {
@@ -3977,8 +3941,6 @@ sewera-septik .form-qwiz__user-contact {
 
 .sewera-septik .types-wells__price-list {
   margin: 0 0 0 !important;
-  font-size: 20px;
-  line-height: 1.3;
 }
 
 .sewera-septik .types-wells__price-list li {
@@ -4013,21 +3975,6 @@ sewera-septik .form-qwiz__user-contact {
   left: 0;
   -o-object-fit: cover;
   object-fit: cover;
-}
-
-.sewera-septik .types-wells__right-blog_obustroystva {
-  flex: none;
-  text-align: center;
-  height: 305px;
-}
-.sewera-septik .types-wells__right-blog_obustroystva img {
-  transform: translate(0, 0);
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  top: 0;
-  left: 0;
-  object-fit: contain;
 }
 
 .sewera-septik ._showmore-active .types-wells__more-accorion {
@@ -4702,30 +4649,6 @@ sewera-septik .form-qwiz__user-contact {
   }
 }
 @media (max-width: 1279.98px) {
-  .sewera-septik .types-wells__slide_obustroystva {
-    height: 750px;
-  }
-  .sewera-septik .types-wells__wrapper-slide_obustroystva {
-    padding: 20px;
-    row-gap: 0;
-  }
-  .sewera-septik .types-wells__slide_obustroystva:has(._showmore-active) {
-    height: 850px;
-  }
-  .sewera-septik .banner__form_mb {
-    padding: 15px 20px;
-  }
-  .sewera-septik .banner__text_arz-well-mb {
-    font-size: 18px;
-  }
-  .sewera-septik .obustroystva-wells-page-bg-img {
-    background-position: bottom 15px right -110px;
-    background-size: 470px auto;
-    background-repeat: no-repeat;
-  }
-  .sewera-septik .banner__obustroystva-padding {
-    padding: 40px 0 !important;
-  }
   .sewera-septik .pesok-wells-page-bg-img {
     background-size: 770px auto;
     background-position: bottom 0px right -200px;
@@ -4758,7 +4681,7 @@ sewera-septik .form-qwiz__user-contact {
   }
   .sewera-septik .wells-page-bg-img {
     right: -40%;
-    background-size: 80% auto;
+    background-size: 800px auto;
     background-position: bottom -100px right 0;
   }
   .sewera-septik .artz-wells-page-bg-img {
@@ -4785,48 +4708,6 @@ sewera-septik .form-qwiz__user-contact {
   }
 }
 @media (max-width: 1023.98px) {
-  .sewera-septik .types-wells__content {
-    font-size: 14px;
-    line-height: 1.4;
-  }
-  .sewera-septik .types-wells__slide_obustroystva {
-    height: 670px;
-  }
-  .sewera-septik .types-wells__slide_obustroystva:has(._showmore-active) {
-    height: 750px;
-  }
-  .sewera-septik .types-wells__wrapper-slide_obustroystva {
-    row-gap: 10px;
-    justify-content: normal;
-  }
-  .sewera-septik .types-wells__block {
-    flex: 1 1;
-  }
-  .sewera-septik .types-wells__left-blog_obustroystva {
-    justify-content: normal;
-  }
-  .sewera-septik .types-wells__btn_obustroystva {
-    align-self: stretch;
-  }
-  .sewera-septik .obustroystva-wells-page-bg-img {
-    background-position: center top 180px;
-    background-size: 300px auto;
-    background-repeat: no-repeat;
-  }
-  .sewera-septik .banner__obustroystva-padding {
-    padding: 40px 0 20px !important;
-  }
-  .sewera-septik .form-order__title {
-    font-size: clamp(1.5rem, 0.75rem + 1.5625vw, 1.75rem);
-  }
-  .sewera-septik .banner__left-blcok h1 {
-    font-size: 24px;
-    line-height: 1.35;
-  }
-  .sewera-septik .banner__text {
-    font-size: 16px;
-    line-height: 1.5;
-  }
   .sewera-septik .calc-wells__hidden-desk {
     display: -webkit-box;
     display: -ms-flexbox;
@@ -5391,7 +5272,16 @@ sewera-septik .form-qwiz__user-contact {
     font-size: 24px;
   }
   .sewera-septik .banner__text {
+    font-size: 16px;
+  }
+  .sewera-septik .banner__text {
     margin-bottom: 4.125rem;
+  }
+  .sewera-septik .banner__left-blcok {
+    padding-top: 30px !important;
+  }
+  .sewera-septik .banner__left-blcok {
+    padding-bottom: 40px !important;
   }
   .sewera-septik .banner__form-wrapper {
     padding-left: 0.9375rem;
@@ -5409,6 +5299,9 @@ sewera-septik .form-qwiz__user-contact {
     flex-direction: column-reverse;
   }
   .sewera-septik .banner__left-blcok {
+    margin-top: -20px;
+    padding-top: 0;
+    padding-bottom: 20px;
     text-align: center;
     -webkit-box-flex: 0;
     -ms-flex: none;
@@ -5417,6 +5310,7 @@ sewera-septik .form-qwiz__user-contact {
     -ms-flex-item-align: stretch;
     -ms-grid-row-align: stretch;
     align-self: stretch;
+    padding-top: 180px;
     z-index: 2;
   }
   .sewera-septik .banner__left-blcok h1 ._hidden-desktop {
@@ -5488,7 +5382,7 @@ sewera-septik .form-qwiz__user-contact {
   .sewera-septik .wells-page-bg-img {
     right: 0;
     background-size: 400px auto;
-    background-position: center top 180px;
+    background-position: center top 220px;
   }
   .sewera-septik .banner__text_arz-well-mb {
     margin-bottom: 202px !important;
@@ -5531,11 +5425,6 @@ sewera-septik .form-qwiz__user-contact {
   }
 }
 @media (max-width: 767.98px) {
-  .sewera-septik .obustroystva-wells-page-bg-img {
-    background-position: center top 180px;
-    background-size: 260px auto;
-    background-repeat: no-repeat;
-  }
   .sewera-septik .service-block__texts {
     font-size: 14px;
     line-height: 1.4;
@@ -5990,7 +5879,7 @@ sewera-septik .form-qwiz__user-contact {
   }
   .sewera-septik .wells-page-bg-img {
     background-size: 400px auto;
-    background-position: center top 160px;
+    background-position: center top 180px;
   }
   .sewera-septik .ya-map__map {
     padding: 0 20px 0;
@@ -6294,8 +6183,7 @@ sewera-septik .form-qwiz__user-contact {
     font-size: 1.5rem;
   }
   .sewera-septik .banner__text {
-    font-size: 14px;
-    line-height: 1.4;
+    font-size: 1rem;
   }
   .sewera-septik .banner__text {
     margin-bottom: 1.25rem;
@@ -6345,10 +6233,6 @@ sewera-septik .form-qwiz__user-contact {
     -ms-grid-row-align: stretch;
     align-self: stretch;
   }
-  .sewera-septik .types-wells__price-list {
-    font-size: 18px;
-    line-height: 22.5px;
-  }
 }
 @media (max-width: 719.98px) {
   .sewera-septik .completed-work__slider {
@@ -6384,6 +6268,10 @@ sewera-septik .form-qwiz__user-contact {
   }
 }
 @media (max-width: 529.98px) {
+  .sewera-septik .wells-page-bg-img {
+    background-size: 365px auto;
+    background-position: center top 225px;
+  }
   .sewera-septik .service-block__list {
     margin: 0 0 0 15px !important;
   }
@@ -6498,11 +6386,6 @@ sewera-septik .form-qwiz__user-contact {
   }
 }
 @media (max-width: 410.98px) {
-  .sewera-septik .obustroystva-wells-page-bg-img {
-    background-position: center top 210px;
-    background-size: 260px auto;
-    background-repeat: no-repeat;
-  }
   .sewera-septik .artz-wells-page-bg-img {
     background-size: 320px auto;
     background-position: center top 170px;
@@ -6524,11 +6407,6 @@ sewera-septik .form-qwiz__user-contact {
   }
 }
 @media (max-width: 374.98px) {
-  .sewera-septik .obustroystva-wells-page-bg-img {
-    background-position: center top 230px;
-    background-size: 260px auto;
-    background-repeat: no-repeat;
-  }
   .sewera-septik .pesok-wells-page-bg-img {
     right: 0;
     background-size: 290px auto;
@@ -6611,6 +6489,19 @@ sewera-septik .form-qwiz__user-contact {
   }
   .sewera-septik .banner__left-blcok {
     padding-bottom: clamp(3rem, 0.1948051948rem + 4.3831168831vw, 4.6875rem);
+  }
+}
+@media (min-width: 48em) and (max-width: 64em) {
+  .sewera-septik .form-order__title {
+    font-size: clamp(1.5rem, 0.75rem + 1.5625vw, 1.75rem);
+  }
+  .sewera-septik .banner__left-blcok h1 {
+    font-size: 24px;
+    line-height: 1.35;
+  }
+  .sewera-septik .banner__text {
+    font-size: 16px;
+    line-height: 1.5;
   }
 }
 @media (max-width: 1440.98px) and (min-width: 89.99875em) {
