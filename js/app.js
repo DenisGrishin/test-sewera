@@ -6303,12 +6303,16 @@ data-youtube - Атрибут для кода youtube
       const oneSelect = document.querySelector('select[data-id="1"]');
       const calcObustroystva = document.getElementById("obustroystva-calc");
       let valueDepth;
-      if (document.querySelector(".select__input")) {
+
+      if (
+        document.querySelector(".select__input") &&
+        document.querySelector(".calc-wells__inpt")
+      ) {
         valueDepth =
           document.querySelector(".calc-wells__inpt").value ||
           document.querySelector(".select__input").dataset.placeholder;
       }
-
+      debugger;
       if (
         !calcObustroystva &&
         originalSelect.dataset.id == 1 &&
@@ -6445,7 +6449,9 @@ data-youtube - Атрибут для кода youtube
       const sumBlock = document.querySelector(".calc-wells__sum");
       let isActiv = true;
       let res = 0;
-
+      if (document.querySelector(".select__input")) {
+        document.querySelector(".select__input").dataset.placeholder = "";
+      }
       isShowCaclTab();
 
       // преключаем между "Глубина скважины" и "Район бурения"
