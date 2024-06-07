@@ -232,7 +232,7 @@ html {
   width: 100%;
   color: #000;
   position: absolute;
-  top: 47.5px;
+  top: 46.5px;
   min-width: 100%;
   left: 0;
   background-color: #fff;
@@ -4850,7 +4850,7 @@ sewera-septik .form-qwiz__user-contact {
     padding: 40px 0 20px !important;
   }
   .sewera-septik .obustroystva-wells-page-bg-img {
-    background-position: center top 180px;
+    background-position: center bottom 240px;
     background-size: 300px auto;
     background-repeat: no-repeat;
   }
@@ -5604,8 +5604,8 @@ sewera-septik .form-qwiz__user-contact {
     height: 640px;
   }
   .sewera-septik .obustroystva-wells-page-bg-img {
-    background-position: center top 180px;
-    background-size: 260px auto;
+    background-position: center bottom 365px;
+    background-size: 255px auto;
     background-repeat: no-repeat;
   }
   .sewera-septik .service-block__texts {
@@ -6429,6 +6429,15 @@ sewera-septik .form-qwiz__user-contact {
   }
 }
 @media (max-width: 429.98px) {
+  .sewera-septik .calc-wells__wrapper-inpt_obustroystva {
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr 1fr 50px;
+    row-gap: 20px;
+  }
+  .sewera-septik #obustroystva-calc .calc-wells__btn {
+    grid-column: auto;
+    margin-top: 0px !important;
+  }
   .sewera-septik .types-wells__slide_obustroystva:has(._showmore-active) {
     height: 720px;
   }
@@ -6522,11 +6531,6 @@ sewera-septik .form-qwiz__user-contact {
   }
 }
 @media (max-width: 410.98px) {
-  .sewera-septik .obustroystva-wells-page-bg-img {
-    background-position: center top 210px;
-    background-size: 260px auto;
-    background-repeat: no-repeat;
-  }
   .sewera-septik .artz-wells-page-bg-img {
     background-size: 320px auto;
     background-position: center top 170px;
