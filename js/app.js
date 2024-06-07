@@ -6299,22 +6299,35 @@ data-youtube - Атрибут для кода youtube
     }
     // Обработчик изменения в селекте
     setSelectChange(originalSelect) {
+      const btnSum = document.querySelector(".calc-wells__btn");
+      const oneSelect = document.querySelector('select[data-id="1"]');
       if (
-        !document.getElementById("calc-wells__finish") &&
+        !document.getElementById("obustroystva-calc") &&
         originalSelect.dataset.id == 1 &&
-        document.querySelector(".calc-wells__btn")
+        document.querySelector(".calc-wells__inpt").value &&
+        document.querySelector(".select__input").dataset.placeholder
       ) {
-        document.querySelector(".calc-wells__btn").classList.remove("_disable");
-        document.querySelector(".calc-wells__btn").disabled = false;
+        btnSum.classList.remove("_disable");
+        btnSum.disabled = false;
       }
       if (
         document.getElementById("calc-wells__finish") &&
         originalSelect.dataset.id == 2 &&
-        document.querySelector(".calc-wells__btn") &&
+        btnSum &&
         document.querySelector(".calc-wells__inpt").value
       ) {
-        document.querySelector(".calc-wells__btn").classList.remove("_disable");
-        document.querySelector(".calc-wells__btn").disabled = false;
+        btnSum.classList.remove("_disable");
+        btnSum.disabled = false;
+      }
+      if (
+        !document.getElementById("obustroystva-calc") &&
+        originalSelect.dataset.id == 3 &&
+        btnSum &&
+        document.querySelector(".select__input").dataset.placeholder &&
+        oneSelect.value
+      ) {
+        btnSum.classList.remove("_disable");
+        btnSum.disabled = false;
       }
       // Моментальная валидация селекта
       if (originalSelect.hasAttribute("data-validate")) {
@@ -6451,6 +6464,14 @@ data-youtube - Атрибут для кода youtube
           isHiddenInpt.hidden = true;
           isHiddenCalc.hidden = false;
           isActiv = booleanValue;
+          inptCalc.value = "";
+          sumBtn.classList.add("_disable");
+          sumBtn.disabled = true;
+          if (document.querySelector(".select__input")) {
+            document.querySelector(".select__input").placeholder =
+              "Район бурения";
+            document.querySelector(".select__input").dataset.placeholder = "";
+          }
         }
       }
 
@@ -6524,7 +6545,12 @@ data-youtube - Атрибут для кода youtube
           sumBtn.disabled = inptCalc.value.trim().length === 0;
           sumBtn.classList.remove("_disable");
         }
-        if (inptCalc.value == "") {
+        if (inptCalc.value !== "" && oneSelect.value) {
+          sumBtn.disabled = false;
+          sumBtn.classList.remove("_disable");
+          return;
+        }
+        if (inptCalc.value === "") {
           sumBtn.disabled = true;
           sumBtn.classList.add("_disable");
         }

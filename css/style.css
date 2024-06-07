@@ -268,27 +268,22 @@ html {
 }
 
 .sewera-septik .select__input::-webkit-input-placeholder {
-  color: #102938 !important;
   font-weight: 500;
 }
 
 .sewera-septik .select__input::-moz-placeholder {
-  color: #102938 !important;
   font-weight: 500;
 }
 
 .sewera-septik .select__input:-ms-input-placeholder {
-  color: #102938 !important;
   font-weight: 500;
 }
 
 .sewera-septik .select__input::-ms-input-placeholder {
-  color: #102938 !important;
   font-weight: 500;
 }
 
 .sewera-septik .select__input::placeholder {
-  color: #102938 !important;
   font-weight: 500;
 }
 
