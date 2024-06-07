@@ -6300,12 +6300,23 @@ data-youtube - Атрибут для кода youtube
     // Обработчик изменения в селекте
     setSelectChange(originalSelect) {
       if (
+        !document.getElementById("calc-wells__finish") &&
         originalSelect.dataset.id == 1 &&
         document.querySelector(".calc-wells__btn")
       ) {
         document.querySelector(".calc-wells__btn").classList.remove("_disable");
         document.querySelector(".calc-wells__btn").disabled = false;
-      } // Моментальная валидация селекта
+      }
+      if (
+        document.getElementById("calc-wells__finish") &&
+        originalSelect.dataset.id == 2 &&
+        document.querySelector(".calc-wells__btn") &&
+        document.querySelector(".calc-wells__inpt").value
+      ) {
+        document.querySelector(".calc-wells__btn").classList.remove("_disable");
+        document.querySelector(".calc-wells__btn").disabled = false;
+      }
+      // Моментальная валидация селекта
       if (originalSelect.hasAttribute("data-validate")) {
         // formValidate.validateInput(originalSelect);
       }
@@ -6408,6 +6419,7 @@ data-youtube - Атрибут для кода youtube
       const sumBtn = document.querySelector(".calc-wells__btn");
       const imgBlock = document.querySelector(".calc-wells__bg-img");
       const finishBlock = document.querySelector(".calc-wells__finish");
+      const calcObustroystva = document.getElementById("obustroystva-calc");
 
       const sumBlock = document.querySelector(".calc-wells__sum");
       let isActiv = true;
@@ -6444,6 +6456,7 @@ data-youtube - Атрибут для кода youtube
 
       // кнопка "Рассчитать"
       sumBtn.addEventListener("click", resultCalc);
+
       function resultCalc(e) {
         let depthValue = isActiv
           ? inptCalc.value
@@ -6456,7 +6469,7 @@ data-youtube - Атрибут для кода youtube
           depthValue = 40;
         }
 
-        if (document.getElementById("obustroystva-calc")) {
+        if (calcObustroystva) {
           let cablePrice = 300 + 100 + 170;
 
           let arrangementPrice = twoSelect.value;
@@ -6497,12 +6510,23 @@ data-youtube - Атрибут для кода youtube
           sumBlock.innerHTML = `${newRes} р.`;
         }
       }
+      // события на проверку на пустое значения
       // события  на ввод макс.глубину 250
       inptCalc.addEventListener("input", (event) => {
-        const num = 250;
-        if (event.target.value > num) {
-          event.target.value = num;
-          event.target.max = num;
+        const numMax = 250;
+
+        if (event.target.value > numMax) {
+          event.target.value = numMax;
+          event.target.max = numMax;
+        }
+
+        if (calcObustroystva && twoSelect.value) {
+          sumBtn.disabled = inptCalc.value.trim().length === 0;
+          sumBtn.classList.remove("_disable");
+        }
+        if (inptCalc.value == "") {
+          sumBtn.disabled = true;
+          sumBtn.classList.add("_disable");
         }
       });
       // берем значения с "Район бурения"
@@ -6510,16 +6534,16 @@ data-youtube - Атрибут для кода youtube
         const option = select.querySelector(`option[value="${select.value}"]`);
         return option.dataset.valueDepth;
       }
+      //анимация
       function animatBlcok() {
         imgBlock.classList.add("_animat");
-
         finishBlock.classList.add("_animat");
       }
       const calcWellsBtnSubmit = document.getElementById("calc-wells__finish");
       if (calcWellsBtnSubmit) {
         calcWellsBtnSubmit.addEventListener("submit", function (e) {
           e.preventDefault();
-          debugger;
+
           var th = $(calcWellsBtnSubmit);
           $(".load__preloader").fadeIn("", function () {
             $.ajax({
