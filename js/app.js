@@ -6301,17 +6301,25 @@ data-youtube - Атрибут для кода youtube
     setSelectChange(originalSelect) {
       const btnSum = document.querySelector(".calc-wells__btn");
       const oneSelect = document.querySelector('select[data-id="1"]');
+      const calcObustroystva = document.getElementById("obustroystva-calc");
+      let valueDepth;
+      if (document.querySelector(".select__input")) {
+        valueDepth =
+          document.querySelector(".calc-wells__inpt").value ||
+          document.querySelector(".select__input").dataset.placeholder;
+      }
+
       if (
-        !document.getElementById("obustroystva-calc") &&
+        !calcObustroystva &&
         originalSelect.dataset.id == 1 &&
-        document.querySelector(".calc-wells__inpt").value &&
-        document.querySelector(".select__input").dataset.placeholder
+        oneSelect.value &&
+        valueDepth
       ) {
         btnSum.classList.remove("_disable");
         btnSum.disabled = false;
       }
       if (
-        document.getElementById("calc-wells__finish") &&
+        calcObustroystva &&
         originalSelect.dataset.id == 2 &&
         btnSum &&
         document.querySelector(".calc-wells__inpt").value
@@ -6320,7 +6328,7 @@ data-youtube - Атрибут для кода youtube
         btnSum.disabled = false;
       }
       if (
-        !document.getElementById("obustroystva-calc") &&
+        !calcObustroystva &&
         originalSelect.dataset.id == 3 &&
         btnSum &&
         document.querySelector(".select__input").dataset.placeholder &&
