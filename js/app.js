@@ -5388,33 +5388,37 @@ data-youtube - Атрибут для кода youtube
         });
         return false;
       });
-      const inputRange = document.querySelector(
-        ".form-qwiz__input-number  input",
-      );
-      if (inputRange) {
-        inputRange.addEventListener("input", (e) => {
-          const nextBtn = document.querySelector(".qwiz-section__next-btn");
-
-          const num = 50;
-
-          if (e.target.value > num) {
-            e.target.value = num;
-            e.target.max = num;
-          }
-
-          inputRange.value = inputRange.value.replace(/[^0-9]/g, "");
-
-          if (inputRange.value.length !== 0) {
-            nextBtn.classList.remove("_disabled");
-            nextBtn.disabled = false;
-          } else {
-            nextBtn.classList.add("_disabled");
-            nextBtn.disabled = true;
-          }
-        });
-      }
     }
   }
+  // события на ввод только чисел и проврка на пустой инпут
+  function validateUserValueInput() {
+    const inputRange = document.querySelector(
+      ".form-qwiz__input-number  input",
+    );
+    if (inputRange) {
+      inputRange.addEventListener("input", (e) => {
+        const nextBtn = document.querySelector(".qwiz-section__next-btn");
+
+        const num = 50;
+
+        if (e.target.value > num) {
+          e.target.value = num;
+          e.target.max = num;
+        }
+
+        inputRange.value = inputRange.value.replace(/[^0-9]/g, "");
+
+        if (inputRange.value.length !== 0) {
+          nextBtn.classList.remove("_disabled");
+          nextBtn.disabled = false;
+        } else {
+          nextBtn.classList.add("_disabled");
+          nextBtn.disabled = true;
+        }
+      });
+    }
+  }
+  validateUserValueInput();
 
   initQwiz();
   // кнопеи сантехники
@@ -5950,7 +5954,6 @@ data-youtube - Атрибут для кода youtube
         ? inputRange.value
         : valueRange.ariaValueText;
     }
-    // события на ввод только чисел и проврка на пустой инпут
 
     // расчет производительности на всю сантехнику дома (раковины, ванна, туалет и т.д)
     function getValueItemPlumbing() {
