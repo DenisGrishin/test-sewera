@@ -5166,6 +5166,9 @@ data-youtube - Атрибут для кода youtube
       const nextBtn = document.querySelector(".qwiz-section__next-btn");
       const bottomPanel = document.querySelector(".qwiz-section__bottom");
       const navigatePanel = document.querySelector(".qwiz-section__navigate");
+      const textProgress = document.querySelector(
+        ".qwiz-section__progress-text",
+      );
       const stepCurrentNumber = document.querySelector(
         ".qwiz-section__current-step",
       );
@@ -5228,7 +5231,9 @@ data-youtube - Атрибут для кода youtube
       // шаг вперед
       function nextStep() {
         ++currentStep;
-
+        if (textProgress) {
+          textProgress.style.display = "flex";
+        }
         isValidateFormService();
 
         if (currentStep === 1) {
@@ -5273,6 +5278,7 @@ data-youtube - Атрибут для кода youtube
         // на последнем шагу добавляет текст 'Итоги'
         if (steps.length === currentStep + 1) {
           filterSeptik();
+          textProgress.style.display = "none";
           editCountStepText("Итоги");
         }
         //есди есть доп.вопрос добавляем 'Дополнительный вопрос'
@@ -5280,6 +5286,7 @@ data-youtube - Атрибут для кода youtube
           steps[currentStep].closest("._additional-question") &&
           statusQuestion
         ) {
+          textProgress.style.display = "none";
           editCountStepText("Дополнительный вопрос");
           switchCurrentClassName(currentStep - 1, currentStep, prevBtn);
           return;
@@ -5289,6 +5296,9 @@ data-youtube - Атрибут для кода youtube
 
       // шаг назад
       function prevStep() {
+        if (textProgress) {
+          textProgress.style.display = "flex";
+        }
         if (currentStep === steps.length - 2) {
           stepCurrentNumber.parentNode.classList.remove("_ready");
         }
@@ -5315,6 +5325,7 @@ data-youtube - Атрибут для кода youtube
           steps[currentStep].closest("._additional-question") &&
           statusQuestion
         ) {
+          textProgress.style.display = "none";
           editCountStepText("Дополнительный вопрос");
           switchCurrentClassName(currentStep + 1, currentStep);
           return;
@@ -5359,24 +5370,24 @@ data-youtube - Атрибут для кода youtube
         steps[stepRemove].classList.remove("_current");
         steps[stepAdd].classList.add("_current");
       }
-      // qwizFrom.addEventListener('submit', function (e) {
-      //   e.preventDefault();
-      //   var th = $('#services_quiz_form');
-      //   $('.load__preloader').fadeIn('', function () {
-      //     $.ajax({
-      //       type: 'POST',
-      //       url: '/index.php?route=common/footer/quiz_submit',
-      //       data: th.serialize(),
-      //       dataType: 'json',
-      //     }).done(function (json) {
-      //       if (json['success']) {
-      //         $('.load__preloader').fadeOut('slow');
-      //         nextStep();
-      //       }
-      //     });
-      //   });
-      //   return false;
-      // });
+      qwizFrom.addEventListener("submit", function (e) {
+        e.preventDefault();
+        var th = $("#services_quiz_form");
+        $(".load__preloader").fadeIn("", function () {
+          $.ajax({
+            type: "POST",
+            url: "/index.php?route=common/footer/quiz_submit",
+            data: th.serialize(),
+            dataType: "json",
+          }).done(function (json) {
+            if (json["success"]) {
+              $(".load__preloader").fadeOut("slow");
+              nextStep();
+            }
+          });
+        });
+        return false;
+      });
       const inputRange = document.querySelector(
         ".form-qwiz__input-number  input",
       );
