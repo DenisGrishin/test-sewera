@@ -5384,6 +5384,13 @@ data-youtube - Атрибут для кода youtube
         inputRange.addEventListener("input", (e) => {
           const nextBtn = document.querySelector(".qwiz-section__next-btn");
 
+          const num = 50;
+
+          if (e.target.value > num) {
+            e.target.value = num;
+            e.target.max = num;
+          }
+
           inputRange.value = inputRange.value.replace(/[^0-9]/g, "");
 
           if (inputRange.value.length !== 0) {
