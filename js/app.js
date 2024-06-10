@@ -5399,7 +5399,7 @@ data-youtube - Атрибут для кода youtube
   }
 
   initQwiz();
-  // кнопки сантехники
+  // кнопеи сантехники
   function countPlumbingItems(params) {
     const plusBtn = document.querySelectorAll(".form-qwiz__btns-plumbing");
 
@@ -5905,7 +5905,6 @@ data-youtube - Атрибут для кода youtube
         salvoReleaseVolume: "680",
         energyConsumption: "1.7",
         productivity: "2.4",
-
         price: "228 600",
         mounting: "55 000",
       },
@@ -5921,9 +5920,7 @@ data-youtube - Атрибут для кода youtube
       if (res <= 0.4) {
         res = 0.4;
       }
-      if (res >= 4) {
-        res = 4;
-      }
+
       return res;
     }
 
@@ -5958,6 +5955,10 @@ data-youtube - Атрибут для кода youtube
         getAmountUserValue() +
         getValueItemPlumbing() / 1000 / 2
       ).toFixed(1);
+
+      if (sum >= 4) {
+        sum = 4;
+      }
 
       console.log("Производительность", sum);
 
@@ -6010,7 +6011,7 @@ data-youtube - Атрибут для кода youtube
       let objRes = createObjRes(res);
 
       const [arrRes, sumRes] = objRes;
-      console.log(objRes);
+
       sumNameSelector.innerHTML = sumRes;
 
       if (objRes) {
