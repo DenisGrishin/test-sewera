@@ -2717,22 +2717,22 @@ html {
 }
 
 .sewera-septik .form-qwiz__wrapper-range {
-  padding: 72px 10px 80px;
-  position: relative;
+  padding: 72px 10px 30px;
 }
 
 .sewera-septik .form-qwiz__input-number {
   text-align: center;
-  display: none;
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  transform: translate(-50%, 0px);
+  margin: 0 auto;
+  margin-top: 30px;
+  transform: translate(0%, 0px);
   width: 100%;
-  max-width: 350px;
+  max-width: 230px;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.5s ease 0s;
 }
 .sewera-septik .form-qwiz__input-number input {
-  padding: 15.4px 20px;
+  padding: 13.4px 10px;
   width: 100%;
   font-weight: 500;
   border-radius: 4px;
@@ -2747,7 +2747,8 @@ html {
 }
 
 .sewera-septik .form-qwiz__input-number._show {
-  display: block;
+  visibility: visible;
+  opacity: 1;
 }
 
 .sewera-septik .form-qwiz__title {

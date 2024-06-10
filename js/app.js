@@ -5399,7 +5399,28 @@ data-youtube - Атрибут для кода youtube
   }
 
   initQwiz();
+  // кнопки сантехники
+  function countPlumbingItems(params) {
+    const plusBtn = document.querySelectorAll(".form-qwiz__btns-plumbing");
 
+    if (plusBtn) {
+      plusBtn.forEach((element) => {
+        element.addEventListener("click", function (e) {
+          let target = e.target;
+
+          if (target.closest("._plus-plumbing")) {
+            if (element.children[1].innerHTML >= 5) return;
+            element.children[1].innerHTML++;
+          }
+          if (target.closest("._minus-plumbing")) {
+            if (element.children[1].innerHTML <= 0) return;
+            element.children[1].innerHTML--;
+          }
+        });
+      });
+    }
+  }
+  countPlumbingItems();
   function filterSeptik() {
     const dataSeptic = [
       // akvalos
@@ -5884,6 +5905,7 @@ data-youtube - Атрибут для кода youtube
         salvoReleaseVolume: "680",
         energyConsumption: "1.7",
         productivity: "2.4",
+
         price: "228 600",
         mounting: "55 000",
       },
@@ -5891,29 +5913,6 @@ data-youtube - Атрибут для кода youtube
     const inputRange = document.querySelector(
       ".form-qwiz__input-number  input",
     );
-
-    // кнопеи сантехники
-    function countPlumbingItems(params) {
-      const plusBtn = document.querySelectorAll(".form-qwiz__btns-plumbing");
-
-      if (plusBtn) {
-        plusBtn.forEach((element) => {
-          element.addEventListener("click", function (e) {
-            let target = e.target;
-
-            if (target.closest("._plus-plumbing")) {
-              if (element.children[1].innerHTML >= 5) return;
-              element.children[1].innerHTML++;
-            }
-            if (target.closest("._minus-plumbing")) {
-              if (element.children[1].innerHTML <= 0) return;
-              element.children[1].innerHTML--;
-            }
-          });
-        });
-      }
-    }
-    countPlumbingItems();
 
     // расчет сколько нужноь производительности септика на n кол-во людей
     function getAmountUserValue() {
