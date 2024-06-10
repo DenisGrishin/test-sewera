@@ -5156,7 +5156,7 @@ data-youtube - Атрибут для кода youtube
   function initQwiz() {
     const qwiz = document.querySelector(".qwiz-section__body");
 
-    // const qwizFrom = document.querySelector('.qwiz-sections');
+    const qwizFrom = document.querySelector(".qwiz-sections");
 
     if (qwiz) {
       const checkBlock = document.querySelector(".form-qwiz");
@@ -5370,24 +5370,26 @@ data-youtube - Атрибут для кода youtube
         steps[stepRemove].classList.remove("_current");
         steps[stepAdd].classList.add("_current");
       }
-      qwizFrom.addEventListener("submit", function (e) {
-        e.preventDefault();
-        var th = $("#services_quiz_form");
-        $(".load__preloader").fadeIn("", function () {
-          $.ajax({
-            type: "POST",
-            url: "/index.php?route=common/footer/quiz_submit",
-            data: th.serialize(),
-            dataType: "json",
-          }).done(function (json) {
-            if (json["success"]) {
-              $(".load__preloader").fadeOut("slow");
-              nextStep();
-            }
+      if (qwizFrom) {
+        qwizFrom.addEventListener("submit", function (e) {
+          e.preventDefault();
+          var th = $("#services_quiz_form");
+          $(".load__preloader").fadeIn("", function () {
+            $.ajax({
+              type: "POST",
+              url: "/index.php?route=common/footer/quiz_submit",
+              data: th.serialize(),
+              dataType: "json",
+            }).done(function (json) {
+              if (json["success"]) {
+                $(".load__preloader").fadeOut("slow");
+                nextStep();
+              }
+            });
           });
+          return false;
         });
-        return false;
-      });
+      }
     }
   }
   // события на ввод только чисел и проврка на пустой инпут
