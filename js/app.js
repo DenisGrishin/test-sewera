@@ -3388,40 +3388,6 @@ data-youtube - Атрибут для кода youtube
 
   function initSliders() {
     bildSliders();
-    // слайдер 'Виды скважин на воду'
-    if (document.querySelector("#types-wells__slider")) {
-      new Swiper("#types-wells__slider", {
-        observer: true,
-        watchSlidesProgress: true,
-        observeParents: true,
-        slidesPerView: 2,
-        spaceBetween: 20,
-        speed: 300,
-        autoHeight: false,
-
-        breakpoints: {
-          319.98: {
-            slidesPerView: 1.3,
-            spaceBetween: 15,
-          },
-          429.98: {
-            slidesPerView: 1.3,
-            spaceBetween: 10,
-          },
-
-          767.98: {
-            autoplay: false,
-            slidesPerView: 1.6,
-          },
-          1023.98: {
-            slidesPerView: 3,
-            spaceBetween: 20,
-            autoplay: false,
-          },
-        },
-        on: {},
-      });
-    }
     // слайдер 'Выполненные работы'
     if (document.querySelector(".completed-work__slider")) {
       new Swiper(".completed-work__slider", {
@@ -3501,7 +3467,7 @@ data-youtube - Атрибут для кода youtube
         spaceBetween: 0,
         speed: 300,
 
-        loop: true,
+        loop: false,
         navigation: {
           nextEl: ".popular-models__nav .popular-models__next",
           prevEl: ".popular-models__nav .popular-models__prev",
@@ -3513,7 +3479,8 @@ data-youtube - Атрибут для кода youtube
           },
           374.98: {
             slidesPerView: 1.4,
-            centeredSlides: true,
+            // initialSlide: 1,
+            // centeredSlides: true,
           },
 
           768: {
@@ -3528,10 +3495,6 @@ data-youtube - Атрибут для кода youtube
         },
         on: {},
       });
-      setTimeout(() => {
-        pop.loopDestroy();
-        pop.loopCreate();
-      }, 1);
     }
 
     // слайдер телеграм
@@ -4295,7 +4258,9 @@ data-youtube - Атрибут для кода youtube
         ],
       },
     ];
-    const tabsMap = document.querySelectorAll(".ya-map__tab");
+
+    const tabsMap = document.querySelectorAll("button[data-city-map]");
+    const slectorBtn = document.querySelectorAll(".ya-map__tab");
 
     var myMap = new ymaps.Map(
       "map",
@@ -4307,7 +4272,17 @@ data-youtube - Атрибут для кода youtube
         searchControlProvider: "yandex#search",
       },
     );
-
+    if (slectorBtn) {
+      slectorBtn.forEach((element) => {
+        element.addEventListener("click", (e) => {
+          if (element.closest("._active-tab-map")) {
+            return;
+          }
+          slectorBtn.forEach((el) => el.classList.remove("_active-tab-map"));
+          element.classList.add("_active-tab-map");
+        });
+      });
+    }
     if (tabsMap.length !== 0) {
       tabsMap.forEach((element) => {
         const dataCity = element.dataset.cityMap;
@@ -4331,11 +4306,6 @@ data-youtube - Атрибут для кода youtube
 
         element.addEventListener("click", (e) => {
           myMap.setCenter(objCity.center, objCity.zoom);
-          if (element.closest("._active-tab-map")) {
-            return;
-          }
-          tabsMap.forEach((el) => el.classList.remove("_active-tab-map"));
-          element.classList.add("_active-tab-map");
         });
       });
     } else {
@@ -4993,8 +4963,8 @@ data-youtube - Атрибут для кода youtube
               element.dataset.slideId ===
               target.closest("[data-top-id]").dataset.topId
             ) {
-              findIndxSlide = slideModel[+element.dataset.swiperSlideIndex + 4];
-              indxSlide = element.dataset.swiperSlideIndex;
+              findIndxSlide = slideModel[+element.dataset.slideId];
+              indxSlide = element.dataset.slideId;
               activeTopBtn = searchActiveBtn(
                 findIndxSlide.querySelector(".card-model__top-btns"),
               );
@@ -5014,7 +4984,7 @@ data-youtube - Атрибут для кода youtube
               element.dataset.slideId ===
               target.closest("[data-bottom-id]").dataset.bottomId
             ) {
-              findIndxSlide = slideModel[+element.dataset.swiperSlideIndex + 4];
+              findIndxSlide = slideModel[+element.dataset.slideId];
               indxSlide = element.dataset.slideId;
               activeTopBtn = searchActiveBtn(
                 findIndxSlide.querySelector(".card-model__top-btns"),
@@ -5169,31 +5139,276 @@ data-youtube - Атрибут для кода youtube
     }
   }
   rangeInit();
+  // function initQwiz() {
+  //   const qwizFrom = document.querySelector('#services_quiz_form');
+  //   // const qwizFrom = document.querySelector('.qwiz-sections');
 
+  //   if (qwizFrom) {
+  //     const checkBlock = document.querySelector('.form-qwiz');
+  //     const inputChecks = document.querySelectorAll('.form-qwiz__input');
+  //     const steps = document.querySelectorAll('.form-qwiz__step');
+  //     const prevBtn = document.querySelector('.qwiz-section__prev-btn');
+  //     const nextBtn = document.querySelector('.qwiz-section__next-btn');
+  //     const bottomPanel = document.querySelector('.qwiz-section__bottom');
+  //     const navigatePanel = document.querySelector('.qwiz-section__navigate ');
+  //     const stepCurrentNumber = document.querySelector(
+  //       '.qwiz-section__current-step'
+  //     );
+  //     const radioBtn = document.querySelectorAll(
+  //       'input[name="Нужен дренажный колодец?"]'
+  //     );
+
+  //     const restartBtn = document.querySelector('.form-qwiz__restart-btn');
+  //     let currentStep = 0;
+  //     let isCheck = false;
+  //     let statusQuestion = '';
+
+  //     radioBtn.forEach((radio) => {
+  //       radio.addEventListener('change', () => (statusQuestion = radio.value));
+  //     });
+
+  //     nextBtn.addEventListener('click', nextStep);
+  //     prevBtn.addEventListener('click', prevStep);
+  //     checkBlock.addEventListener('click', isClickCheck);
+  //     if (document.querySelector('.qwiz-section__finish-step')) {
+  //       document.querySelector('.qwiz-section__finish-step').innerHTML = `/${
+  //         steps.length - 1
+  //       }`;
+  //     }
+
+  //     // кнопка заказать занова
+  //     if (restartBtn) {
+  //       restartBtn.addEventListener('click', function (e) {
+  //         currentStep = 0;
+  //         isCheck = false;
+  //         stepCurrentNumber.innerHTML = 1;
+  //         prevBtn.classList.add('_disabled');
+  //         prevBtn.disabled = true;
+  //         steps[0].classList.add('_current');
+  //         steps[steps.length - 1].classList.remove('_current');
+  //         bottomPanel.style.display = 'flex';
+  //         stepCurrentNumber.parentNode.style.display = 'flex';
+  //         stepCurrentNumber.parentNode.classList.remove('_ready');
+  //         inputChecks.forEach((inpt) => (inpt.checked = false));
+  //       });
+  //     }
+
+  //     function isClickCheck(e) {
+  //       let target = e.target;
+
+  //       if (target.classList.contains('form-qwiz__input')) {
+  //         isValidateFormService();
+  //         if (!isCheck && currentStep === steps.length - 3) {
+  //           nextBtn.classList.add('_disabled');
+  //           nextBtn.disabled = true;
+  //         }
+  //         if (isCheck) {
+  //           nextBtn.classList.remove('_disabled');
+  //           nextBtn.disabled = false;
+  //         }
+  //       }
+  //     }
+  //     // ==============================================================================
+
+  //     // шаг вперед
+  //     function nextStep() {
+  //       ++currentStep;
+
+  //       isValidateFormService();
+
+  //       if (currentStep === 1) {
+  //         prevBtn.style.display = 'inline-block';
+  //         navigatePanel.style.justifyContent = 'space-between';
+  //       }
+  //       //  относиться квизу на сервере убирает топ шаги
+  //       if (isCheck && currentStep === steps.length - 2) {
+  //         stepCurrentNumber.parentNode.classList.add('_ready');
+  //       }
+  //       // относиться квизу на сервере открывает кнопку впред
+  //       if (!isCheck && currentStep === steps.length - 3) {
+  //         nextBtn.classList.add('_disabled');
+  //         nextBtn.disabled = true;
+  //       }
+
+  //       if (steps.length - 1 === currentStep) {
+  //         navigatePanel.style.display = 'none';
+  //       }
+  //       if (bottomPanel && steps.length - 2 === currentStep) {
+  //         bottomPanel.style.display = 'none';
+  //       }
+
+  //       if (
+  //         steps[currentStep].closest('._additional-question') &&
+  //         !statusQuestion
+  //       ) {
+  //         switchCurrentClassName(currentStep - 1, currentStep + 1, nextBtn);
+  //         currentStep = currentStep + 1;
+  //         editCountStepText(`Шаг ${currentStep}`);
+  //         return;
+  //       }
+  //       prevBtn.classList.remove('_disabled');
+  //       prevBtn.disabled = false;
+  //       //прибаляем шаги +1
+  //       if (statusQuestion) {
+  //         editCountStepText(`Шаг ${currentStep}`);
+  //       } else {
+  //         editCountStepText(`Шаг ${currentStep + 1}`);
+  //       }
+
+  //       // на последнем шагу добавляет текст 'Итоги'
+  //       if (steps.length === currentStep + 1) {
+  //         resultSeptic();
+  //         editCountStepText('Итоги');
+  //       }
+  //       //есди есть доп.вопрос добавляем 'Дополнительный вопрос'
+  //       if (
+  //         steps[currentStep].closest('._additional-question') &&
+  //         statusQuestion
+  //       ) {
+  //         editCountStepText('Дополнительный вопрос');
+  //         switchCurrentClassName(currentStep - 1, currentStep, prevBtn);
+  //         return;
+  //       }
+  //       switchCurrentClassName(currentStep - 1, currentStep, prevBtn);
+  //     }
+
+  //     // шаг назад
+  //     function prevStep() {
+  //       if (currentStep === steps.length - 2) {
+  //         stepCurrentNumber.parentNode.classList.remove('_ready');
+  //       }
+
+  //       if (currentStep === steps.length - 3) {
+  //         nextBtn.classList.remove('_disabled');
+  //       }
+
+  //       if (prevBtn.classList.contains('_disabled')) {
+  //         return;
+  //       }
+
+  //       currentStep--;
+
+  //       // проверка, покать доп.вопрос
+  //       if (
+  //         steps[currentStep].closest('._additional-question') &&
+  //         !statusQuestion
+  //       ) {
+  //         switchCurrentClassName(currentStep + 1, currentStep - 1, nextBtn);
+  //         currentStep = 3;
+  //         editCountStepText(`Шаг ${currentStep + 1}`);
+  //         return;
+  //       }
+
+  //       //доп.вопрос проверка текст
+  //       if (
+  //         steps[currentStep].closest('._additional-question') &&
+  //         statusQuestion
+  //       ) {
+  //         editCountStepText('Дополнительный вопрос');
+  //         switchCurrentClassName(currentStep + 1, currentStep);
+  //         return;
+  //       }
+  //       if (
+  //         steps[currentStep].closest('._additional-question') &&
+  //         statusQuestion
+  //       ) {
+  //         editCountStepText(`Шаг ${currentStep}`);
+  //       } else {
+  //         editCountStepText(`Шаг ${currentStep + 1}`);
+  //       }
+
+  //       if (currentStep === 0) {
+  //         prevBtn.style.display = 'none';
+  //         navigatePanel.style.justifyContent = 'flex-end';
+  //         prevBtn.classList.add('_disabled');
+  //         prevBtn.disabled = true;
+  //       }
+  //       nextBtn.disabled = false;
+  //       switchCurrentClassName(currentStep + 1, currentStep);
+  //     }
+
+  //     // валидация чекбокса
+  //     function isValidateFormService() {
+  //       for (let i = 0; i < inputChecks.length; i++) {
+  //         const element = inputChecks[i];
+  //         if (element.checked) {
+  //           isCheck = true;
+  //           return;
+  //         }
+  //       }
+  //       isCheck = false;
+  //       return;
+  //     }
+  //     // меняем текст шага
+  //     function editCountStepText(text) {
+  //       stepCurrentNumber.innerHTML = text;
+  //     }
+  //     // меняем класс  у текущего шага
+  //     function switchCurrentClassName(stepRemove, stepAdd) {
+  //       steps[stepRemove].classList.remove('_current');
+  //       steps[stepAdd].classList.add('_current');
+  //     }
+  //     //   qwizFrom.addEventListener('submit', function (e) {
+  //     //     e.preventDefault();
+  //     //     var th = $('#services_quiz_form');
+  //     //     $('.load__preloader').fadeIn('', function () {
+  //     //       $.ajax({
+  //     //         type: 'POST',
+  //     //         url: '/index.php?route=common/footer/quiz_submit',
+  //     //         data: th.serialize(),
+  //     //         dataType: 'json',
+  //     //       }).done(function (json) {
+  //     //         if (json['success']) {
+  //     //           $('.load__preloader').fadeOut('slow');
+  //     //           nextStep();
+  //     //         }
+  //     //       });
+  //     //     });
+  //     //     return false;
+  //     //   });
+  //   }
+  // }
   function initQwiz() {
     const qwizFrom = document.querySelector("#services_quiz_form");
-    const qwizCalc = document.querySelector("#calc-septik");
-    if (qwizFrom) {
+    const qwiz = document.querySelector(".qwiz-section__body");
+
+    // const qwizFrom = document.querySelector('.qwiz-sections');
+
+    if (qwiz) {
       const checkBlock = document.querySelector(".form-qwiz");
       const inputChecks = document.querySelectorAll(".form-qwiz__input");
       const steps = document.querySelectorAll(".form-qwiz__step");
       const prevBtn = document.querySelector(".qwiz-section__prev-btn");
       const nextBtn = document.querySelector(".qwiz-section__next-btn");
-      const panelNavigate = document.querySelector(".qwiz-section__bottom");
+      const bottomPanel = document.querySelector(".qwiz-section__bottom");
+      const navigatePanel = document.querySelector(".qwiz-section__navigate");
       const stepCurrentNumber = document.querySelector(
         ".qwiz-section__current-step",
       );
+      const radioBtn = document.querySelectorAll(
+        'input[name="Нужен дренажный колодец?"]',
+      );
+
       const restartBtn = document.querySelector(".form-qwiz__restart-btn");
-      const finishStep = document.querySelector(".qwiz-section__finish-step");
       let currentStep = 0;
       let isCheck = false;
+      let statusQuestion = "";
+
+      radioBtn.forEach((radio) => {
+        radio.addEventListener("change", () => (statusQuestion = radio.value));
+      });
 
       nextBtn.addEventListener("click", nextStep);
       prevBtn.addEventListener("click", prevStep);
       checkBlock.addEventListener("click", isClickCheck);
-      if (finishStep) finishStep.innerHTML = `/${steps.length - 1}`;
+      if (document.querySelector(".qwiz-section__finish-step")) {
+        document.querySelector(".qwiz-section__finish-step").innerHTML = `/${
+          steps.length - 1
+        }`;
+      }
+
       // кнопка заказать занова
-      if (restartBtn)
+      if (restartBtn) {
         restartBtn.addEventListener("click", function (e) {
           currentStep = 0;
           isCheck = false;
@@ -5202,17 +5417,18 @@ data-youtube - Атрибут для кода youtube
           prevBtn.disabled = true;
           steps[0].classList.add("_current");
           steps[steps.length - 1].classList.remove("_current");
-          panelNavigate.style.display = "flex";
+          bottomPanel.style.display = "flex";
           stepCurrentNumber.parentNode.style.display = "flex";
           stepCurrentNumber.parentNode.classList.remove("_ready");
           inputChecks.forEach((inpt) => (inpt.checked = false));
         });
+      }
 
       function isClickCheck(e) {
         let target = e.target;
+
         if (target.classList.contains("form-qwiz__input")) {
           isValidateFormService();
-
           if (!isCheck && currentStep === steps.length - 3) {
             nextBtn.classList.add("_disabled");
             nextBtn.disabled = true;
@@ -5226,247 +5442,25 @@ data-youtube - Атрибут для кода youtube
       // ==============================================================================
 
       // шаг вперед
-      function nextStep(e) {
+      function nextStep() {
         ++currentStep;
 
         isValidateFormService();
 
-        console.log(currentStep);
+        if (currentStep === 1) {
+          prevBtn.style.display = "flex";
+          navigatePanel.style.justifyContent = "space-between";
+        }
+        //  относиться квизу на сервере убирает топ шаги
         if (isCheck && currentStep === steps.length - 2) {
           stepCurrentNumber.parentNode.classList.add("_ready");
         }
-
+        // относиться квизу на сервере открывает кнопку впред
         if (!isCheck && currentStep === steps.length - 3) {
           nextBtn.classList.add("_disabled");
           nextBtn.disabled = true;
         }
-        if (steps.length - 1 === currentStep) {
-          stepCurrentNumber.parentNode.style.display = "none";
-        }
-
-        if (steps.length - 2 === currentStep) {
-          panelNavigate.style.display = "none";
-        }
-
-        if (steps.length === currentStep) {
-          steps[currentStep - 1].style.display = "none";
-          return;
-        }
-
-        stepCurrentNumber.innerHTML = currentStep + 1;
-
-        prevBtn.classList.remove("_disabled");
-        prevBtn.disabled = false;
-        steps[currentStep - 1].classList.remove("_current");
-        steps[currentStep].classList.add("_current");
-      }
-      // шаг назад
-      function prevStep(e) {
-        if (currentStep === steps.length - 2) {
-          stepCurrentNumber.parentNode.classList.remove("_ready");
-        }
-
-        if (currentStep === steps.length - 3) {
-          nextBtn.classList.remove("_disabled");
-        }
-
-        if (prevBtn.classList.contains("_disabled")) {
-          return;
-        }
-        currentStep--;
-        stepCurrentNumber.innerHTML = currentStep + 1;
-
-        if (currentStep === 0) {
-          prevBtn.classList.add("_disabled");
-          prevBtn.disabled = true;
-        }
-        nextBtn.disabled = false;
-        steps[currentStep + 1].classList.remove("_current");
-        steps[currentStep].classList.add("_current");
-      }
-
-      // валидация чекбокса
-      function isValidateFormService() {
-        for (let i = 0; i < inputChecks.length; i++) {
-          const element = inputChecks[i];
-          if (element.checked) {
-            isCheck = true;
-            return;
-          }
-        }
-        isCheck = false;
-        return;
-      }
-      qwizFrom.addEventListener("submit", function (e) {
-        e.preventDefault();
-        var th = $("#services_quiz_form");
-        $(".load__preloader").fadeIn("", function () {
-          $.ajax({
-            type: "POST",
-            url: "/index.php?route=common/footer/quiz_submit",
-            data: th.serialize(),
-            dataType: "json",
-          }).done(function (json) {
-            if (json["success"]) {
-              $(".load__preloader").fadeOut("slow");
-              nextStep();
-            }
-          });
-        });
-        return false;
-      });
-    }
-    if (qwizCalc) {
-      const inputChecks = document.querySelectorAll(".form-qwiz__input");
-      const steps = document.querySelectorAll(".form-qwiz__step");
-      const prevBtn = document.querySelector(".qwiz-section__prev-btn");
-      const nextBtn = document.querySelector(".qwiz-section__next-btn");
-      const bottomPanel = document.querySelector(".qwiz-section__bottom");
-      const navigatePanel = document.querySelector(".qwiz-section__navigate ");
-      const stepCurrentNumber = document.querySelector(
-        ".qwiz-section__current-step",
-      );
-      const radioBtn = document.querySelectorAll(
-        'input[name="Место отвода воды из септика"]',
-      );
-      const oneRadioBtns = document.querySelectorAll(
-        'input[name="Глубина залегания трубы"]',
-      );
-      const twoRadioBtns = document.querySelectorAll(
-        'input[name="Место отвода воды из септика"]',
-      );
-      const threeRadioBtns = document.querySelectorAll(
-        'input[name="Количество колец"]',
-      );
-      const restartBtn = document.querySelector(".form-qwiz__restart-btn");
-      let currentStep = 0;
-      let isCheck = true;
-      let statusQuestion = false;
-
-      radioBtn.forEach((radio) => {
-        radio.addEventListener("change", () => {
-          if (radio.value === "Дренажный колодец") {
-            statusQuestion = true;
-            return;
-          }
-          statusQuestion = false;
-        });
-      });
-
-      nextBtn.addEventListener("click", nextStep);
-      prevBtn.addEventListener("click", prevStep);
-
-      if (document.querySelector(".qwiz-section__finish-step")) {
-        document.querySelector(".qwiz-section__finish-step").innerHTML = `/${
-          steps.length - 1
-        }`;
-      }
-
-      // кнопка заказать занова
-      if (restartBtn) {
-        restartBtn.addEventListener("click", function (e) {
-          currentStep = 0;
-          stepCurrentNumber.innerHTML = "Шаг 1";
-          prevBtn.classList.add("_disabled");
-          steps[0].classList.add("_current");
-          steps[steps.length - 1].classList.remove("_current");
-          navigatePanel.style.display = "flex";
-          prevBtn.style.display = "none";
-          document.querySelector(".qwiz-section__progress-step").style.display =
-            "flex";
-          navigatePanel.style.justifyContent = "flex-end";
-          deleteCheck(oneRadioBtns);
-          deleteCheck(twoRadioBtns);
-          deleteCheck(threeRadioBtns);
-        });
-      }
-
-      // ==============================================================================
-
-      function deleteCheck(selector) {
-        selector.forEach((el) => {
-          el.checked = false;
-        });
-      }
-
-      function checkRadioValue(selector) {
-        let res = false;
-        selector.forEach((el) => {
-          if (el.checked) {
-            res = true;
-          }
-        });
-        return res;
-      }
-
-      function eventRadio(selector) {
-        if (selector) {
-          selector.forEach((it) => {
-            it.addEventListener("click", () => clickRadioCheck(selector));
-          });
-        }
-      }
-
-      function clickRadioCheck(slector) {
-        checkRadioValue(slector);
-        nextBtn.classList.remove("_disabled");
-      }
-      eventRadio(oneRadioBtns);
-      eventRadio(twoRadioBtns);
-      eventRadio(threeRadioBtns);
-      // шаг вперед
-      function nextStep(e) {
-        let isOneRadio = checkRadioValue(oneRadioBtns);
-        let isTwoRadio = checkRadioValue(twoRadioBtns);
-        let isThreeRadio = checkRadioValue(threeRadioBtns);
-        console.log(currentStep);
-
-        if (currentStep == 2 && !statusQuestion) {
-          nextBtn.classList.remove("_disabled");
-        }
-        // ==== 3
-        if (currentStep === 2 && !isThreeRadio && statusQuestion) {
-          nextBtn.classList.add("_disabled");
-        }
-        if (currentStep === 3 && !isThreeRadio) {
-          return;
-        }
-        // ==== 2
-        if (currentStep === 1 && !isTwoRadio) {
-          nextBtn.classList.add("_disabled");
-        }
-        if (currentStep === 2 && !isTwoRadio) {
-          return;
-        }
-        // ==== 1
-        if (currentStep === 0 && !isOneRadio) {
-          nextBtn.classList.add("_disabled");
-        }
-
-        if (currentStep === 1 && !isOneRadio) {
-          return;
-        }
-        ++currentStep;
-
-        isValidateFormService();
-
-        if (steps.length === currentStep + 1) {
-          document.querySelector(".qwiz-section__progress-step").style.display =
-            "none";
-        }
-
-        if (steps.length - 2 === currentStep) {
-          navigatePanel.style.display = "none";
-        }
-        if (currentStep === 1) {
-          prevBtn.style.display = "inline-block";
-          navigatePanel.style.justifyContent = "space-between";
-        }
-
-        if (isCheck && currentStep === steps.length - 2) {
-          stepCurrentNumber.parentNode.classList.add("_ready");
-        }
-
+        // убирает на посленем шагу кнопки 'Впред и Назад'
         if (steps.length - 1 === currentStep) {
           navigatePanel.style.display = "none";
         }
@@ -5479,22 +5473,22 @@ data-youtube - Атрибут для кода youtube
           !statusQuestion
         ) {
           switchCurrentClassName(currentStep - 1, currentStep + 1, nextBtn);
-          currentStep = 4;
-          editCountStepText(`Шаг ${currentStep}`);
+          currentStep = currentStep + 1;
+          editCountStepText(`${currentStep}`);
           return;
         }
         prevBtn.classList.remove("_disabled");
         prevBtn.disabled = false;
         //прибаляем шаги +1
         if (statusQuestion) {
-          editCountStepText(`Шаг ${currentStep}`);
+          editCountStepText(currentStep);
         } else {
-          editCountStepText(`Шаг ${currentStep + 1}`);
+          editCountStepText(currentStep + 1);
         }
 
         // на последнем шагу добавляет текст 'Итоги'
-        if (steps.length - 1 === currentStep + 1) {
-          showReusltSeptik();
+        if (steps.length === currentStep + 1) {
+          resultSeptic();
           editCountStepText("Итоги");
         }
         //есди есть доп.вопрос добавляем 'Дополнительный вопрос'
@@ -5503,7 +5497,6 @@ data-youtube - Атрибут для кода youtube
           statusQuestion
         ) {
           editCountStepText("Дополнительный вопрос");
-
           switchCurrentClassName(currentStep - 1, currentStep, prevBtn);
           return;
         }
@@ -5511,12 +5504,12 @@ data-youtube - Атрибут для кода youtube
       }
 
       // шаг назад
-      function prevStep(e) {
-        let isTwoRadio = checkRadioValue(twoRadioBtns);
-        if (currentStep == 3 && isTwoRadio) {
-          nextBtn.classList.remove("_disabled");
+      function prevStep() {
+        if (currentStep === steps.length - 2) {
+          stepCurrentNumber.parentNode.classList.remove("_ready");
         }
-        if (currentStep == 1) {
+
+        if (currentStep === steps.length - 3) {
           nextBtn.classList.remove("_disabled");
         }
 
@@ -5528,8 +5521,8 @@ data-youtube - Атрибут для кода youtube
           !statusQuestion
         ) {
           switchCurrentClassName(currentStep + 1, currentStep - 1, nextBtn);
-          currentStep = 2;
-          editCountStepText(`Шаг ${currentStep + 1}`);
+          currentStep = 3;
+          editCountStepText(`${currentStep + 1}`);
           return;
         }
 
@@ -5539,8 +5532,16 @@ data-youtube - Атрибут для кода youtube
           statusQuestion
         ) {
           editCountStepText("Дополнительный вопрос");
+          switchCurrentClassName(currentStep + 1, currentStep);
+          return;
+        }
+        if (
+          steps[currentStep].closest("._additional-question") &&
+          statusQuestion
+        ) {
+          editCountStepText(currentStep);
         } else {
-          editCountStepText(`Шаг ${currentStep + 1}`);
+          editCountStepText(currentStep + 1);
         }
 
         if (currentStep === 0) {
@@ -5574,26 +5575,27 @@ data-youtube - Атрибут для кода youtube
         steps[stepRemove].classList.remove("_current");
         steps[stepAdd].classList.add("_current");
       }
-      qwizCalc.addEventListener("submit", function (e) {
-        e.preventDefault();
-        var th = $("#calc-septik");
-        $(".load__preloader").fadeIn("", function () {
-          $.ajax({
-            type: "POST",
-            url: "/index.php?route=common/footer/quiz_submit",
-            data: th.serialize(),
-            dataType: "json",
-          }).done(function (json) {
-            if (json["success"]) {
-              $(".load__preloader").fadeOut("slow");
-              nextStep();
-            }
-          });
-        });
-        return false;
-      });
+      // qwizFrom.addEventListener('submit', function (e) {
+      //   e.preventDefault();
+      //   var th = $('#services_quiz_form');
+      //   $('.load__preloader').fadeIn('', function () {
+      //     $.ajax({
+      //       type: 'POST',
+      //       url: '/index.php?route=common/footer/quiz_submit',
+      //       data: th.serialize(),
+      //       dataType: 'json',
+      //     }).done(function (json) {
+      //       if (json['success']) {
+      //         $('.load__preloader').fadeOut('slow');
+      //         nextStep();
+      //       }
+      //     });
+      //   });
+      //   return false;
+      // });
     }
   }
+
   initQwiz();
   // кнопеи сантехники
   function countPlumbingItems(params) {
@@ -5618,6 +5620,503 @@ data-youtube - Атрибут для кода youtube
   }
   countPlumbingItems();
 
+  const dataSeptic = [
+    // akvalos
+
+    {
+      linkSeptik: "septik-akvalos-2",
+      nameSeptik: "Септик Аквалос 2",
+      pipeDepth: "30",
+      userValue: "2",
+      salvoReleaseVolume: "120",
+      energyConsumption: "1,37",
+      productivity: "0.4",
+      price: "82 800",
+      mounting: "27 000",
+    },
+    {
+      linkSeptik: "septik-akvalos-3",
+      nameSeptik: "Аквалос 3",
+      pipeDepth: "50",
+      userValue: "2",
+      salvoReleaseVolume: "220",
+      energyConsumption: "1,37",
+      productivity: "0.6",
+      price: "93 150",
+      mounting: "27 000",
+    },
+    {
+      linkSeptik: "septik-akvalos-4",
+
+      nameSeptik: "Аквалос 4",
+      pipeDepth: "60",
+      userValue: "4",
+      salvoReleaseVolume: "250",
+      energyConsumption: "1,37",
+      productivity: "0.8",
+      price: "106 200",
+      mounting: "27 000",
+    },
+    {
+      linkSeptik: "septik-akvalos-4-gorizontalnij",
+      nameSeptik: "Аквалос 4 Гориз.",
+      pipeDepth: "30",
+      userValue: "4",
+      salvoReleaseVolume: "250",
+      energyConsumption: "0,9",
+      productivity: "0.8",
+      price: "120 600",
+      mounting: "32 000",
+    },
+    {
+      linkSeptik: "septik-akvalos-5",
+      nameSeptik: "Аквалос 5",
+      pipeDepth: "60",
+      userValue: "5",
+      salvoReleaseVolume: "390",
+      energyConsumption: "1,37",
+      productivity: "0.9",
+      price: "116 100",
+      mounting: "34 000",
+    },
+    {
+      linkSeptik: "septik-akvalos-5-gorizontalnij",
+      nameSeptik: "Аквалос 5 Гориз.",
+      pipeDepth: "30",
+      userValue: "5",
+      salvoReleaseVolume: "300",
+      energyConsumption: "0,9",
+      productivity: "0.9",
+      price: "130 050",
+    },
+    {
+      linkSeptik: "septik-akvalos-7",
+      nameSeptik: "Аквалос 7",
+      pipeDepth: "60",
+      userValue: "7",
+      salvoReleaseVolume: "550",
+      energyConsumption: "1,37",
+      productivity: "1.2",
+      price: "140 400",
+      mounting: "38 000",
+    },
+    {
+      linkSeptik: "septik-akvalos-7-gorizontalnij",
+      nameSeptik: "Аквалос 7 Гориз.",
+      pipeDepth: "30",
+      userValue: "7",
+      salvoReleaseVolume: "550",
+      energyConsumption: "0,9",
+      productivity: "1.2",
+      price: "158 400",
+      mounting: "40 000",
+    },
+    {
+      linkSeptik: "septik-akvalos-8",
+      nameSeptik: "Аквалос 8",
+      pipeDepth: "60",
+      userValue: "8",
+      salvoReleaseVolume: "700",
+      energyConsumption: "1,57",
+      productivity: "1.6",
+      price: "148 500",
+      mounting: "40 000",
+    },
+    {
+      linkSeptik: "septik-akvalos-10",
+      nameSeptik: "Аквалос 10",
+      pipeDepth: "60",
+      userValue: "10",
+      salvoReleaseVolume: "900",
+      energyConsumption: "2,57",
+      productivity: "2.0",
+      price: "194 400",
+      mounting: "49 000",
+    },
+    {
+      linkSeptik: "septik-akvalos-10-gorizontalnij",
+      nameSeptik: "Аквалос 10 Гориз.",
+      pipeDepth: "30",
+      userValue: "10",
+      salvoReleaseVolume: "800",
+      energyConsumption: "0,9",
+      productivity: "2.0",
+      price: "201 600",
+      mounting: "51 000",
+    },
+    {
+      linkSeptik: "septik-akvalos-15",
+      nameSeptik: "Аквалос 15",
+      pipeDepth: "60",
+      userValue: "15",
+      salvoReleaseVolume: "1125",
+      energyConsumption: "2,57",
+      productivity: "3.0",
+      price: "253 800",
+      mounting: "55 000",
+    },
+    {
+      linkSeptik: "septik-akvalos-20",
+      nameSeptik: "Аквалос 20",
+      pipeDepth: "60",
+      userValue: "20",
+      salvoReleaseVolume: "1350",
+      energyConsumption: "1,5",
+      productivity: "4.0",
+      price: "323 100",
+      mounting: "60 000",
+    },
+
+    //topas
+
+    {
+      linkSeptik: "septik-topas-4",
+      nameSeptik: "Топас 4",
+      pipeDepth: "60",
+      userValue: "4",
+      salvoReleaseVolume: "175",
+      energyConsumption: "1",
+      productivity: "0.8",
+      price: "122 310",
+      mounting: "27 000",
+    },
+    {
+      linkSeptik: "septik-topas-5",
+      nameSeptik: "Топас 5",
+      pipeDepth: "60",
+      userValue: "5",
+      salvoReleaseVolume: "220",
+      energyConsumption: "1",
+      productivity: "1",
+      price: "143 550",
+      mounting: "34 000",
+    },
+    {
+      linkSeptik: "septik-topas-6",
+
+      nameSeptik: "Топас 6",
+      pipeDepth: "60",
+      userValue: "6",
+      salvoReleaseVolume: "250",
+      energyConsumption: "1",
+      productivity: "1.15",
+      price: "144 810",
+      mounting: "34 000",
+    },
+    {
+      linkSeptik: "septik-topas-8",
+      nameSeptik: "Топас 8",
+      pipeDepth: "60",
+      userValue: "8",
+      salvoReleaseVolume: "440",
+      energyConsumption: "1",
+      productivity: "1.5",
+      price: "166 410",
+      mounting: "40 000",
+    },
+    {
+      linkSeptik: "septik-topas-9",
+      nameSeptik: "Топас 9",
+      pipeDepth: "60",
+      userValue: "9",
+      salvoReleaseVolume: "510",
+      energyConsumption: "1",
+      productivity: "1.7",
+      price: "168 390",
+      mounting: "40 000",
+    },
+    {
+      linkSeptik: "septik-topas-10",
+      nameSeptik: "Топас 10",
+      pipeDepth: "60",
+      userValue: "10",
+      salvoReleaseVolume: "760",
+      energyConsumption: "2",
+      productivity: "2",
+      price: "226 710",
+      mounting: "49 000",
+    },
+    {
+      linkSeptik: "septik-topas-12",
+      nameSeptik: "Топас 12",
+      pipeDepth: "60",
+      userValue: "12",
+      salvoReleaseVolume: "830",
+      energyConsumption: "2",
+      productivity: "2.2",
+      price: "228 870",
+      mounting: "55 000",
+    },
+
+    //	 astra
+
+    {
+      linkSeptik: "septik-astra-3",
+      nameSeptik: "Астра 3",
+      pipeDepth: "60",
+      userValue: "3",
+      salvoReleaseVolume: "130",
+      energyConsumption: "1",
+      productivity: "0.6",
+      price: "102 000",
+      mounting: "27 000",
+    },
+    {
+      linkSeptik: "septik-astra-4",
+      nameSeptik: "Астра 4",
+      pipeDepth: "60",
+      userValue: "4",
+      salvoReleaseVolume: "150",
+      energyConsumption: "1",
+      productivity: "0.8",
+      price: "106 250",
+      mounting: "27 000",
+    },
+
+    {
+      linkSeptik: "septik-astra-5",
+      nameSeptik: "Астра 5",
+      pipeDepth: "60",
+      userValue: "5",
+      salvoReleaseVolume: "250",
+      energyConsumption: "1.5",
+      productivity: "1",
+      price: "123 250",
+      mounting: "34 000",
+    },
+    {
+      linkSeptik: "septik-astra-6",
+
+      nameSeptik: "Астра 6",
+      pipeDepth: "60",
+      userValue: "6",
+      salvoReleaseVolume: "280",
+      energyConsumption: "1.5",
+      productivity: "1.2",
+      price: "130 050",
+      mounting: "34 000",
+    },
+    {
+      linkSeptik: "septik-astra-7",
+      nameSeptik: "Астра 7",
+      pipeDepth: "60",
+      userValue: "8",
+      salvoReleaseVolume: "300",
+      energyConsumption: "1.5",
+      productivity: "1.4",
+      price: "136 850",
+      mounting: "38 000",
+    },
+    {
+      linkSeptik: "septik-astra-8",
+      nameSeptik: "Астра 8",
+      pipeDepth: "60",
+      userValue: "8",
+      salvoReleaseVolume: "350",
+      energyConsumption: "1.5",
+      productivity: "1.6",
+      price: "148 699",
+      mounting: "40 000",
+    },
+    {
+      linkSeptik: "septik-astra-9",
+      nameSeptik: "Астра 9",
+      pipeDepth: "60",
+      userValue: "9",
+      salvoReleaseVolume: "450",
+      energyConsumption: "1.5",
+      productivity: "1.8",
+      price: "169 150",
+      mounting: "40 000",
+    },
+    {
+      linkSeptik: "septik-astra-10",
+      nameSeptik: "Астра 10",
+      pipeDepth: "60",
+      userValue: "10",
+      salvoReleaseVolume: "550",
+      energyConsumption: "1.5",
+      productivity: "2",
+      price: "196 350",
+      mounting: "49 000",
+    },
+    {
+      linkSeptik: "septik-astra-15",
+      nameSeptik: "Астра 15",
+      pipeDepth: "60",
+      userValue: "15",
+      salvoReleaseVolume: "600",
+      energyConsumption: "2.4",
+      productivity: "3",
+      price: "255 000",
+      mounting: "55 000",
+    },
+
+    // Малахит
+
+    {
+      linkSeptik: "septik-malahit-4",
+      nameSeptik: "Малахит 4",
+      pipeDepth: "60",
+      userValue: "4",
+      salvoReleaseVolume: "220",
+      energyConsumption: "1.2",
+      productivity: "0.9",
+      price: "116 494",
+      mounting: "27 000",
+    },
+
+    {
+      linkSeptik: "septik-malahit-5",
+      nameSeptik: "Малахит 5",
+      pipeDepth: "60",
+      userValue: "5",
+      salvoReleaseVolume: "263",
+      energyConsumption: "1.5",
+      productivity: "1",
+      price: "137 694",
+      mounting: "34 000",
+    },
+    {
+      linkSeptik: "septik-malahit-6",
+
+      nameSeptik: "Малахит 6",
+      pipeDepth: "60",
+      userValue: "6",
+      salvoReleaseVolume: "290",
+      energyConsumption: "1.5",
+      productivity: "1.2",
+      price: "153 594",
+      mounting: "34 000",
+    },
+    {
+      linkSeptik: "septik-malahit-8",
+      nameSeptik: "Малахит 8",
+      pipeDepth: "60",
+      userValue: "8",
+      salvoReleaseVolume: "420",
+      energyConsumption: "1.7",
+      productivity: "1.6",
+      price: "185 394",
+      mounting: "40 000",
+    },
+    {
+      linkSeptik: "septik-malahit-10",
+
+      nameSeptik: "Малахит 10",
+      pipeDepth: "60",
+      userValue: "10",
+      salvoReleaseVolume: "500",
+      energyConsumption: "1.7",
+      productivity: "2",
+      price: "222 494",
+      mounting: "49 000",
+    },
+    {
+      linkSeptik: "septik-malahit-12",
+      nameSeptik: "Малахит 12",
+      pipeDepth: "60",
+      userValue: "12",
+      salvoReleaseVolume: "645",
+      energyConsumption: "1.7",
+      productivity: "2.5",
+      price: "243 694",
+      mounting: "55 000",
+    },
+
+    // евролос
+
+    {
+      linkSeptik: "septik-evrolos-bio-3",
+      nameSeptik: "Евролос БИО 3",
+      pipeDepth: "60",
+      userValue: "3",
+      salvoReleaseVolume: "150",
+      energyConsumption: "1",
+      productivity: "0.6",
+      price: "116 900",
+      mounting: "27 000",
+    },
+    {
+      linkSeptik: "septik-evrolos-bio-4",
+      nameSeptik: "Евролос БИО 4",
+      pipeDepth: "60",
+      userValue: "4",
+      salvoReleaseVolume: "180",
+      energyConsumption: "1.2",
+      productivity: "0.8",
+      price: "122 300",
+      mounting: "27 000",
+    },
+
+    {
+      linkSeptik: "septik-evrolos-bio-5",
+      nameSeptik: "Евролос БИО 5",
+      pipeDepth: "60",
+      userValue: "5",
+      salvoReleaseVolume: "210",
+      energyConsumption: "1.5",
+      productivity: "1",
+      price: "129 400",
+      mounting: "34 000",
+    },
+    {
+      linkSeptik: "septik-evrolos-bio-6",
+
+      nameSeptik: "Евролос БИО 6",
+      pipeDepth: "60",
+      userValue: "6",
+      salvoReleaseVolume: "270",
+      energyConsumption: "1.5",
+      productivity: "1.3",
+      price: "142 500",
+      mounting: "34 000",
+    },
+    {
+      linkSeptik: "septik-evrolos-bio-8",
+      nameSeptik: "Евролос БИО 8",
+      pipeDepth: "60",
+      userValue: "8",
+      salvoReleaseVolume: "370",
+      energyConsumption: "1.5",
+      productivity: "1.6",
+      price: "166 800",
+      mounting: "40 000",
+    },
+    {
+      linkSeptik: "septik-evrolos-bio-10",
+
+      nameSeptik: "Евролос БИО 10",
+      pipeDepth: "60",
+      userValue: "10",
+      salvoReleaseVolume: "550",
+      energyConsumption: "1.7",
+      productivity: "2",
+      price: "208 700",
+      mounting: "49 000",
+    },
+    {
+      linkSeptik: "septik-malahit-12",
+      nameSeptik: "Евролос БИО 12",
+      pipeDepth: "60",
+      userValue: "12",
+      salvoReleaseVolume: "680",
+      energyConsumption: "1.7",
+      productivity: "2.4",
+      price: "228 600",
+      mounting: "55 000",
+    },
+  ];
+
+  // расчет сколько нужноь производительности септика на n кол-во людей
+  function getAmountUserValue() {
+    const valueRange = document.querySelector(".noUi-handle");
+    let res = (+valueRange.ariaValueText * 150 * 1.2) / 1000;
+    if (res <= 0.4) {
+      res = 0.4;
+    }
+    return res;
+  }
   // расчет производительности на всю сантехнику дома (раковины, ванна, туалет и т.д)
   function getValueItemPlumbing() {
     const selectorsCount = document.querySelectorAll(
@@ -5634,1087 +6133,124 @@ data-youtube - Атрибут для кода youtube
     return resSum;
   }
 
+  function resultSeptic() {
+    let sum = (
+      getAmountUserValue() +
+      getValueItemPlumbing() / 1000 / 2
+    ).toFixed(1);
+
+    console.log(sum);
+
+    const resFilterRange = filterRange(dataSeptic, +sum, +sum, []);
+    // фильтар по юзерам
+    // const valueRangeUser =
+    //   document.querySelector('.noUi-handle').ariaValueText === '1'
+    //     ? '2'
+    //     : document.querySelector('.noUi-handle').ariaValueText;
+
+    // let resSeptik = resFilterRange.filter((it) => {
+    //   if (it.userValue == valueRangeUser) {
+    //     return it;
+    //   }
+    // });
+
+    showReusltSeptik(resFilterRange.slice(0, 3));
+  }
+
+  function filterRange(septikArr, min, max, resArr) {
+    if (max >= 4) {
+      return resArr;
+    }
+    for (let i = 0; i < septikArr.length; i++) {
+      if (
+        min <= septikArr[i].productivity &&
+        septikArr[i].productivity <= max
+      ) {
+        resArr.push(septikArr[i]);
+        septikArr.splice(i, 1);
+      }
+    }
+
+    // if (min <= 0.4) {
+    //   min = 0.4;
+    // }
+
+    // return filterRange(septikArr, min - 0.1, max + 0.1, arrRes);
+    return filterRange(septikArr, min, max + 0.1, resArr);
+  }
+
   // выводим данные в итоги
   function showReusltSeptik(res) {
+    createObjRes(res);
     const listResSelector = document.querySelectorAll(
       ".form-qwiz__content-finish",
     );
-    const result = collectDate();
+    const sumNameSelector = document.querySelector(".form-qwiz__sum-finish");
 
-    listResSelector[0].innerHTML = result.onePoint;
-    listResSelector[1].innerHTML = result.threePoint;
-    listResSelector[2].innerHTML = result.twoPoint;
+    let objRes = createObjRes(res);
 
-    listResSelector[4].innerHTML = result.fourPoint;
-    if (!result.extraPoint) {
-      listResSelector[3].parentElement.remove();
-    } else {
-      listResSelector[3].innerHTML = result.extraPoint;
+    const [arrRes, sumRes] = objRes;
+    console.log(objRes);
+    sumNameSelector.innerHTML = sumRes;
+
+    if (objRes) {
+      for (let indx = 0; indx < listResSelector.length; indx++) {
+        const element = listResSelector[indx];
+        if (indx === 0) {
+          createNewLinkSeptick(element, res);
+          continue;
+        }
+        element.innerHTML = arrRes[indx];
+      }
     }
-    debugger;
   }
 
-  function collectDate() {
-    const onePoint = document.querySelector(".noUi-handle").ariaValueText;
-    const twoPoint = document.querySelectorAll(
-      'input[name="Глубина залегания трубы"]',
+  // собираем обьект с данынми
+  function createObjRes(res) {
+    if (res.length === 0) return;
+
+    const resObj = {};
+    const valueRange = document.querySelector(".noUi-handle").ariaValueText;
+
+    resObj.link = "";
+    resObj.userValue = valueRange;
+    resObj.plannedSalvoRelease = `${getValueItemPlumbing()} л`;
+    resObj.salvoReleaseVolume = `${res[0].salvoReleaseVolume} л`;
+    resObj.price = `~${res[0].price} р.`;
+    resObj.pipeDepth = `${res[0].pipeDepth} см`;
+    resObj.deliveryPrice = "9100 р.";
+    resObj.productivity = `${res[0].productivity} м3`;
+    resObj.mounting = `${res[0].mounting} р.`;
+    resObj.energyConsumption = `${res[0].energyConsumption} кВт/сутки`;
+
+    let sumName = new Intl.NumberFormat("ru", {}).format(
+      Number(res[0].price.replace(/\s+/g, "")) +
+        Number(res[0].mounting.replace(/\s+/g, "")) +
+        9100,
     );
-    const threePoint = document.querySelectorAll(
-      'input[name="Место отвода воды из септика"]',
-    );
 
-    const extraPoint = document.querySelectorAll(
-      'input[name="Количество колец"]',
-    );
-    const res = {
-      onePoint,
-      twoPoint: "",
-      threePoint: "",
-      fourPoint: "",
-      extraPoint: "",
-    };
-    if (twoPoint) {
-      twoPoint.forEach((el) => {
-        if (el.checked) {
-          res.twoPoint = el.value;
-        }
-      });
-    }
-    if (threePoint) {
-      threePoint.forEach((el) => {
-        if (el.checked) {
-          res.threePoint = el.value;
-        }
-      });
-    }
-    if (extraPoint) {
-      extraPoint.forEach((el) => {
-        if (el.checked) {
-          res.extraPoint = el.value;
-        }
-      });
-    }
-    res.fourPoint = getValueItemPlumbing();
+    let arrRes = Object.values(resObj);
 
-    return res;
+    return [arrRes, `${sumName} р.`];
   }
 
-  // Класс построения Select
-  class SelectConstructor {
-    constructor(props, data = null) {
-      let defaultConfig = {
-        init: true,
-        logging: true,
-      };
-      this.config = Object.assign(defaultConfig, props);
-      // CSS классы модуля
-      this.selectClasses = {
-        classSelect: "select", // Главный блок
-        classSelectBody: "select__body", // Тело селекта
-        classSelectTitle: "select__title", // Заголовок
-        classSelectValue: "select__value", // Значение в заголовке
-        classSelectLabel: "select__label", // Лабел
-        classSelectInput: "select__input", // Поле ввода
-        classSelectText: "select__text", // Оболочка текстовых данных
-        classSelectLink: "select__link", // Ссылка в элементе
-        classSelectOptions: "select__options", // Выпадающий список
-        classSelectOptionsScroll: "select__scroll", // Оболочка при скролле
-        classSelectOption: "select__option", // Пункт
-        classSelectContent: "select__content", // Оболочка контента в заголовке
-        classSelectRow: "select__row", // Ряд
-        classSelectData: "select__asset", // Дополнительные данные
-        classSelectDisabled: "_select-disabled", // Запрешен
-        classSelectTag: "_select-tag", // Класс тега
-        classSelectOpen: "_select-open", // Список открыт
-        classSelectActive: "_select-active", // Список выбран
-        classSelectFocus: "_select-focus", // Список в фокусе
-        classSelectMultiple: "_select-multiple", // Мультивыбор
-        classSelectCheckBox: "_select-checkbox", // Стиль чекбокса
-        classSelectOptionSelected: "_select-selected", // Выбранный пункт
-      };
-      this._this = this;
-      // Запуск инициализации
-      if (this.config.init) {
-        // Получение всех select на странице
-        const selectItems = data
-          ? document.querySelectorAll(data)
-          : document.querySelectorAll("select");
-        if (selectItems.length) {
-          this.selectsInit(selectItems);
-        } else {
-        }
-      }
-    }
-    // Конструктор CSS класса
-    getSelectClass(className) {
-      return `.${className}`;
-    }
-    // Геттер элементов псевдоселекта
-    getSelectElement(selectItem, className) {
-      return {
-        originalSelect: selectItem.querySelector("select"),
-        selectElement: selectItem.querySelector(this.getSelectClass(className)),
-      };
-    }
-    // Функция инициализации всех селектов
-    selectsInit(selectItems) {
-      selectItems.forEach((originalSelect, index) => {
-        this.selectInit(originalSelect, index + 1);
-      });
-      // Обработчики событий...
-      // ...при клике
-      document.addEventListener(
-        "click",
-        function (e) {
-          this.selectsActions(e);
-        }.bind(this),
-      );
-      // ...при нажатии клавиши
-      document.addEventListener(
-        "keydown",
-        function (e) {
-          this.selectsActions(e);
-        }.bind(this),
-      );
-      // ...при фокусе
-      document.addEventListener(
-        "focusin",
-        function (e) {
-          this.selectsActions(e);
-        }.bind(this),
-      );
-      // ...при потере фокуса
-      document.addEventListener(
-        "focusout",
-        function (e) {
-          this.selectsActions(e);
-        }.bind(this),
-      );
-      document.addEventListener(
-        "input",
-        function (e) {
-          this.selectsActions(e);
-        }.bind(this),
-      );
-    }
-    // Функция инициализации конкретного селекта
-    selectInit(originalSelect, index) {
-      const _this = this;
-      // Создаем оболочку
-      let selectItem = document.createElement("div");
-      selectItem.classList.add(this.selectClasses.classSelect);
-      // Выводим оболочку перед оригинальным селектом
-      originalSelect.parentNode.insertBefore(selectItem, originalSelect);
-      // Помещаем оригинальный селект в оболочку
-      selectItem.appendChild(originalSelect);
-      // Скрываем оригинальный селект
-      originalSelect.hidden = true;
+  // создаем ссылки на септике в итоге
+  function createNewLinkSeptick(listLink, res) {
+    let theFirstChild = listLink.firstChild;
 
-      // Присваиваем уникальный ID
-      index ? (originalSelect.dataset.id = index) : null;
-
-      // Конструктор косновных элементов
-      selectItem.insertAdjacentHTML(
-        "beforeend",
-        `<div class="${this.selectClasses.classSelectBody}"><div hidden class="${this.selectClasses.classSelectOptions}"></div></div>`,
-      );
-      // Запускаем конструктор псевдоселекта
-      this.selectBuild(originalSelect);
-
-      // Работа с плейсхолдером
-      if (this.getSelectPlaceholder(originalSelect)) {
-        // Запоминаем плейсхолдер
-        originalSelect.dataset.placeholder =
-          this.getSelectPlaceholder(originalSelect).value;
-        // Если включен режим label
-        if (this.getSelectPlaceholder(originalSelect).label.show) {
-          const selectItemTitle = this.getSelectElement(
-            selectItem,
-            this.selectClasses.classSelectTitle,
-          ).selectElement;
-          selectItemTitle.insertAdjacentHTML(
-            "afterbegin",
-            `<span class="${this.selectClasses.classSelectLabel}">${
-              this.getSelectPlaceholder(originalSelect).label.text
-                ? this.getSelectPlaceholder(originalSelect).label.text
-                : this.getSelectPlaceholder(originalSelect).value
-            }</span>`,
-          );
-        }
-      }
-      // Запоминаем скорость
-      originalSelect.dataset.speed = originalSelect.dataset.speed
-        ? originalSelect.dataset.speed
-        : "150";
-      // Событие при изменении оригинального select
-
-      originalSelect.addEventListener("change", function (e) {
-        _this.selectChange(e);
-      });
-    }
-    // Конструктор псевдоселекта
-    selectBuild(originalSelect) {
-      const selectItem = originalSelect.parentElement;
-      // Добавляем ID селекта
-      selectItem.dataset.id = originalSelect.dataset.id;
-      // Получаем класс оригинального селекта, создаем модификатор и добавляем его
-      selectItem.classList.add(
-        originalSelect.getAttribute("class")
-          ? `select_${originalSelect.getAttribute("class")}`
-          : "",
-      );
-      // Если множественный выбор, добавляем класс
-      originalSelect.multiple
-        ? selectItem.classList.add(this.selectClasses.classSelectMultiple)
-        : selectItem.classList.remove(this.selectClasses.classSelectMultiple);
-      // Cтилизация элементов под checkbox (только для multiple)
-      originalSelect.hasAttribute("data-checkbox") && originalSelect.multiple
-        ? selectItem.classList.add(this.selectClasses.classSelectCheckBox)
-        : selectItem.classList.remove(this.selectClasses.classSelectCheckBox);
-      // Сеттер значения заголовка селекта
-      this.setSelectTitleValue(selectItem, originalSelect);
-      // Сеттер элементов списка (options)
-      this.setOptions(selectItem, originalSelect);
-      // Если включена опция поиска data-search, запускаем обработчик
-
-      originalSelect.hasAttribute("data-search")
-        ? this.searchActions(selectItem)
-        : null;
-      // Если указана настройка data-open, открываем селект
-      originalSelect.hasAttribute("data-open")
-        ? this.selectAction(selectItem)
-        : null;
-      // Обработчик disabled
-      this.selectDisabled(selectItem, originalSelect);
-    }
-    // Функция реакций на события
-    selectsActions(e) {
-      const targetElement = e.target;
-      const targetType = e.type;
-
-      if (
-        targetElement.closest(
-          this.getSelectClass(this.selectClasses.classSelect),
-        ) ||
-        targetElement.closest(
-          this.getSelectClass(this.selectClasses.classSelectTag),
-        )
-      ) {
-        const selectItem = targetElement.closest(".select")
-          ? targetElement.closest(".select")
-          : document.querySelector(
-              `.${this.selectClasses.classSelect}[data-id="${
-                targetElement.closest(
-                  this.getSelectClass(this.selectClasses.classSelectTag),
-                ).dataset.selectId
-              }"]`,
-            );
-        const originalSelect = this.getSelectElement(selectItem).originalSelect;
-        if (targetType === "click") {
-          if (!originalSelect.disabled) {
-            if (
-              targetElement.closest(
-                this.getSelectClass(this.selectClasses.classSelectTag),
-              )
-            ) {
-              // Обработка клика на тег
-              const targetTag = targetElement.closest(
-                this.getSelectClass(this.selectClasses.classSelectTag),
-              );
-              const optionItem = document.querySelector(
-                `.${this.selectClasses.classSelect}[data-id="${targetTag.dataset.selectId}"] .select__option[data-value="${targetTag.dataset.value}"]`,
-              );
-              this.optionAction(selectItem, originalSelect, optionItem);
-            } else if (
-              targetElement.closest(
-                this.getSelectClass(this.selectClasses.classSelectTitle),
-              )
-            ) {
-              // Обработка клика на заголовок селекта
-              this.selectAction(selectItem);
-            } else if (
-              targetElement.closest(
-                this.getSelectClass(this.selectClasses.classSelectOption),
-              )
-            ) {
-              // Обработка клика на элемент селекта
-              const optionItem = targetElement.closest(
-                this.getSelectClass(this.selectClasses.classSelectOption),
-              );
-
-              this.optionAction(selectItem, originalSelect, optionItem);
-            }
-          }
-        } else if (targetType === "focusin") {
-          if (
-            targetElement.closest(
-              this.getSelectClass(this.selectClasses.classSelect),
-            )
-          ) {
-            // document.querySelector('.select__input').select();
-            // document.querySelector('.select__input').value = '';
-            const selectOptions = this.getSelectElement(
-              selectItem,
-              this.selectClasses.classSelectOptions,
-            ).selectElement;
-            const selectOptionsItems = selectOptions.querySelectorAll(
-              `.${this.selectClasses.classSelectOption}`,
-            );
-            // selectOptionsItems.forEach((element) => {
-            //   element.hidden = false;
-            // });
-            selectItem.classList.add(this.selectClasses.classSelectFocus);
-            // targetType === 'focusin'
-            //   ? selectItem.classList.add(this.selectClasses.classSelectFocus)
-            //   : selectItem.classList.remove(this.selectClasses.classSelectFocus);
-          }
-        } else if (targetType === "focusout") {
-          if (
-            targetElement.closest(
-              this.getSelectClass(this.selectClasses.classSelect),
-            )
-          ) {
-            selectItem.classList.remove(this.selectClasses.classSelectFocus);
-          }
-        } else if (targetType === "keydown" && e.code === "Escape") {
-          this.selectsСlose();
-        } else if (targetType === "input") {
-          this.searchActions(selectItem);
-        }
-      } else {
-        this.selectsСlose();
-      }
-    }
-
-    // Функция закрытия всех селектов
-    selectsСlose() {
-      const selectActiveItems = document.querySelectorAll(
-        `${this.getSelectClass(
-          this.selectClasses.classSelect,
-        )}${this.getSelectClass(this.selectClasses.classSelectOpen)}`,
-      );
-      if (selectActiveItems.length) {
-        selectActiveItems.forEach((selectActiveItem) => {
-          this.selectAction(selectActiveItem);
-        });
-      }
-    }
-    // Функция открытия/закрытия конкретного селекта
-    selectAction(selectItem) {
-      const originalSelect = this.getSelectElement(selectItem).originalSelect;
-      const selectOptions = this.getSelectElement(
-        selectItem,
-        this.selectClasses.classSelectOptions,
-      ).selectElement;
-      if (!selectOptions.classList.contains("_slide")) {
-        selectItem.classList.toggle(this.selectClasses.classSelectOpen);
-
-        _slideToggle(selectOptions, originalSelect.dataset.speed);
-      }
-    }
-    // Сеттер значения заголовка селекта
-    setSelectTitleValue(selectItem, originalSelect) {
-      const selectItemBody = this.getSelectElement(
-        selectItem,
-        this.selectClasses.classSelectBody,
-      ).selectElement;
-      const selectItemTitle = this.getSelectElement(
-        selectItem,
-        this.selectClasses.classSelectTitle,
-      ).selectElement;
-      if (selectItemTitle) selectItemTitle.remove();
-      selectItemBody.insertAdjacentHTML(
-        "afterbegin",
-        this.getSelectTitleValue(selectItem, originalSelect),
-      );
-    }
-    // Конструктор значения заголовка
-    getSelectTitleValue(selectItem, originalSelect) {
-      // Получаем выбранные текстовые значения
-      let selectTitleValue = this.getSelectedOptionsData(
-        originalSelect,
-        2,
-      ).html;
-      // Обработка значений мультивыбора
-      // Если включен режим тегов (указана настройка data-tags)
-      if (originalSelect.multiple && originalSelect.hasAttribute("data-tags")) {
-        selectTitleValue = this.getSelectedOptionsData(originalSelect)
-          .elements.map(
-            (option) =>
-              `<span role="button" data-select-id="${
-                selectItem.dataset.id
-              }" data-value="${
-                option.value
-              }" class="_select-tag">${this.getSelectElementContent(
-                option,
-              )}</span>`,
-          )
-          .join("");
-        // Если вывод тегов во внешний блок
-        if (
-          originalSelect.dataset.tags &&
-          document.querySelector(originalSelect.dataset.tags)
-        ) {
-          document.querySelector(originalSelect.dataset.tags).innerHTML =
-            selectTitleValue;
-          if (originalSelect.hasAttribute("data-search"))
-            selectTitleValue = false;
-        }
-      }
-      // Значение(я) или плейсхолдер
-      selectTitleValue = selectTitleValue.length
-        ? selectTitleValue
-        : originalSelect.dataset.placeholder;
-      // Если есть значение, добавляем класс
-      this.getSelectedOptionsData(originalSelect).values.length
-        ? selectItem.classList.add(this.selectClasses.classSelectActive)
-        : selectItem.classList.remove(this.selectClasses.classSelectActive);
-      // Возвращаем поле ввода для поиска или текст
-      if (originalSelect.hasAttribute("data-search")) {
-        // Выводим поле ввода для поиска
-        // value="${selectTitleValue}"
-        return `<div class="${this.selectClasses.classSelectTitle}"><span class="${this.selectClasses.classSelectValue}"><input  autocomplete="off" type="text" placeholder="${selectTitleValue}"  data-placeholder="${selectTitleValue}" class="${this.selectClasses.classSelectInput}"></span></div>`;
-      } else {
-        // Если выбран элемент со своим классом
-        const customClass =
-          this.getSelectedOptionsData(originalSelect).elements.length &&
-          this.getSelectedOptionsData(originalSelect).elements[0].dataset.class
-            ? ` ${
-                this.getSelectedOptionsData(originalSelect).elements[0].dataset
-                  .class
-              }`
-            : "";
-        // Выводим текстовое значение
-        return `<button type="button" class="${this.selectClasses.classSelectTitle}"><span class="${this.selectClasses.classSelectValue}"><span class="${this.selectClasses.classSelectContent}${customClass}">${selectTitleValue}</span></span></button>`;
-      }
-    }
-    // Конструктор данных для значения заголовка
-    getSelectElementContent(selectOption) {
-      // Если для элемента указан вывод картинки или текста, перестраиваем конструкцию
-      const selectOptionData = selectOption.dataset.asset
-        ? `${selectOption.dataset.asset}`
-        : "";
-      const selectOptionDataHTML =
-        selectOptionData.indexOf("img") >= 0
-          ? `<img src="${selectOptionData}" alt="">`
-          : selectOptionData;
-      let selectOptionContentHTML = ``;
-      selectOptionContentHTML += selectOptionData
-        ? `<span class="${this.selectClasses.classSelectRow}">`
-        : "";
-      selectOptionContentHTML += selectOptionData
-        ? `<span class="${this.selectClasses.classSelectData}">`
-        : "";
-      selectOptionContentHTML += selectOptionData ? selectOptionDataHTML : "";
-      selectOptionContentHTML += selectOptionData ? `</span>` : "";
-      selectOptionContentHTML += selectOptionData
-        ? `<span class="${this.selectClasses.classSelectText}">`
-        : "";
-      selectOptionContentHTML += selectOption.textContent;
-      selectOptionContentHTML += selectOptionData ? `</span>` : "";
-      selectOptionContentHTML += selectOptionData ? `</span>` : "";
-      return selectOptionContentHTML;
-    }
-    // Получение данных плейсхолдера
-    getSelectPlaceholder(originalSelect) {
-      const selectPlaceholder = Array.from(originalSelect.options).find(
-        (option) => !option.value,
-      );
-      if (selectPlaceholder) {
-        return {
-          value: selectPlaceholder.textContent,
-          show: selectPlaceholder.hasAttribute("data-show"),
-          label: {
-            show: selectPlaceholder.hasAttribute("data-label"),
-            text: selectPlaceholder.dataset.label,
-          },
-        };
-      }
-    }
-    // Получение данных из выбранных элементов
-    getSelectedOptionsData(originalSelect, type) {
-      // Получаем все выбранные объекты из select
-      let selectedOptions = [];
-      if (originalSelect.multiple) {
-        // Если мультивыбор
-        // Убираем плейсхолдер, получаем остальные выбранные элементы
-        selectedOptions = Array.from(originalSelect.options)
-          .filter((option) => option.value)
-          .filter((option) => option.selected);
-      } else {
-        // Если единичный выбор
-        selectedOptions.push(
-          originalSelect.options[originalSelect.selectedIndex],
+    for (let i = 0; i < 3; i++) {
+      let newLink = document.createElement("a");
+      if (res[i]) {
+        newLink.setAttribute(
+          "href",
+          `https://sewera.ru/products/${res[i].linkSeptik}`,
         );
-      }
-      return {
-        elements: selectedOptions.map((option) => option),
-        values: selectedOptions
-          .filter((option) => option.value)
-          .map((option) => option.value),
-        html: selectedOptions.map((option) =>
-          this.getSelectElementContent(option),
-        ),
-      };
-    }
-    // Конструктор элементов списка
-    getOptions(originalSelect) {
-      // Настрока скролла элементов
-      let selectOptionsScroll = originalSelect.hasAttribute("data-scroll")
-        ? `data-simplebar`
-        : "";
-      let selectOptionsScrollHeight = originalSelect.dataset.scroll
-        ? `style="max-height:${originalSelect.dataset.scroll}px"`
-        : "";
-      // Получаем элементы списка
-      let selectOptions = Array.from(originalSelect.options);
-      if (selectOptions.length > 0) {
-        let selectOptionsHTML = ``;
-        // Если указана настройка data-show, показываем плейсхолдер в списке
-        if (
-          (this.getSelectPlaceholder(originalSelect) &&
-            !this.getSelectPlaceholder(originalSelect).show) ||
-          originalSelect.multiple
-        ) {
-          selectOptions = selectOptions.filter((option) => option.value);
-        }
-        // Строим и выводим основную конструкцию
-        selectOptionsHTML += selectOptionsScroll
-          ? `<div ${selectOptionsScroll} ${selectOptionsScrollHeight} class="${this.selectClasses.classSelectOptionsScroll}">`
-          : "";
-        selectOptions.forEach((selectOption) => {
-          // Получаем конструкцию конкретного элемента списка
-          selectOptionsHTML += this.getOption(selectOption, originalSelect);
-        });
-        selectOptionsHTML += selectOptionsScroll ? `</div>` : "";
-        return selectOptionsHTML;
+        newLink.setAttribute("target", "_blank");
+        newLink.innerHTML = `${res[i].nameSeptik}, `;
+        listLink.insertBefore(newLink, theFirstChild);
       }
     }
-    // Конструктор конкретного элемента списка
-    getOption(selectOption, originalSelect) {
-      // Если элемент выбран и включен режим мультивыбора, добавляем класс
-      const selectOptionSelected =
-        selectOption.selected && originalSelect.multiple
-          ? ` ${this.selectClasses.classSelectOptionSelected}`
-          : "";
-      // Если элемент выбрани нет настройки data-show-selected, скрываем элемент
-      const selectOptionHide =
-        selectOption.selected &&
-        !originalSelect.hasAttribute("data-show-selected")
-          ? `hidden`
-          : ``;
-      // Если для элемента указан класс добавляем
-      const selectOptionClass = selectOption.dataset.class
-        ? ` ${selectOption.dataset.class}`
-        : "";
-      // Если указан режим ссылки
-      const selectOptionLink = selectOption.dataset.href
-        ? selectOption.dataset.href
-        : false;
-      const selectOptionLinkTarget = selectOption.hasAttribute(
-        "data-href-blank",
-      )
-        ? `target="_blank"`
-        : "";
-      // Строим и возвращаем конструкцию элемента
-      let selectOptionHTML = ``;
-      selectOptionHTML += selectOptionLink
-        ? `<a ${selectOptionLinkTarget} ${selectOptionHide} href="${selectOptionLink}" data-value="${selectOption.value}" class="${this.selectClasses.classSelectOption}${selectOptionClass}${selectOptionSelected}">`
-        : `<button ${selectOptionHide} class="${this.selectClasses.classSelectOption}${selectOptionClass}${selectOptionSelected}" data-value="${selectOption.value}" type="button">`;
-      selectOptionHTML += this.getSelectElementContent(selectOption);
-      selectOptionHTML += selectOptionLink ? `</a>` : `</button>`;
-      return selectOptionHTML;
-    }
-    // Сеттер элементов списка (options)
-    setOptions(selectItem, originalSelect) {
-      // Получаем объект тела псевдоселекта
-      const selectItemOptions = this.getSelectElement(
-        selectItem,
-        this.selectClasses.classSelectOptions,
-      ).selectElement;
-      // Запускаем конструктор элементов списка (options) и добавляем в тело псевдоселекта
-      selectItemOptions.innerHTML = this.getOptions(originalSelect);
-    }
-    // Обработчик клика на элемент списка
-    optionAction(selectItem, originalSelect, optionItem) {
-      if (originalSelect.multiple) {
-        // Если мультивыбор
-        // Выделяем классом элемент
-        optionItem.classList.toggle(
-          this.selectClasses.classSelectOptionSelected,
-        );
-        // Очищаем выбранные элементы
-        const originalSelectSelectedItems =
-          this.getSelectedOptionsData(originalSelect).elements;
-        originalSelectSelectedItems.forEach((originalSelectSelectedItem) => {
-          originalSelectSelectedItem.removeAttribute("selected");
-        });
-        // Выбираем элементы
-        const selectSelectedItems = selectItem.querySelectorAll(
-          this.getSelectClass(this.selectClasses.classSelectOptionSelected),
-        );
-        selectSelectedItems.forEach((selectSelectedItems) => {
-          originalSelect
-            .querySelector(
-              `option[value="${selectSelectedItems.dataset.value}"]`,
-            )
-            .setAttribute("selected", "selected");
-        });
-      } else {
-        // Если единичный выбор
-        // Если не указана настройка data-show-selected, скрываем выбранный элемент
-        if (!originalSelect.hasAttribute("data-show-selected")) {
-          // Сначала все показать
-          if (
-            selectItem.querySelector(
-              `${this.getSelectClass(
-                this.selectClasses.classSelectOption,
-              )}[hidden]`,
-            )
-          ) {
-            selectItem.querySelector(
-              `${this.getSelectClass(
-                this.selectClasses.classSelectOption,
-              )}[hidden]`,
-            ).hidden = false;
-          }
-          // Скрываем выбранную
-          optionItem.hidden = true;
-        }
-        originalSelect.value = optionItem.hasAttribute("data-value")
-          ? optionItem.dataset.value
-          : optionItem.textContent;
-        this.selectAction(selectItem);
-      }
-      // Обновляем заголовок селекта
-      this.setSelectTitleValue(selectItem, originalSelect);
-      // Вызываем реакцию на изменение селекта
-      this.setSelectChange(originalSelect);
-    }
-    // Реакция на измененение оригинального select
-    selectChange(e) {
-      const originalSelect = e.target;
-      this.selectBuild(originalSelect);
-      this.setSelectChange(originalSelect);
-    }
-    // Обработчик изменения в селекте
-    setSelectChange(originalSelect) {
-      const btnSum = document.querySelector(".calc-wells__btn");
-      const oneSelect = document.querySelector('select[data-id="1"]');
-      const calcObustroystva = document.getElementById("obustroystva-calc");
-      let valueDepth;
-
-      if (
-        document.querySelector(".select__input") &&
-        document.querySelector(".calc-wells__inpt")
-      ) {
-        valueDepth =
-          document.querySelector(".calc-wells__inpt").value ||
-          document.querySelector(".select__input").dataset.placeholder;
-      }
-      debugger;
-      if (
-        !calcObustroystva &&
-        originalSelect.dataset.id == 1 &&
-        oneSelect.value &&
-        valueDepth
-      ) {
-        btnSum.classList.remove("_disable");
-        btnSum.disabled = false;
-      }
-      if (
-        calcObustroystva &&
-        originalSelect.dataset.id == 2 &&
-        btnSum &&
-        document.querySelector(".calc-wells__inpt").value
-      ) {
-        btnSum.classList.remove("_disable");
-        btnSum.disabled = false;
-      }
-      if (
-        !calcObustroystva &&
-        originalSelect.dataset.id == 3 &&
-        btnSum &&
-        document.querySelector(".select__input").dataset.placeholder &&
-        oneSelect.value
-      ) {
-        btnSum.classList.remove("_disable");
-        btnSum.disabled = false;
-      }
-      // Моментальная валидация селекта
-      if (originalSelect.hasAttribute("data-validate")) {
-        // formValidate.validateInput(originalSelect);
-      }
-      // При изменении селекта отправляем форму
-
-      if (originalSelect.hasAttribute("data-submit") && originalSelect.value) {
-        let tempButton = document.createElement("button");
-        tempButton.type = "submit";
-        originalSelect.closest("form").append(tempButton);
-        tempButton.click();
-        tempButton.remove();
-      }
-      const selectItem = originalSelect.parentElement;
-      // Вызов коллбэк функции
-      this.selectCallback(selectItem, originalSelect);
-    }
-    // Обработчик disabled
-    selectDisabled(selectItem, originalSelect) {
-      if (originalSelect.disabled) {
-        selectItem.classList.add(this.selectClasses.classSelectDisabled);
-        this.getSelectElement(
-          selectItem,
-          this.selectClasses.classSelectTitle,
-        ).selectElement.disabled = true;
-      } else {
-        selectItem.classList.remove(this.selectClasses.classSelectDisabled);
-        this.getSelectElement(
-          selectItem,
-          this.selectClasses.classSelectTitle,
-        ).selectElement.disabled = false;
-      }
-    }
-    // Обработчик поиска по элементам списка
-    searchActions(selectItem) {
-      // debugger;
-      const originalSelect = this.getSelectElement(selectItem).originalSelect;
-      const selectInput = this.getSelectElement(
-        selectItem,
-        this.selectClasses.classSelectInput,
-      ).selectElement;
-      const selectOptions = this.getSelectElement(
-        selectItem,
-        this.selectClasses.classSelectOptions,
-      ).selectElement;
-      const selectOptionsItems = selectOptions.querySelectorAll(
-        `.${this.selectClasses.classSelectOption}`,
-      );
-      const _this = this;
-
-      // selectInput.addEventListener('input', function () {
-      selectOptionsItems.forEach((selectOptionsItem) => {
-        // debugger;
-        if (
-          selectOptionsItem.textContent
-            .toUpperCase()
-            .indexOf(selectInput.value.toUpperCase()) >= 0
-        ) {
-          selectOptionsItem.hidden = false;
-        } else {
-          selectOptionsItem.hidden = true;
-        }
-      });
-      // Если список закрыт открываем
-      selectOptions.hidden === true ? _this.selectAction(selectItem) : null;
-      // });
-    }
-    // Коллбэк функция
-    selectCallback(selectItem, originalSelect) {
-      document.dispatchEvent(
-        new CustomEvent("selectCallback", {
-          detail: {
-            select: originalSelect,
-          },
-        }),
-      );
-    }
-  }
-
-  const selectCalc = new SelectConstructor();
-
-  // ==============================================================
-  // ==============================================================
-  // калькуляторо для скважины
-  // ==============================================================
-  // ==============================================================
-
-  function initCalcWells() {
-    if (document.querySelector(".calc-wells")) {
-      const oneSelect = document.querySelector('select[data-id="1"]');
-      const twoSelect = document.querySelector(
-        'select[name="Вид обустройства"]',
-      );
-      const threeSelect = document.querySelector(
-        'select[name="Район бурения"]',
-      );
-      const inptCalc = document.querySelector(".calc-wells__inpt");
-      const slectAreaCalc = document.querySelector(".calc-wells__select");
-      const inptBtn = document.querySelector("#int");
-      const calcBtn = document.querySelector("#calc");
-      const sumBtn = document.querySelector(".calc-wells__btn");
-      const imgBlock = document.querySelector(".calc-wells__bg-img");
-      const finishBlock = document.querySelector(".calc-wells__finish");
-      const calcObustroystva = document.getElementById("obustroystva-calc");
-
-      const sumBlock = document.querySelector(".calc-wells__sum");
-      let isActiv = true;
-      let res = 0;
-      if (document.querySelector(".select__input")) {
-        document.querySelector(".select__input").dataset.placeholder = "";
-      }
-      isShowCaclTab();
-
-      // преключаем между "Глубина скважины" и "Район бурения"
-      function isShowCaclTab() {
-        if (inptBtn) {
-          inptBtn.addEventListener("click", (e) =>
-            cliclBtn(calcBtn, inptBtn, inptCalc, slectAreaCalc, true),
-          );
-        }
-        if (calcBtn) {
-          calcBtn.addEventListener("click", (e) =>
-            cliclBtn(inptBtn, calcBtn, slectAreaCalc, inptCalc, false),
-          );
-        }
-        function cliclBtn(
-          removeSelector,
-          addSelector,
-          isHiddenCalc,
-          isHiddenInpt,
-          booleanValue,
-        ) {
-          removeSelector.classList.remove("_active");
-          addSelector.classList.add("_active");
-          isHiddenInpt.hidden = true;
-          isHiddenCalc.hidden = false;
-          isActiv = booleanValue;
-          inptCalc.value = "";
-          sumBtn.classList.add("_disable");
-          sumBtn.disabled = true;
-          if (document.querySelector(".select__input")) {
-            document.querySelector(".select__input").placeholder =
-              "Район бурения";
-            document.querySelector(".select__input").dataset.placeholder = "";
-          }
-        }
-      }
-
-      // кнопка "Рассчитать"
-      sumBtn.addEventListener("click", resultCalc);
-
-      function resultCalc(e) {
-        let depthValue = isActiv
-          ? inptCalc.value
-          : findValueOption(threeSelect);
-        let wellsValue =
-          oneSelect.value === "Артезианская скважина" ? 3350 : 3250;
-        let arrangementValue = twoSelect.value ? twoSelect.value : "";
-
-        if (depthValue < 40) {
-          depthValue = 40;
-        }
-
-        if (calcObustroystva) {
-          let cablePrice = 300 + 100 + 170;
-
-          let arrangementPrice = twoSelect.value;
-          depthValue = +depthValue / 2;
-
-          if (depthValue > 70) {
-            cablePrice = 470 + 100 + 170;
-          }
-
-          res = String(+depthValue * +cablePrice + +arrangementPrice);
-        } else {
-          if (depthValue > 80) {
-            wellsValue = wellsValue + 100;
-          }
-          res = String(+wellsValue * +depthValue + +arrangementValue);
-        }
-
-        const newRes = res
-          .split("")
-          .reverse()
-          .map((it, indx) => {
-            if (indx == 0) return it;
-            if (indx % 3 == 0) {
-              return `${it} `;
-            }
-            return it;
-          })
-          .reverse()
-          .join("");
-
-        if (res) {
-          if (windowSizeUser()) {
-            animatBlcok();
-          } else {
-            finishBlock.classList.add("_animat-mob");
-          }
-          finishBlock.hidden = false;
-          sumBlock.innerHTML = `${newRes} р.`;
-        }
-      }
-      // события на проверку на пустое значения
-      // события  на ввод макс.глубину 250
-      inptCalc.addEventListener("input", (event) => {
-        const numMax = 250;
-
-        if (event.target.value > numMax) {
-          event.target.value = numMax;
-          event.target.max = numMax;
-        }
-
-        if (calcObustroystva && twoSelect.value) {
-          sumBtn.disabled = inptCalc.value.trim().length === 0;
-          sumBtn.classList.remove("_disable");
-        }
-        if (inptCalc.value !== "" && oneSelect.value) {
-          sumBtn.disabled = false;
-          sumBtn.classList.remove("_disable");
-          return;
-        }
-        if (inptCalc.value === "") {
-          sumBtn.disabled = true;
-          sumBtn.classList.add("_disable");
-        }
-      });
-      // берем значения с "Район бурения"
-      function findValueOption(select) {
-        const option = select.querySelector(`option[value="${select.value}"]`);
-        return option.dataset.valueDepth;
-      }
-      //анимация
-      function animatBlcok() {
-        imgBlock.classList.add("_animat");
-        finishBlock.classList.add("_animat");
-      }
-      const calcWellsBtnSubmit = document.getElementById("calc-wells__finish");
-      if (calcWellsBtnSubmit) {
-        calcWellsBtnSubmit.addEventListener("submit", function (e) {
-          e.preventDefault();
-
-          var th = $(calcWellsBtnSubmit);
-          $(".load__preloader").fadeIn("", function () {
-            $.ajax({
-              type: "POST",
-              url: "/index.php?route=common/footer/quiz_submit",
-              data: th.serialize(),
-              dataType: "json",
-            }).done(function (json) {
-              if (json["success"]) {
-                window.location.href = "https://sewera.ru/sent/";
-                $(".load__preloader").fadeOut("slow");
-              }
-            });
-          });
-
-          return false;
-        });
-      }
-    }
-  }
-
-  function windowSizeUser() {
-    if (window.matchMedia("(min-width: 1023.98px)").matches) {
-      return true;
-    } else {
-      pageNavigation();
-      return false;
-    }
-  }
-
-  window.addEventListener("resize", windowSizeUser);
-
-  initCalcWells();
-  // ==========================================================================
-  // ==========================================================================
-  // ==========================================================================
-  function pageNavigation() {
-    // data-goto - указать ID блока
-    // data-goto-header - учитывать header
-    // data-goto-speed - скорость (только если используется доп плагин)
-    // Работаем при клике на пункт
-    document.addEventListener("click", pageNavigationAction);
-    // Если подключен scrollWatcher, подсвечиваем текущий пукт меню
-    document.addEventListener("watcherCallback", pageNavigationAction);
-    // Основная функция
-    function pageNavigationAction(e) {
-      if (e.type === "click") {
-        const targetElement = e.target;
-        if (targetElement.closest("[data-goto]")) {
-          const gotoLink = targetElement.closest("[data-goto]");
-          const gotoLinkSelector = gotoLink.dataset.goto
-            ? gotoLink.dataset.goto
-            : "";
-          const noHeader = gotoLink.hasAttribute("data-goto-header")
-            ? true
-            : false;
-          const gotoSpeed = gotoLink.dataset.gotoSpeed
-            ? gotoLink.dataset.gotoSpeed
-            : "500";
-          gotoBlock(gotoLinkSelector, noHeader, gotoSpeed);
-          e.preventDefault();
-        }
-      } else if (e.type === "watcherCallback") {
-        if (e.detail) {
-          const entry = e.detail.entry;
-          const targetElement = entry.target;
-          // Обработка пунктов навигации, если указано значение navigator подсвечиваем текущий пукт меню
-          if (targetElement.dataset.watch === "navigator") {
-            const navigatorItem = targetElement.id;
-            const navigatorActiveItem = document.querySelector(
-              `[data-goto]._navigator-active`,
-            );
-            const navigatorCurrentItem = document.querySelector(
-              `[data-goto="${navigatorItem}"]`,
-            );
-            if (entry.isIntersecting) {
-              // Видим объект
-              // navigatorActiveItem ? navigatorActiveItem.classList.remove('_navigator-active') : null;
-              navigatorCurrentItem
-                ? navigatorCurrentItem.classList.add("_navigator-active")
-                : null;
-            } else {
-              // Не видим объект
-              navigatorCurrentItem
-                ? navigatorCurrentItem.classList.remove("_navigator-active")
-                : null;
-            }
-          }
-        }
-      }
-    }
-  }
-  // Модуль плавной проктутки к блоку
-  let gotoBlock = (targetBlock, noHeader = false, speed = 500, offset = 0) => {
-    const targetBlockElement = document.querySelector(targetBlock);
-    if (targetBlockElement) {
-      let headerItem = "";
-      let headerItemHeight = 0;
-      if (noHeader) {
-        headerItem = "header.header";
-        headerItemHeight = document.querySelector(headerItem).offsetHeight;
-      }
-      let options = {
-        speedAsDuration: true,
-        speed: speed,
-        header: headerItem,
-        offset: offset,
-        easing: "easeOutQuad",
-      };
-      // Закрываем меню, если оно открыто
-      document.documentElement.classList.contains("menu-open")
-        ? menuClose()
-        : null;
-
-      if (typeof SmoothScroll !== "undefined") {
-        // Прокрутка с использованием дополнения
-        new SmoothScroll().animateScroll(targetBlockElement, "", options);
-      } else {
-        // Прокрутка стандартными средствами
-        let targetBlockElementPosition =
-          targetBlockElement.getBoundingClientRect().top + scrollY;
-        window.scrollTo({
-          top: headerItemHeight
-            ? targetBlockElementPosition - headerItemHeight
-            : targetBlockElementPosition,
-          behavior: "smooth",
-        });
-      }
-    } else {
-    }
-  }; // CONCATENATED MODULE: ./src/js/app.js
+  } // CONCATENATED MODULE: ./src/js/app.js
 
   // Подключение основного файла стилей
 
