@@ -2720,34 +2720,6 @@ html {
   padding: 72px 10px 30px;
 }
 
-.sewera-septik .form-qwiz__input-number {
-  text-align: center;
-  margin: 0 auto;
-  margin-top: 30px;
-  transform: scale(0);
-  width: 100%;
-  max-width: 230px;
-  transition: all 0.4s ease-in-out 0s;
-}
-.sewera-septik .form-qwiz__input-number input {
-  padding: 13.4px 10px;
-  width: 100%;
-  font-weight: 500;
-  border-radius: 4px;
-  background-color: #fff;
-  border-bottom: 4px;
-  max-width: 350px;
-}
-.sewera-septik .form-qwiz__input-number input::placeholder {
-  font-size: 14px;
-  color: #102938;
-  font-weight: 500;
-}
-
-.sewera-septik .form-qwiz__input-number._show {
-  transform: scale(1);
-}
-
 .sewera-septik .form-qwiz__title {
   font-size: 20px;
   font-weight: 700;
@@ -4014,8 +3986,8 @@ sewera-septik .form-qwiz__user-contact {
 
 .sewera-septik .types-wells__price-list {
   margin: 0 0 0 !important;
-  font-size: 14px;
-  line-height: 22.1px;
+  font-size: 20px;
+  line-height: 1.3;
 }
 
 .sewera-septik .types-wells__price-list li {
