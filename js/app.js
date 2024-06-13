@@ -5545,7 +5545,7 @@ data-youtube - Атрибут для кода youtube
         ) {
           switchCurrentClassName(currentStep + 1, currentStep - 1, nextBtn);
           currentStep = 2;
-          editCountStepText(`${currentStep + 1}`);
+          editCountStepText(` ${currentStep + 1}`);
           return;
         }
 
