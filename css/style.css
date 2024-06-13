@@ -2720,12 +2720,44 @@ html {
   padding: 72px 10px 30px;
 }
 
+.sewera-septik .form-qwiz__input-number {
+  text-align: center;
+  margin: 0 auto;
+  margin-top: 30px;
+  transform: scale(0);
+  width: 100%;
+  max-width: 230px;
+  transition: all 0.4s ease-in-out 0s;
+}
+.sewera-septik .form-qwiz__input-number input {
+  padding: 13.4px 10px;
+  width: 100%;
+  font-weight: 500;
+  border-radius: 4px;
+  background-color: #fff;
+  border-bottom: 4px;
+  max-width: 350px;
+}
+.sewera-septik .form-qwiz__input-number input::placeholder {
+  font-size: 14px;
+  color: #102938;
+  font-weight: 500;
+}
+
+.sewera-septik .form-qwiz__input-number._show {
+  transform: scale(1);
+}
+
 .sewera-septik .form-qwiz__title {
   font-size: 20px;
   font-weight: 700;
   margin-bottom: 10px;
   line-height: 20px;
   max-width: 100%;
+}
+
+.sewera-septik .form-qwiz__title_mb-big {
+  margin-bottom: 40px;
 }
 
 .sewera-septik .form-qwiz__text-title {
@@ -3176,10 +3208,6 @@ sewera-septik .form-qwiz__user-contact {
   opacity: 1;
 }
 
-.sewera-septik .qwiz-section__body {
-  margin-bottom: 30px;
-}
-
 .sewera-septik .qwiz-section__bottom {
   display: -webkit-box;
   display: -ms-flexbox;
@@ -3223,6 +3251,7 @@ sewera-septik .form-qwiz__user-contact {
   -webkit-box-pack: end;
   -ms-flex-pack: end;
   justify-content: flex-end;
+  margin-top: 30px;
 }
 
 .sewera-septik .qwiz-section__next-btn,
@@ -3285,15 +3314,16 @@ sewera-septik .form-qwiz__user-contact {
 
 .sewera-septik .form-qwiz__left-finish {
   -webkit-box-flex: 0;
-  -ms-flex: 0 1 562px;
-  flex: 0 1 562px;
-  max-width: 562px;
+  -ms-flex: 0 1 404px;
+  flex: 0 1 404px;
+  max-width: 404px;
+  background-color: #fff;
   display: -ms-grid;
   display: grid;
   justify-items: start;
   row-gap: 20px;
-  border-right: 1px solid rgba(16, 41, 56, 0.1176470588);
-  padding-right: 40px;
+  padding: 30px;
+  border-radius: 4px;
 }
 
 .sewera-septik .form-qwiz__title-finish {
@@ -3986,8 +4016,8 @@ sewera-septik .form-qwiz__user-contact {
 
 .sewera-septik .types-wells__price-list {
   margin: 0 0 0 !important;
-  font-size: 20px;
-  line-height: 1.3;
+  font-size: 14px;
+  line-height: 22.1px;
 }
 
 .sewera-septik .types-wells__price-list li {
@@ -4811,6 +4841,23 @@ sewera-septik .form-qwiz__user-contact {
   }
 }
 @media (max-width: 1023.98px) {
+  .sewera-septik .form-qwiz__right-finish {
+    -ms-grid-columns: 1fr 1fr;
+    grid-template-columns: 1fr 1fr;
+    -ms-grid-rows: 1fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr 1fr;
+    -webkit-column-gap: 10px;
+    -moz-column-gap: 10px;
+    column-gap: 10px;
+  }
+  .sewera-septik .form-qwiz__grid-fix-finish {
+    -ms-grid-column: 1;
+    -ms-grid-column-span: 2;
+    grid-column: 1/3;
+    -ms-grid-row: 1;
+    -ms-grid-row-span: 1;
+    grid-row: 1/2;
+  }
   .sewera-septik .calc-wells {
     padding-top: 15px;
     padding-left: 15px;
@@ -5248,16 +5295,16 @@ sewera-septik .form-qwiz__user-contact {
     line-height: 135%;
   }
   .sewera-septik .form-qwiz__blcok-finish {
-    -webkit-column-gap: 30px;
-    -moz-column-gap: 30px;
-    column-gap: 30px;
+    -webkit-column-gap: 10px;
+    -moz-column-gap: 10px;
+    column-gap: 20px;
   }
   .sewera-septik .form-qwiz__right-finish {
-    -ms-grid-columns: 1fr;
-    grid-template-columns: 1fr;
-    -webkit-column-gap: 30px;
-    -moz-column-gap: 30px;
-    column-gap: 30px;
+    -ms-grid-columns: 1fr 1fr;
+    grid-template-columns: 1fr 1fr;
+    -webkit-column-gap: 10px;
+    -moz-column-gap: 10px;
+    column-gap: 10px;
   }
   .sewera-septik .form-qwiz__title-finish {
     font-size: 16px;
@@ -5280,9 +5327,8 @@ sewera-septik .form-qwiz__user-contact {
     -webkit-box-flex: 1;
     -ms-flex-positive: 1;
     flex-grow: 1;
-    min-width: 212px;
+    min-width: 224px;
     padding: 15px;
-    padding-right: 30px;
   }
   .sewera-septik .form-qwiz__item-finish {
     font-size: 14px;
@@ -6136,10 +6182,6 @@ sewera-septik .form-qwiz__user-contact {
   .sewera-septik .qwiz-section__wrapper {
     padding: 20px 15px;
   }
-  .sewera-septik .form-qwiz__left-finish {
-    border-right: 0;
-    padding: 0;
-  }
   .sewera-septik .form-qwiz__left-finish,
   .sewera-septik .form-qwiz__right-finish {
     -webkit-box-flex: 1;
@@ -6149,23 +6191,6 @@ sewera-septik .form-qwiz__user-contact {
   }
   .sewera-septik .form-qwiz__left-finish {
     justify-items: stretch;
-  }
-  .sewera-septik .form-qwiz__right-finish {
-    -ms-grid-columns: 1fr 1fr;
-    grid-template-columns: 1fr 1fr;
-    -ms-grid-rows: 1fr 1fr 1fr;
-    grid-template-rows: 1fr 1fr 1fr;
-    -webkit-column-gap: 10px;
-    -moz-column-gap: 10px;
-    column-gap: 10px;
-  }
-  .sewera-septik .form-qwiz__grid-fix-finish {
-    -ms-grid-column: 1;
-    -ms-grid-column-span: 2;
-    grid-column: 1/3;
-    -ms-grid-row: 1;
-    -ms-grid-row-span: 1;
-    grid-row: 1/2;
   }
   .sewera-septik .form-qwiz__blcok-finish {
     -webkit-box-orient: vertical;
