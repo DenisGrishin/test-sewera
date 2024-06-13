@@ -5376,16 +5376,6 @@ data-youtube - Атрибут для кода youtube
         });
       }
 
-      function checkRadioValue(selector) {
-        let res = false;
-        selector.forEach((el) => {
-          if (el.checked) {
-            res = true;
-          }
-        });
-        return res;
-      }
-
       function eventRadio(selector) {
         if (selector) {
           selector.forEach((it) => {
@@ -5628,7 +5618,18 @@ data-youtube - Атрибут для кода youtube
       }
     }
   }
+
   initQwiz();
+  function checkRadioValue(selector) {
+    let res = false;
+    selector.forEach((el) => {
+      if (el.checked) {
+        res = true;
+      }
+    });
+    return res;
+  }
+
   // события на ввод только чисел и проврка на пустой инпут
   function validateUserValueInput() {
     const inputRange = document.querySelector(
@@ -6226,17 +6227,6 @@ data-youtube - Атрибут для кода youtube
       console.log("Производительность", sum);
 
       const resFilterRange = filterRange(dataSeptic, +sum, +sum, []);
-      // фильтар по юзерам
-      // const valueRangeUser =
-      //   document.querySelector('.noUi-handle').ariaValueText === '1'
-      //     ? '2'
-      //     : document.querySelector('.noUi-handle').ariaValueText;
-
-      // let resSeptik = resFilterRange.filter((it) => {
-      //   if (it.userValue == valueRangeUser) {
-      //     return it;
-      //   }
-      // });
 
       showReusltSeptik(resFilterRange.slice(0, 3));
     }
@@ -6254,11 +6244,7 @@ data-youtube - Атрибут для кода youtube
       if (max >= 4) {
         return resArr;
       }
-      // if (min <= 0.4) {
-      //   min = 0.4;
-      // }
 
-      // return filterRange(septikArr, min - 0.1, max + 0.1, arrRes);
       return filterRange(septikArr, min, max + 0.1, resArr);
     }
 
@@ -6267,6 +6253,7 @@ data-youtube - Атрибут для кода youtube
       const listResSelector = document.querySelectorAll(
         ".form-qwiz__content-finish",
       );
+
       const sumNameSelector = document.querySelector(".form-qwiz__sum-finish");
 
       let objRes = createObjRes(res);
@@ -6304,11 +6291,15 @@ data-youtube - Атрибут для кода youtube
       resObj.productivity = `${res[0].productivity} м3`;
       resObj.mounting = `${res[0].mounting} р.`;
       resObj.energyConsumption = `${res[0].energyConsumption} кВт/сутки`;
+      const threeRadioBtns = document.querySelectorAll(
+        'input[name="Количество колец"]',
+      );
 
       let sumName = new Intl.NumberFormat("ru", {}).format(
         Number(res[0].price.replace(/\s+/g, "")) +
           Number(res[0].mounting.replace(/\s+/g, "")) +
-          9100,
+          9100 +
+          (checkRadioValue(threeRadioBtns) ? 38000 : 0),
       );
 
       let arrRes = Object.values(resObj);
