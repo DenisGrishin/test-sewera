@@ -2615,9 +2615,9 @@ html {
 .sewera-septik .form-qwiz__house-plumbing {
   display: -ms-grid;
   display: grid;
-  -webkit-column-gap: 10px;
-  -moz-column-gap: 10px;
-  column-gap: 10px;
+  -webkit-column-gap: 20px;
+  -moz-column-gap: 20px;
+  column-gap: 20px;
   row-gap: 20px;
   -ms-grid-columns: 1fr 1fr 1fr 1fr;
   grid-template-columns: 1fr 1fr 1fr 1fr;
@@ -2642,6 +2642,7 @@ html {
   justify-content: space-between;
   -webkit-column-gap: 20px;
   -moz-column-gap: 20px;
+  text-align: right;
   column-gap: 20px;
 }
 
@@ -4763,6 +4764,12 @@ sewera-septik .form-qwiz__user-contact {
   .sewera-septik .slider-navigation-next {
     right: 10px;
   }
+  .sewera-septik .form-qwiz__house-plumbing {
+    -ms-grid-columns: 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr;
+    -ms-grid-rows: 1fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr 1fr;
+  }
 }
 @media (max-width: 1279.98px) {
   .sewera-septik .types-wells__slide_obustroystva:has(._showmore-active) {
@@ -4822,12 +4829,6 @@ sewera-septik .form-qwiz__user-contact {
   }
   .sewera-septik .form-order__btn_mobile-decor::before {
     bottom: 41px;
-  }
-  .sewera-septik .form-qwiz__house-plumbing {
-    -ms-grid-columns: 1fr 1fr 1fr;
-    grid-template-columns: 1fr 1fr 1fr;
-    -ms-grid-rows: 1fr 1fr 1fr;
-    grid-template-rows: 1fr 1fr 1fr;
   }
   .sewera-septik .banner__show-laptop-br {
     display: inline-block;

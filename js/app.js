@@ -5629,7 +5629,15 @@ data-youtube - Атрибут для кода youtube
     });
     return res;
   }
-
+  function getValueAdditionalQuestion(selector) {
+    let value = 0;
+    selector.forEach((element) => {
+      if (element.checked) {
+        value = element.value;
+      }
+    });
+    return Number(value);
+  }
   // события на ввод только чисел и проврка на пустой инпут
   function validateUserValueInput() {
     const inputRange = document.querySelector(
@@ -6286,7 +6294,7 @@ data-youtube - Атрибут для кода youtube
       resObj.plannedSalvoRelease = `${getValueItemPlumbing()} л`;
       resObj.salvoReleaseVolume = `${res[0].salvoReleaseVolume} л`;
       resObj.price = `~${res[0].price} р.`;
-      resObj.pipeDepth = `${res[0].pipeDepth} см`;
+      resObj.pipeDepth = `от ${res[0].pipeDepth} см`;
       resObj.deliveryPrice = "9100 р.";
       resObj.productivity = `${res[0].productivity} м3`;
       resObj.mounting = `${res[0].mounting} р.`;
@@ -6299,9 +6307,9 @@ data-youtube - Атрибут для кода youtube
         Number(res[0].price.replace(/\s+/g, "")) +
           Number(res[0].mounting.replace(/\s+/g, "")) +
           9100 +
-          (checkRadioValue(threeRadioBtns) ? 38000 : 0),
+          getValueAdditionalQuestion(threeRadioBtns),
       );
-
+      console.log(getValueAdditionalQuestion(threeRadioBtns));
       let arrRes = Object.values(resObj);
 
       return [arrRes, `${sumName} р.`];
