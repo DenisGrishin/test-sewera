@@ -5398,6 +5398,10 @@ data-youtube - Атрибут для кода youtube
       ".form-qwiz__input-number  input",
     );
     if (inputRange) {
+      inputRange.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") e.preventDefault();
+      });
+
       inputRange.addEventListener("input", (e) => {
         const nextBtn = document.querySelector(".qwiz-section__next-btn");
 
