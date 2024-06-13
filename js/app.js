@@ -5214,7 +5214,6 @@ data-youtube - Атрибут для кода youtube
 
         isValidateFormService();
 
-        console.log(currentStep);
         if (isCheck && currentStep === steps.length - 2) {
           stepCurrentNumber.parentNode.classList.add("_ready");
         }
@@ -5512,7 +5511,6 @@ data-youtube - Атрибут для кода youtube
           deleteCheck(oneRadioBtns);
           deleteCheck(twoRadioBtns);
           deleteCheck(threeRadioBtns);
-          console.log(currentStep);
         });
       }
       // шаг назад
@@ -6231,8 +6229,6 @@ data-youtube - Атрибут для кода youtube
       if (sum >= 4) {
         sum = 4;
       }
-
-      console.log("Производительность", sum);
 
       const resFilterRange = filterRange(dataSeptic, +sum, +sum, []);
 

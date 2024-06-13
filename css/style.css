@@ -5310,7 +5310,7 @@ sewera-septik .form-qwiz__user-contact {
     column-gap: 10px;
   }
   .sewera-septik .form-qwiz__title-finish {
-    font-size: 16px;
+    font-size: 16px !important;
     line-height: 1.5;
   }
   .sewera-septik .form-qwiz__sum-finish {
@@ -6231,9 +6231,9 @@ sewera-septik .form-qwiz__user-contact {
     row-gap: 20px;
   }
   .sewera-septik .form-qwiz__title {
-    font-size: 16px;
+    font-size: 16px !important;
     line-height: 1.5;
-    margin-bottom: 20px;
+    margin-bottom: 20px !important;
   }
   .sewera-septik .form-qwiz__items_no-wrap {
     -ms-flex-wrap: wrap;
