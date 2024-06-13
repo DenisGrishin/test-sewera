@@ -5407,13 +5407,15 @@ data-youtube - Атрибут для кода youtube
         let isOneRadio = checkRadioValue(oneRadioBtns);
         let isTwoRadio = checkRadioValue(twoRadioBtns);
         let isThreeRadio = checkRadioValue(threeRadioBtns);
-        if (currentStep == 2 && !statusQuestion) {
-          nextBtn.classList.remove("_disabled");
-        }
-        // ==== 3
-        if (currentStep === 2 && !isThreeRadio && statusQuestion) {
+
+        if (currentStep == 2 && statusQuestion) {
           nextBtn.classList.add("_disabled");
         }
+        // ==== 3
+        if (currentStep === 2 && isThreeRadio && statusQuestion) {
+          nextBtn.classList.add("_disabled");
+        }
+
         if (currentStep === 3 && !isThreeRadio) {
           return;
         }
@@ -5501,6 +5503,7 @@ data-youtube - Атрибут для кода youtube
           switchCurrentClassName(currentStep - 1, currentStep, prevBtn);
           return;
         }
+
         switchCurrentClassName(currentStep - 1, currentStep, prevBtn);
       }
       // кнопка заказать занова
@@ -5525,6 +5528,7 @@ data-youtube - Атрибут для кода youtube
       // шаг назад
       function prevStep() {
         let isTwoRadio = checkRadioValue(twoRadioBtns);
+
         if (currentStep == 3 && isTwoRadio) {
           nextBtn.classList.remove("_disabled");
         }
@@ -5544,18 +5548,19 @@ data-youtube - Атрибут для кода youtube
 
         currentStep--;
 
-        // проверка, покать доп.вопрос
+        // проверка, показать доп.вопрос
         if (
           steps[currentStep].closest("._additional-question") &&
           !statusQuestion
         ) {
           switchCurrentClassName(currentStep + 1, currentStep - 1, nextBtn);
-          currentStep = 3;
+          currentStep = 2;
           editCountStepText(`${currentStep + 1}`);
           return;
         }
 
         //доп.вопрос проверка текст
+
         if (
           steps[currentStep].closest("._additional-question") &&
           statusQuestion
@@ -5564,12 +5569,6 @@ data-youtube - Атрибут для кода youtube
           editCountStepText("Дополнительный вопрос");
           switchCurrentClassName(currentStep + 1, currentStep);
           return;
-        }
-        if (
-          steps[currentStep].closest("._additional-question") &&
-          statusQuestion
-        ) {
-          editCountStepText(currentStep);
         } else {
           editCountStepText(currentStep + 1);
         }
