@@ -5154,11 +5154,152 @@ data-youtube - Атрибут для кода youtube
   rangeInit();
 
   function initQwiz() {
-    const qwiz = document.querySelector(".qwiz-section__body");
+    const qwizFrom = document.querySelector("#services_quiz_form");
+    const qwizCalc = document.querySelector("#calc-septik");
+    if (qwizFrom) {
+      const checkBlock = document.querySelector(".form-qwiz");
+      const inputChecks = document.querySelectorAll(".form-qwiz__input");
+      const steps = document.querySelectorAll(".form-qwiz__step");
+      const prevBtn = document.querySelector(".qwiz-section__prev-btn");
+      const nextBtn = document.querySelector(".qwiz-section__next-btn");
+      const panelNavigate = document.querySelector(".qwiz-section__bottom");
+      const stepCurrentNumber = document.querySelector(
+        ".qwiz-section__current-step",
+      );
+      const restartBtn = document.querySelector(".form-qwiz__restart-btn");
+      const finishStep = document.querySelector(".qwiz-section__finish-step");
+      let currentStep = 0;
+      let isCheck = false;
 
-    const qwizFrom = document.querySelector(".qwiz-sections");
+      nextBtn.addEventListener("click", nextStep);
+      prevBtn.addEventListener("click", prevStep);
+      checkBlock.addEventListener("click", isClickCheck);
+      if (finishStep) finishStep.innerHTML = `/${steps.length - 1}`;
+      // кнопка заказать занова
+      if (restartBtn)
+        restartBtn.addEventListener("click", function (e) {
+          currentStep = 0;
+          isCheck = false;
+          stepCurrentNumber.innerHTML = 1;
+          prevBtn.classList.add("_disabled");
+          prevBtn.disabled = true;
+          steps[0].classList.add("_current");
+          steps[steps.length - 1].classList.remove("_current");
+          panelNavigate.style.display = "flex";
+          stepCurrentNumber.parentNode.style.display = "flex";
+          stepCurrentNumber.parentNode.classList.remove("_ready");
+          inputChecks.forEach((inpt) => (inpt.checked = false));
+        });
 
-    if (qwiz) {
+      function isClickCheck(e) {
+        let target = e.target;
+        if (target.classList.contains("form-qwiz__input")) {
+          isValidateFormService();
+
+          if (!isCheck && currentStep === steps.length - 3) {
+            nextBtn.classList.add("_disabled");
+            nextBtn.disabled = true;
+          }
+          if (isCheck) {
+            nextBtn.classList.remove("_disabled");
+            nextBtn.disabled = false;
+          }
+        }
+      }
+      // ==============================================================================
+
+      // шаг вперед
+      function nextStep(e) {
+        ++currentStep;
+
+        isValidateFormService();
+
+        console.log(currentStep);
+        if (isCheck && currentStep === steps.length - 2) {
+          stepCurrentNumber.parentNode.classList.add("_ready");
+        }
+
+        if (!isCheck && currentStep === steps.length - 3) {
+          nextBtn.classList.add("_disabled");
+          nextBtn.disabled = true;
+        }
+        if (steps.length - 1 === currentStep) {
+          stepCurrentNumber.parentNode.style.display = "none";
+        }
+
+        if (steps.length - 2 === currentStep) {
+          panelNavigate.style.display = "none";
+        }
+
+        if (steps.length === currentStep) {
+          steps[currentStep - 1].style.display = "none";
+          return;
+        }
+
+        stepCurrentNumber.innerHTML = currentStep + 1;
+
+        prevBtn.classList.remove("_disabled");
+        prevBtn.disabled = false;
+        steps[currentStep - 1].classList.remove("_current");
+        steps[currentStep].classList.add("_current");
+      }
+      // шаг назад
+      function prevStep(e) {
+        if (currentStep === steps.length - 2) {
+          stepCurrentNumber.parentNode.classList.remove("_ready");
+        }
+
+        if (currentStep === steps.length - 3) {
+          nextBtn.classList.remove("_disabled");
+        }
+
+        if (prevBtn.classList.contains("_disabled")) {
+          return;
+        }
+        currentStep--;
+        stepCurrentNumber.innerHTML = currentStep + 1;
+
+        if (currentStep === 0) {
+          prevBtn.classList.add("_disabled");
+          prevBtn.disabled = true;
+        }
+        nextBtn.disabled = false;
+        steps[currentStep + 1].classList.remove("_current");
+        steps[currentStep].classList.add("_current");
+      }
+
+      // валидация чекбокса
+      function isValidateFormService() {
+        for (let i = 0; i < inputChecks.length; i++) {
+          const element = inputChecks[i];
+          if (element.checked) {
+            isCheck = true;
+            return;
+          }
+        }
+        isCheck = false;
+        return;
+      }
+      qwizFrom.addEventListener("submit", function (e) {
+        e.preventDefault();
+        var th = $("#services_quiz_form");
+        $(".load__preloader").fadeIn("", function () {
+          $.ajax({
+            type: "POST",
+            url: "/index.php?route=common/footer/quiz_submit",
+            data: th.serialize(),
+            dataType: "json",
+          }).done(function (json) {
+            if (json["success"]) {
+              $(".load__preloader").fadeOut("slow");
+              nextStep();
+            }
+          });
+        });
+        return false;
+      });
+    }
+    if (qwizCalc) {
       const checkBlock = document.querySelector(".form-qwiz");
       const inputChecks = document.querySelectorAll(".form-qwiz__input");
       const steps = document.querySelectorAll(".form-qwiz__step");
@@ -5172,19 +5313,16 @@ data-youtube - Атрибут для кода youtube
       const stepCurrentNumber = document.querySelector(
         ".qwiz-section__current-step",
       );
-      const radioBtn = document.querySelectorAll(
-        'input[name="Нужен дренажный колодец?"]',
-      );
-
+      // кнопка чтоб сдлеать следующий шаг на "отправить заявку"
+      const btnSumbmitNext = document.querySelector(".form-qwiz__btn-finish");
       const restartBtn = document.querySelector(".form-qwiz__restart-btn");
       let currentStep = 0;
       let isCheck = false;
       let statusQuestion = "";
 
-      radioBtn.forEach((radio) => {
-        radio.addEventListener("change", () => (statusQuestion = radio.value));
+      btnSumbmitNext.addEventListener("click", function (e) {
+        nextStep();
       });
-
       nextBtn.addEventListener("click", nextStep);
       prevBtn.addEventListener("click", prevStep);
       checkBlock.addEventListener("click", isClickCheck);
@@ -5192,23 +5330,6 @@ data-youtube - Атрибут для кода youtube
         document.querySelector(".qwiz-section__finish-step").innerHTML = `/${
           steps.length - 1
         }`;
-      }
-
-      // кнопка заказать занова
-      if (restartBtn) {
-        restartBtn.addEventListener("click", function (e) {
-          currentStep = 0;
-          isCheck = false;
-          stepCurrentNumber.innerHTML = 1;
-          prevBtn.classList.add("_disabled");
-          prevBtn.disabled = true;
-          steps[0].classList.add("_current");
-          steps[steps.length - 1].classList.remove("_current");
-          bottomPanel.style.display = "flex";
-          stepCurrentNumber.parentNode.style.display = "flex";
-          stepCurrentNumber.parentNode.classList.remove("_ready");
-          inputChecks.forEach((inpt) => (inpt.checked = false));
-        });
       }
 
       function isClickCheck(e) {
@@ -5226,10 +5347,92 @@ data-youtube - Атрибут для кода youtube
           }
         }
       }
+      const radioBtn = document.querySelectorAll(
+        'input[name="Место отвода воды из септика"]',
+      );
+      const oneRadioBtns = document.querySelectorAll(
+        'input[name="Глубина залегания трубы"]',
+      );
+      const twoRadioBtns = document.querySelectorAll(
+        'input[name="Место отвода воды из септика"]',
+      );
+      const threeRadioBtns = document.querySelectorAll(
+        'input[name="Количество колец"]',
+      );
+      radioBtn.forEach((radio) => {
+        radio.addEventListener("change", () => {
+          if (radio.value === "Дренажный колодец") {
+            statusQuestion = true;
+            return;
+          }
+          statusQuestion = false;
+        });
+      });
+
       // ==============================================================================
+      function deleteCheck(selector) {
+        selector.forEach((el) => {
+          el.checked = false;
+        });
+      }
+
+      function checkRadioValue(selector) {
+        let res = false;
+        selector.forEach((el) => {
+          if (el.checked) {
+            res = true;
+          }
+        });
+        return res;
+      }
+
+      function eventRadio(selector) {
+        if (selector) {
+          selector.forEach((it) => {
+            it.addEventListener("click", () => clickRadioCheck(selector));
+          });
+        }
+      }
+
+      function clickRadioCheck(slector) {
+        checkRadioValue(slector);
+        nextBtn.classList.remove("_disabled");
+      }
+      eventRadio(oneRadioBtns);
+      eventRadio(twoRadioBtns);
+      eventRadio(threeRadioBtns);
 
       // шаг вперед
       function nextStep() {
+        let isOneRadio = checkRadioValue(oneRadioBtns);
+        let isTwoRadio = checkRadioValue(twoRadioBtns);
+        let isThreeRadio = checkRadioValue(threeRadioBtns);
+        if (currentStep == 2 && !statusQuestion) {
+          nextBtn.classList.remove("_disabled");
+        }
+        // ==== 3
+        if (currentStep === 2 && !isThreeRadio && statusQuestion) {
+          nextBtn.classList.add("_disabled");
+        }
+        if (currentStep === 3 && !isThreeRadio) {
+          return;
+        }
+        // ==== 2
+        if (currentStep === 1 && !isTwoRadio) {
+          nextBtn.classList.add("_disabled");
+        }
+        if (currentStep === 2 && !isTwoRadio) {
+          return;
+        }
+        // ==== 1
+        if (currentStep === 0 && !isOneRadio) {
+          nextBtn.classList.add("_disabled");
+        }
+
+        if (currentStep === 1 && !isOneRadio) {
+          return;
+        }
+
         ++currentStep;
         if (textProgress) {
           textProgress.style.display = "flex";
@@ -5250,8 +5453,14 @@ data-youtube - Атрибут для кода youtube
           nextBtn.disabled = true;
         }
         // убирает на посленем шагу кнопки 'Впред и Назад'
-        if (steps.length - 1 === currentStep) {
+        if (steps.length - 3 === currentStep) {
           navigatePanel.style.display = "none";
+        }
+
+        if (steps.length - 2 === currentStep) {
+          document.querySelector(
+            ".qwiz-section__progress-step ",
+          ).style.display = "none";
         }
         if (bottomPanel && steps.length - 2 === currentStep) {
           bottomPanel.style.display = "none";
@@ -5276,7 +5485,8 @@ data-youtube - Атрибут для кода youtube
         }
 
         // на последнем шагу добавляет текст 'Итоги'
-        if (steps.length === currentStep + 1) {
+
+        if (steps.length === currentStep + 3) {
           filterSeptik();
           textProgress.style.display = "none";
           editCountStepText("Итоги");
@@ -5293,9 +5503,34 @@ data-youtube - Атрибут для кода youtube
         }
         switchCurrentClassName(currentStep - 1, currentStep, prevBtn);
       }
-
+      // кнопка заказать занова
+      if (restartBtn) {
+        restartBtn.addEventListener("click", function (e) {
+          currentStep = 0;
+          stepCurrentNumber.innerHTML = "Шаг 1";
+          prevBtn.classList.add("_disabled");
+          steps[0].classList.add("_current");
+          steps[steps.length - 1].classList.remove("_current");
+          navigatePanel.style.display = "flex";
+          prevBtn.style.display = "none";
+          document.querySelector(".qwiz-section__progress-step").style.display =
+            "flex";
+          navigatePanel.style.justifyContent = "flex-end";
+          deleteCheck(oneRadioBtns);
+          deleteCheck(twoRadioBtns);
+          deleteCheck(threeRadioBtns);
+          console.log(currentStep);
+        });
+      }
       // шаг назад
       function prevStep() {
+        let isTwoRadio = checkRadioValue(twoRadioBtns);
+        if (currentStep == 3 && isTwoRadio) {
+          nextBtn.classList.remove("_disabled");
+        }
+        if (currentStep == 1) {
+          nextBtn.classList.remove("_disabled");
+        }
         if (textProgress) {
           textProgress.style.display = "flex";
         }
@@ -5370,10 +5605,12 @@ data-youtube - Атрибут для кода youtube
         steps[stepRemove].classList.remove("_current");
         steps[stepAdd].classList.add("_current");
       }
-      if (qwizFrom) {
-        qwizFrom.addEventListener("submit", function (e) {
+
+      if (qwizCalc) {
+        qwizCalc.addEventListener("submit", function (e) {
           e.preventDefault();
-          var th = $("#services_quiz_form");
+          var th = $(qwizCalc);
+
           $(".load__preloader").fadeIn("", function () {
             $.ajax({
               type: "POST",
@@ -5392,6 +5629,7 @@ data-youtube - Атрибут для кода youtube
       }
     }
   }
+  initQwiz();
   // события на ввод только чисел и проврка на пустой инпут
   function validateUserValueInput() {
     const inputRange = document.querySelector(
@@ -5426,7 +5664,6 @@ data-youtube - Атрибут для кода youtube
   }
   validateUserValueInput();
 
-  initQwiz();
   // кнопеи сантехники
   function countPlumbingItems(params) {
     const plusBtn = document.querySelectorAll(".form-qwiz__btns-plumbing");
@@ -6028,8 +6265,6 @@ data-youtube - Атрибут для кода youtube
 
     // выводим данные в итоги
     function showReusltSeptik(res) {
-      createObjRes(res);
-
       const listResSelector = document.querySelectorAll(
         ".form-qwiz__content-finish",
       );
@@ -6046,6 +6281,7 @@ data-youtube - Атрибут для кода youtube
           const element = listResSelector[indx];
           if (indx === 0) {
             createNewLinkSeptick(element, res);
+
             continue;
           }
           element.innerHTML = arrRes[indx];

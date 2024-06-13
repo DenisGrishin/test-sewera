@@ -2717,7 +2717,7 @@ html {
 }
 
 .sewera-septik .form-qwiz__wrapper-range {
-  padding: 72px 10px 30px;
+  padding: 72px 10px 0px;
 }
 
 .sewera-septik .form-qwiz__input-number {
@@ -2900,16 +2900,15 @@ html {
   -ms-flex-align: center;
   align-items: center;
   background-color: #fff;
-  padding: 30px;
+  padding: 15px 25px;
   border-radius: 4px;
   -webkit-box-orient: vertical;
   -webkit-box-direction: normal;
-  -ms-flex-direction: column;
-  flex-direction: column;
   -webkit-box-align: stretch;
   -ms-flex-align: stretch;
   align-items: stretch;
   width: 100%;
+  margin-bottom: 20px;
 }
 
 .sewera-septik .form-qwiz__block-user {
@@ -2989,6 +2988,7 @@ html {
   -moz-column-gap: 20px;
   column-gap: 20px;
   height: 100%;
+  margin-bottom: 20px;
 }
 
 .sewera-septik .form-qwiz__option {
@@ -4841,6 +4841,9 @@ sewera-septik .form-qwiz__user-contact {
   }
 }
 @media (max-width: 1023.98px) {
+  ._after-none::after {
+    display: none;
+  }
   .sewera-septik .form-qwiz__right-finish {
     -ms-grid-columns: 1fr 1fr;
     grid-template-columns: 1fr 1fr;
@@ -5356,15 +5359,13 @@ sewera-septik .form-qwiz__user-contact {
     -ms-flex-wrap: nowrap;
     flex-wrap: nowrap;
   }
-  .sewera-septik .form-qwiz__text {
-    text-wrap: nowrap;
-  }
   .sewera-septik .form-qwiz__item {
     -webkit-box-flex: 0;
     -ms-flex: 0 1 50%;
     flex: 0 1 50%;
   }
   .sewera-septik .form-qwiz__user-contact {
+    flex-wrap: wrap;
     padding: 20px;
     row-gap: 10px;
   }
@@ -6252,6 +6253,7 @@ sewera-septik .form-qwiz__user-contact {
   .sewera-septik .form-qwiz__user-contact {
     padding: 15px 20px;
     row-gap: 15px;
+    flex-direction: column;
   }
   .sewera-septik .form-qwiz__block-user {
     padding: 0;
