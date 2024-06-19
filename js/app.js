@@ -5692,6 +5692,679 @@ data-youtube - Атрибут для кода youtube
     }
   }
   countPlumbingItems();
+  // function filterSeptik() {
+  //   const dataSeptic = [
+  //     // akvalos
+
+  //     {
+  //       linkSeptik: 'septik-akvalos-2',
+  //       nameSeptik: 'Септик Аквалос 2',
+  //       pipeDepth: '30',
+  //       userValue: '2',
+  //       salvoReleaseVolume: '120',
+  //       energyConsumption: '1,37',
+  //       productivity: '0.4',
+  //       price: '82 800',
+  //       mounting: '27 000',
+  //     },
+  //     {
+  //       linkSeptik: 'septik-akvalos-3',
+  //       nameSeptik: 'Аквалос 3',
+  //       pipeDepth: '50',
+  //       userValue: '2',
+  //       salvoReleaseVolume: '220',
+  //       energyConsumption: '1,37',
+  //       productivity: '0.6',
+  //       price: '93 150',
+  //       mounting: '27 000',
+  //     },
+  //     {
+  //       linkSeptik: 'septik-akvalos-4',
+
+  //       nameSeptik: 'Аквалос 4',
+  //       pipeDepth: '60',
+  //       userValue: '4',
+  //       salvoReleaseVolume: '250',
+  //       energyConsumption: '1,37',
+  //       productivity: '0.8',
+  //       price: '106 200',
+  //       mounting: '27 000',
+  //     },
+  //     {
+  //       linkSeptik: 'septik-akvalos-4-gorizontalnij',
+  //       nameSeptik: 'Аквалос 4 Гориз.',
+  //       pipeDepth: '30',
+  //       userValue: '4',
+  //       salvoReleaseVolume: '250',
+  //       energyConsumption: '0,9',
+  //       productivity: '0.8',
+  //       price: '120 600',
+  //       mounting: '32 000',
+  //     },
+  //     {
+  //       linkSeptik: 'septik-akvalos-5',
+  //       nameSeptik: 'Аквалос 5',
+  //       pipeDepth: '60',
+  //       userValue: '5',
+  //       salvoReleaseVolume: '390',
+  //       energyConsumption: '1,37',
+  //       productivity: '0.9',
+  //       price: '116 100',
+  //       mounting: '34 000',
+  //     },
+  //     {
+  //       linkSeptik: 'septik-akvalos-5-gorizontalnij',
+  //       nameSeptik: 'Аквалос 5 Гориз.',
+  //       pipeDepth: '30',
+  //       userValue: '5',
+  //       salvoReleaseVolume: '300',
+  //       energyConsumption: '0,9',
+  //       productivity: '0.9',
+  //       price: '130 050',
+  //     },
+  //     {
+  //       linkSeptik: 'septik-akvalos-7',
+  //       nameSeptik: 'Аквалос 7',
+  //       pipeDepth: '60',
+  //       userValue: '7',
+  //       salvoReleaseVolume: '550',
+  //       energyConsumption: '1,37',
+  //       productivity: '1.2',
+  //       price: '140 400',
+  //       mounting: '38 000',
+  //     },
+  //     {
+  //       linkSeptik: 'septik-akvalos-7-gorizontalnij',
+  //       nameSeptik: 'Аквалос 7 Гориз.',
+  //       pipeDepth: '30',
+  //       userValue: '7',
+  //       salvoReleaseVolume: '550',
+  //       energyConsumption: '0,9',
+  //       productivity: '1.2',
+  //       price: '158 400',
+  //       mounting: '40 000',
+  //     },
+  //     {
+  //       linkSeptik: 'septik-akvalos-8',
+  //       nameSeptik: 'Аквалос 8',
+  //       pipeDepth: '60',
+  //       userValue: '8',
+  //       salvoReleaseVolume: '700',
+  //       energyConsumption: '1,57',
+  //       productivity: '1.6',
+  //       price: '148 500',
+  //       mounting: '40 000',
+  //     },
+  //     {
+  //       linkSeptik: 'septik-akvalos-10',
+  //       nameSeptik: 'Аквалос 10',
+  //       pipeDepth: '60',
+  //       userValue: '10',
+  //       salvoReleaseVolume: '900',
+  //       energyConsumption: '2,57',
+  //       productivity: '2.0',
+  //       price: '194 400',
+  //       mounting: '49 000',
+  //     },
+  //     {
+  //       linkSeptik: 'septik-akvalos-10-gorizontalnij',
+  //       nameSeptik: 'Аквалос 10 Гориз.',
+  //       pipeDepth: '30',
+  //       userValue: '10',
+  //       salvoReleaseVolume: '800',
+  //       energyConsumption: '0,9',
+  //       productivity: '2.0',
+  //       price: '201 600',
+  //       mounting: '51 000',
+  //     },
+  //     {
+  //       linkSeptik: 'septik-akvalos-15',
+  //       nameSeptik: 'Аквалос 15',
+  //       pipeDepth: '60',
+  //       userValue: '15',
+  //       salvoReleaseVolume: '1125',
+  //       energyConsumption: '2,57',
+  //       productivity: '3.0',
+  //       price: '253 800',
+  //       mounting: '55 000',
+  //     },
+  //     {
+  //       linkSeptik: 'septik-akvalos-20',
+  //       nameSeptik: 'Аквалос 20',
+  //       pipeDepth: '60',
+  //       userValue: '20',
+  //       salvoReleaseVolume: '1350',
+  //       energyConsumption: '1,5',
+  //       productivity: '4.0',
+  //       price: '323 100',
+  //       mounting: '60 000',
+  //     },
+
+  //     //topas
+
+  //     {
+  //       linkSeptik: 'septik-topas-4',
+  //       nameSeptik: 'Топас 4',
+  //       pipeDepth: '60',
+  //       userValue: '4',
+  //       salvoReleaseVolume: '175',
+  //       energyConsumption: '1',
+  //       productivity: '0.8',
+  //       price: '122 310',
+  //       mounting: '27 000',
+  //     },
+  //     {
+  //       linkSeptik: 'septik-topas-5',
+  //       nameSeptik: 'Топас 5',
+  //       pipeDepth: '60',
+  //       userValue: '5',
+  //       salvoReleaseVolume: '220',
+  //       energyConsumption: '1',
+  //       productivity: '1',
+  //       price: '143 550',
+  //       mounting: '34 000',
+  //     },
+  //     {
+  //       linkSeptik: 'septik-topas-6',
+
+  //       nameSeptik: 'Топас 6',
+  //       pipeDepth: '60',
+  //       userValue: '6',
+  //       salvoReleaseVolume: '250',
+  //       energyConsumption: '1',
+  //       productivity: '1.15',
+  //       price: '144 810',
+  //       mounting: '34 000',
+  //     },
+  //     {
+  //       linkSeptik: 'septik-topas-8',
+  //       nameSeptik: 'Топас 8',
+  //       pipeDepth: '60',
+  //       userValue: '8',
+  //       salvoReleaseVolume: '440',
+  //       energyConsumption: '1',
+  //       productivity: '1.5',
+  //       price: '166 410',
+  //       mounting: '40 000',
+  //     },
+  //     {
+  //       linkSeptik: 'septik-topas-9',
+  //       nameSeptik: 'Топас 9',
+  //       pipeDepth: '60',
+  //       userValue: '9',
+  //       salvoReleaseVolume: '510',
+  //       energyConsumption: '1',
+  //       productivity: '1.7',
+  //       price: '168 390',
+  //       mounting: '40 000',
+  //     },
+  //     {
+  //       linkSeptik: 'septik-topas-10',
+  //       nameSeptik: 'Топас 10',
+  //       pipeDepth: '60',
+  //       userValue: '10',
+  //       salvoReleaseVolume: '760',
+  //       energyConsumption: '2',
+  //       productivity: '2',
+  //       price: '226 710',
+  //       mounting: '49 000',
+  //     },
+  //     {
+  //       linkSeptik: 'septik-topas-12',
+  //       nameSeptik: 'Топас 12',
+  //       pipeDepth: '60',
+  //       userValue: '12',
+  //       salvoReleaseVolume: '830',
+  //       energyConsumption: '2',
+  //       productivity: '2.2',
+  //       price: '228 870',
+  //       mounting: '55 000',
+  //     },
+
+  //     //	 astra
+
+  //     {
+  //       linkSeptik: 'septik-astra-3',
+  //       nameSeptik: 'Астра 3',
+  //       pipeDepth: '60',
+  //       userValue: '3',
+  //       salvoReleaseVolume: '130',
+  //       energyConsumption: '1',
+  //       productivity: '0.6',
+  //       price: '102 000',
+  //       mounting: '27 000',
+  //     },
+  //     {
+  //       linkSeptik: 'septik-astra-4',
+  //       nameSeptik: 'Астра 4',
+  //       pipeDepth: '60',
+  //       userValue: '4',
+  //       salvoReleaseVolume: '150',
+  //       energyConsumption: '1',
+  //       productivity: '0.8',
+  //       price: '106 250',
+  //       mounting: '27 000',
+  //     },
+
+  //     {
+  //       linkSeptik: 'septik-astra-5',
+  //       nameSeptik: 'Астра 5',
+  //       pipeDepth: '60',
+  //       userValue: '5',
+  //       salvoReleaseVolume: '250',
+  //       energyConsumption: '1.5',
+  //       productivity: '1',
+  //       price: '123 250',
+  //       mounting: '34 000',
+  //     },
+  //     {
+  //       linkSeptik: 'septik-astra-6',
+
+  //       nameSeptik: 'Астра 6',
+  //       pipeDepth: '60',
+  //       userValue: '6',
+  //       salvoReleaseVolume: '280',
+  //       energyConsumption: '1.5',
+  //       productivity: '1.2',
+  //       price: '130 050',
+  //       mounting: '34 000',
+  //     },
+  //     {
+  //       linkSeptik: 'septik-astra-7',
+  //       nameSeptik: 'Астра 7',
+  //       pipeDepth: '60',
+  //       userValue: '8',
+  //       salvoReleaseVolume: '300',
+  //       energyConsumption: '1.5',
+  //       productivity: '1.4',
+  //       price: '136 850',
+  //       mounting: '38 000',
+  //     },
+  //     {
+  //       linkSeptik: 'septik-astra-8',
+  //       nameSeptik: 'Астра 8',
+  //       pipeDepth: '60',
+  //       userValue: '8',
+  //       salvoReleaseVolume: '350',
+  //       energyConsumption: '1.5',
+  //       productivity: '1.6',
+  //       price: '148 699',
+  //       mounting: '40 000',
+  //     },
+  //     {
+  //       linkSeptik: 'septik-astra-9',
+  //       nameSeptik: 'Астра 9',
+  //       pipeDepth: '60',
+  //       userValue: '9',
+  //       salvoReleaseVolume: '450',
+  //       energyConsumption: '1.5',
+  //       productivity: '1.8',
+  //       price: '169 150',
+  //       mounting: '40 000',
+  //     },
+  //     {
+  //       linkSeptik: 'septik-astra-10',
+  //       nameSeptik: 'Астра 10',
+  //       pipeDepth: '60',
+  //       userValue: '10',
+  //       salvoReleaseVolume: '550',
+  //       energyConsumption: '1.5',
+  //       productivity: '2',
+  //       price: '196 350',
+  //       mounting: '49 000',
+  //     },
+  //     {
+  //       linkSeptik: 'septik-astra-15',
+  //       nameSeptik: 'Астра 15',
+  //       pipeDepth: '60',
+  //       userValue: '15',
+  //       salvoReleaseVolume: '600',
+  //       energyConsumption: '2.4',
+  //       productivity: '3',
+  //       price: '255 000',
+  //       mounting: '55 000',
+  //     },
+
+  //     // Малахит
+
+  //     {
+  //       linkSeptik: 'septik-malahit-4',
+  //       nameSeptik: 'Малахит 4',
+  //       pipeDepth: '60',
+  //       userValue: '4',
+  //       salvoReleaseVolume: '220',
+  //       energyConsumption: '1.2',
+  //       productivity: '0.9',
+  //       price: '116 494',
+  //       mounting: '27 000',
+  //     },
+
+  //     {
+  //       linkSeptik: 'septik-malahit-5',
+  //       nameSeptik: 'Малахит 5',
+  //       pipeDepth: '60',
+  //       userValue: '5',
+  //       salvoReleaseVolume: '263',
+  //       energyConsumption: '1.5',
+  //       productivity: '1',
+  //       price: '137 694',
+  //       mounting: '34 000',
+  //     },
+  //     {
+  //       linkSeptik: 'septik-malahit-6',
+
+  //       nameSeptik: 'Малахит 6',
+  //       pipeDepth: '60',
+  //       userValue: '6',
+  //       salvoReleaseVolume: '290',
+  //       energyConsumption: '1.5',
+  //       productivity: '1.2',
+  //       price: '153 594',
+  //       mounting: '34 000',
+  //     },
+  //     {
+  //       linkSeptik: 'septik-malahit-8',
+  //       nameSeptik: 'Малахит 8',
+  //       pipeDepth: '60',
+  //       userValue: '8',
+  //       salvoReleaseVolume: '420',
+  //       energyConsumption: '1.7',
+  //       productivity: '1.6',
+  //       price: '185 394',
+  //       mounting: '40 000',
+  //     },
+  //     {
+  //       linkSeptik: 'septik-malahit-10',
+
+  //       nameSeptik: 'Малахит 10',
+  //       pipeDepth: '60',
+  //       userValue: '10',
+  //       salvoReleaseVolume: '500',
+  //       energyConsumption: '1.7',
+  //       productivity: '2',
+  //       price: '222 494',
+  //       mounting: '49 000',
+  //     },
+  //     {
+  //       linkSeptik: 'septik-malahit-12',
+  //       nameSeptik: 'Малахит 12',
+  //       pipeDepth: '60',
+  //       userValue: '12',
+  //       salvoReleaseVolume: '645',
+  //       energyConsumption: '1.7',
+  //       productivity: '2.5',
+  //       price: '243 694',
+  //       mounting: '55 000',
+  //     },
+
+  //     // евролос
+
+  //     {
+  //       linkSeptik: 'septik-evrolos-bio-3',
+  //       nameSeptik: 'Евролос БИО 3',
+  //       pipeDepth: '60',
+  //       userValue: '3',
+  //       salvoReleaseVolume: '150',
+  //       energyConsumption: '1',
+  //       productivity: '0.6',
+  //       price: '116 900',
+  //       mounting: '27 000',
+  //     },
+  //     {
+  //       linkSeptik: 'septik-evrolos-bio-4',
+  //       nameSeptik: 'Евролос БИО 4',
+  //       pipeDepth: '60',
+  //       userValue: '4',
+  //       salvoReleaseVolume: '180',
+  //       energyConsumption: '1.2',
+  //       productivity: '0.8',
+  //       price: '122 300',
+  //       mounting: '27 000',
+  //     },
+
+  //     {
+  //       linkSeptik: 'septik-evrolos-bio-5',
+  //       nameSeptik: 'Евролос БИО 5',
+  //       pipeDepth: '60',
+  //       userValue: '5',
+  //       salvoReleaseVolume: '210',
+  //       energyConsumption: '1.5',
+  //       productivity: '1',
+  //       price: '129 400',
+  //       mounting: '34 000',
+  //     },
+  //     {
+  //       linkSeptik: 'septik-evrolos-bio-6',
+
+  //       nameSeptik: 'Евролос БИО 6',
+  //       pipeDepth: '60',
+  //       userValue: '6',
+  //       salvoReleaseVolume: '270',
+  //       energyConsumption: '1.5',
+  //       productivity: '1.3',
+  //       price: '142 500',
+  //       mounting: '34 000',
+  //     },
+  //     {
+  //       linkSeptik: 'septik-evrolos-bio-8',
+  //       nameSeptik: 'Евролос БИО 8',
+  //       pipeDepth: '60',
+  //       userValue: '8',
+  //       salvoReleaseVolume: '370',
+  //       energyConsumption: '1.5',
+  //       productivity: '1.6',
+  //       price: '166 800',
+  //       mounting: '40 000',
+  //     },
+  //     {
+  //       linkSeptik: 'septik-evrolos-bio-10',
+
+  //       nameSeptik: 'Евролос БИО 10',
+  //       pipeDepth: '60',
+  //       userValue: '10',
+  //       salvoReleaseVolume: '550',
+  //       energyConsumption: '1.7',
+  //       productivity: '2',
+  //       price: '208 700',
+  //       mounting: '49 000',
+  //     },
+  //     {
+  //       linkSeptik: 'septik-malahit-12',
+  //       nameSeptik: 'Евролос БИО 12',
+  //       pipeDepth: '60',
+  //       userValue: '12',
+  //       salvoReleaseVolume: '680',
+  //       energyConsumption: '1.7',
+  //       productivity: '2.4',
+  //       price: '228 600',
+  //       mounting: '55 000',
+  //     },
+  //   ];
+  //   const inputRange = document.querySelector('.form-qwiz__input-number  input');
+
+  //   // расчет сколько нужноь производительности септика на n кол-во людей
+  //   function getAmountUserValue() {
+  //     let res = (Number(getQuantityUser()) * 150 * 1.2) / 1000;
+
+  //     if (res <= 0.4) {
+  //       res = 0.4;
+  //     }
+
+  //     return res;
+  //   }
+
+  //   // берем значения с ранжа или инпута
+  //   function getQuantityUser() {
+  //     const valueRange = document.querySelector('.noUi-handle');
+
+  //     return valueRange.ariaValueText === '10+'
+  //       ? inputRange.value
+  //       : valueRange.ariaValueText;
+  //   }
+
+  //   // расчет производительности на всю сантехнику дома (раковины, ванна, туалет и т.д)
+  //   function getValueItemPlumbing() {
+  //     const selectorsCount = document.querySelectorAll(
+  //       '.form-qwiz__count-plumbing'
+  //     );
+  //     let resSum = 0;
+  //     let currentSum = 0;
+  //     selectorsCount.forEach((element) => {
+  //       let dataValue = element.dataset.plumbingValue;
+  //       currentSum = dataValue * element.innerHTML;
+  //       resSum += currentSum;
+  //     });
+
+  //     return resSum;
+  //   }
+
+  //   function resultSeptic() {
+  //     let sum = (
+  //       getAmountUserValue() +
+  //       getValueItemPlumbing() / 1000 / 2
+  //     ).toFixed(1);
+
+  //     if (sum >= 4) {
+  //       sum = 4;
+  //     }
+
+  //     const resFilterRange = filterRange(dataSeptic, +sum, +sum, []);
+
+  //     showReusltSeptik(resFilterRange.slice(0, 3));
+  //   }
+  //   resultSeptic();
+  //   function filterRange(septikArr, min, max, resArr) {
+  //     for (let i = 0; i < septikArr.length; i++) {
+  //       if (
+  //         min <= septikArr[i].productivity &&
+  //         septikArr[i].productivity <= max
+  //       ) {
+  //         resArr.push(septikArr[i]);
+  //         septikArr.splice(i, 1);
+  //       }
+  //     }
+  //     if (max >= 4) {
+  //       return resArr;
+  //     }
+
+  //     return filterRange(septikArr, min, max + 0.1, resArr);
+  //   }
+
+  //   // выводим данные в итоги
+  //   function showReusltSeptik(res) {
+  //     const listResSelector = document.querySelectorAll(
+  //       '.form-qwiz__content-finish'
+  //     );
+
+  //     const sumNameSelector = document.querySelector('.form-qwiz__sum-finish');
+
+  //     let objRes = createObjRes(res);
+
+  //     const [arrRes, sumRes] = objRes;
+
+  //     sumNameSelector.innerHTML = sumRes;
+
+  //     if (objRes) {
+  //       for (let indx = 0; indx < listResSelector.length; indx++) {
+  //         const element = listResSelector[indx];
+  //         if (indx === 0) {
+  //           createNewLinkSeptick(element, res);
+
+  //           continue;
+  //         }
+  //         element.innerHTML = arrRes[indx];
+  //       }
+  //     }
+  //   }
+
+  //   // собираем обьект с данынми
+  //   function createObjRes(res) {
+  //     if (res.length === 0) return;
+
+  //     const resObj = {};
+
+  //     resObj.link = '';
+  //     resObj.userValue = getQuantityUser();
+  //     resObj.plannedSalvoRelease = `${getValueItemPlumbing()} л`;
+  //     resObj.salvoReleaseVolume = `${res[0].salvoReleaseVolume} л`;
+  //     resObj.price = `~${res[0].price} р.`;
+  //     resObj.pipeDepth = `от ${res[0].pipeDepth} см`;
+  //     resObj.deliveryPrice = '9100 р.';
+  //     resObj.productivity = `${res[0].productivity} м3`;
+  //     resObj.mounting = `${res[0].mounting} р.`;
+  //     resObj.energyConsumption = `${res[0].energyConsumption} кВт/сутки`;
+  //     const threeRadioBtns = document.querySelectorAll(
+  //       'input[name="Количество колец"]'
+  //     );
+
+  //     let sumName = new Intl.NumberFormat('ru', {}).format(
+  //       Number(res[0].price.replace(/\s+/g, '')) +
+  //         Number(res[0].mounting.replace(/\s+/g, '')) +
+  //         9100 +
+  //         getValueAdditionalQuestion(threeRadioBtns)
+  //     );
+  //     console.log(getValueAdditionalQuestion(threeRadioBtns));
+  //     let arrRes = Object.values(resObj);
+
+  //     return [arrRes, `${sumName} р.`];
+  //   }
+
+  //   // создаем ссылки на септике в итоге
+  //   // function createNewLinkSeptick(listLink, res) {
+  //   //   let theFirstChild = listLink.firstChild;
+
+  //   //   for (let i = 0; i < 3; i++) {
+  //   //     let newLink = document.createElement('a');
+  //   //     if (res[i]) {
+  //   //       newLink.setAttribute(
+  //   //         'href',
+  //   //         `https://sewera.ru/products/${res[i].linkSeptik}`
+  //   //       );
+  //   //       newLink.setAttribute('target', '_blank');
+  //   //       if (i < 2) {
+  //   //         newLink.innerHTML = `${res[i].nameSeptik}, `;
+  //   //       } else {
+  //   //         newLink.innerHTML = `${res[i].nameSeptik}`;
+  //   //       }
+  //   //       listLink.insertBefore(newLink, theFirstChild);
+  //   //     }
+  //   //   }
+  //   // }
+  //   function createNewLinkSeptick(listLink, res) {
+  //     let inputValue = '';
+  //     let inputName = listLink.previousElementSibling.innerText;
+
+  //     let theFirstChild = listLink.firstChild;
+
+  //     for (let i = 0; i < 3; i++) {
+  //       let newLink = document.createElement('a');
+  //       if (res[i]) {
+  //         newLink.setAttribute(
+  //           'href',
+  //           `https://sewera.ru/products/${res[i].linkSeptik}`
+  //         );
+  //         newLink.setAttribute('target', '_blank');
+  //         if (i < 2) {
+  //           inputValue += `${res[i].nameSeptik}, `;
+  //           newLink.innerHTML = `${res[i].nameSeptik}, `;
+  //         } else {
+  //           inputValue += `${res[i].nameSeptik}`;
+  //           newLink.innerHTML = `${res[i].nameSeptik}`;
+  //         }
+  //         listLink.insertBefore(newLink, theFirstChild);
+  //       }
+  //     }
+
+  //     listLink.insertAdjacentHTML(
+  //       'beforeend',
+  //       '<input type="hidden" name="' +
+  //         inputName +
+  //         '" value="' +
+  //         inputValue +
+  //         '">'
+  //     );
+  //   }
+  // }
   function filterSeptik() {
     const dataSeptic = [
       // akvalos
@@ -6266,6 +6939,9 @@ data-youtube - Атрибут для кода youtube
 
       sumNameSelector.innerHTML = sumRes;
 
+      const sumInput = document.getElementById("finish-sum_input");
+      if (sumInput) sumInput.value = sumRes;
+
       if (objRes) {
         for (let indx = 0; indx < listResSelector.length; indx++) {
           const element = listResSelector[indx];
@@ -6274,7 +6950,14 @@ data-youtube - Атрибут для кода youtube
 
             continue;
           }
-          element.innerHTML = arrRes[indx];
+
+          element.innerHTML =
+            arrRes[indx] +
+            '<input type="hidden" name="' +
+            element.previousElementSibling.innerText +
+            '" value="' +
+            arrRes[indx] +
+            '">';
         }
       }
     }
@@ -6313,6 +6996,9 @@ data-youtube - Атрибут для кода youtube
 
     // создаем ссылки на септике в итоге
     function createNewLinkSeptick(listLink, res) {
+      let inputValue = "";
+      let inputName = listLink.previousElementSibling.innerText;
+
       let theFirstChild = listLink.firstChild;
 
       for (let i = 0; i < 3; i++) {
@@ -6323,10 +7009,25 @@ data-youtube - Атрибут для кода youtube
             `https://sewera.ru/products/${res[i].linkSeptik}`,
           );
           newLink.setAttribute("target", "_blank");
-          newLink.innerHTML = `${res[i].nameSeptik}, `;
+          if (i < 2) {
+            inputValue += `${res[i].nameSeptik}, `;
+            newLink.innerHTML = `${res[i].nameSeptik}, `;
+          } else {
+            inputValue += `${res[i].nameSeptik}`;
+            newLink.innerHTML = `${res[i].nameSeptik}`;
+          }
           listLink.insertBefore(newLink, theFirstChild);
         }
       }
+
+      listLink.insertAdjacentHTML(
+        "beforeend",
+        '<input type="hidden" name="' +
+          inputName +
+          '" value="' +
+          inputValue +
+          '">',
+      );
     }
   } // CONCATENATED MODULE: ./src/js/app.js
 
