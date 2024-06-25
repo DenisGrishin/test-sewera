@@ -411,6 +411,14 @@ html {
   display: inline-block;
 }
 
+.sewera-septik ._table-hidden {
+  display: inline-block;
+}
+
+.sewera-septik ._table-show {
+  display: none;
+}
+
 .sewera-septik ._mobile-show {
   display: none;
 }
@@ -514,7 +522,7 @@ html {
   -webkit-box-flex: 0;
   -ms-flex: 0 0 77%;
   flex: 0 0 77%;
-  max-width: 726px;
+  max-width: 726px !important;
   position: relative;
 }
 
@@ -532,12 +540,8 @@ html {
 
 .sewera-septik .obustroystva-wells-page-bg-img {
   background-position: bottom 90px right -30px;
-  background-size: 530px auto;
+  background-size: 587px auto;
   background-repeat: no-repeat;
-}
-
-.banner__obustroystva-padding {
-  padding: 160px 0 !important;
 }
 
 .sewera-septik .banner__right {
@@ -581,12 +585,13 @@ html {
   -webkit-box-align: center;
   -ms-flex-align: center;
   align-items: center;
-  padding: 30px 20px !important;
+  padding: 20px !important;
 }
 
 .sewera-septik .banner__form,
 .sewera-septik .form-qwiz__user-contact {
   gap: 40px;
+  margin-bottom: 20px;
 }
 
 .sewera-septik .banner__form input,
@@ -681,16 +686,8 @@ html {
 }
 
 .sewera-septik .banner__left-blcok_wide {
-  padding: 60px 0 !important;
+  padding: 130px 0 !important;
   margin-top: 0 !important;
-}
-
-.sewera-septik .banner__wells-padding {
-  padding: 107px 0 !important;
-}
-
-.sewera-septik .wells-page-bg-img + .banner__wells-padding {
-  padding: 49px 0 !important;
 }
 
 .sewera-septik .banner__left-blcok_wide .banner__form {
@@ -763,7 +760,7 @@ html {
   height: 100%;
   top: 0;
   right: -7%;
-  background-position: bottom 0px right 0;
+  background-position: center right 0;
   background-size: 567px auto;
   background-repeat: no-repeat;
 }
@@ -774,7 +771,7 @@ html {
   height: 100%;
   top: 0;
   right: -13%;
-  background-position: bottom -10px right 0;
+  background-position: center right 0;
   background-size: 720px auto;
   background-repeat: no-repeat;
 }
@@ -785,13 +782,13 @@ html {
   height: 100%;
   top: 0;
   right: -464px;
-  background-position: bottom -105px right 0;
+  background-position: top 110% right 20px;
   background-size: 919px auto;
   background-repeat: no-repeat;
 }
 
 .sewera-septik .septic-bg-img {
-  background-position: bottom right;
+  background-position: bottom 20px right;
   background-size: 34.9407114625% auto;
   background-repeat: no-repeat;
 }
@@ -2563,16 +2560,6 @@ html {
   border-bottom: none;
 }
 
-.sewera-septik .banner__form,
-.sewera-septik .form-qwiz__user-contact {
-  gap: 40px;
-}
-
-.sewera-septik .banner__form input,
-.sewera-septik .form-qwiz__user-contact input {
-  outline: 0 !important;
-}
-
 .sewera-septik .form-qwiz__step {
   display: none;
 }
@@ -3925,8 +3912,18 @@ sewera-septik .form-qwiz__user-contact {
   transition: all 0.3s ease 0s;
 }
 
+.sewera-septik .types-wells__slide_two-slide {
+  height: 371px;
+  transition: all 0.3s ease 0s;
+  border-radius: 8px;
+}
+
 .sewera-septik .types-wells__slide_obustroystva:has(._showmore-active) {
   height: 770px;
+}
+
+.sewera-septik .types-wells__slide_two-slide:has(._showmore-active) {
+  height: 460px;
 }
 
 .sewera-septik .types-wells__wrapper-slide_obustroystva:has(._showmore-active) {
@@ -4016,7 +4013,6 @@ sewera-septik .form-qwiz__user-contact {
 
 .sewera-septik .types-wells__price-list {
   margin: 0 0 0 !important;
-  font-size: 14px;
   line-height: 22.1px;
 }
 
@@ -4065,6 +4061,7 @@ sewera-septik .form-qwiz__user-contact {
   align-items: center;
   min-height: 305px;
 }
+
 .sewera-septik .types-wells__right-blog_obustroystva img {
   max-width: 240px;
   transform: translate(0, 0);
@@ -4268,7 +4265,7 @@ sewera-septik .form-qwiz__user-contact {
   display: -ms-flexbox;
   display: flex;
   position: relative;
-  z-index: 1;
+  z-index: 2;
 }
 
 .sewera-septik .calc-wells__block_mb-big {
@@ -4478,6 +4475,10 @@ sewera-septik .form-qwiz__user-contact {
   -webkit-box-direction: normal;
   -ms-flex-direction: column;
   flex-direction: column;
+}
+
+.sewera-septik .calc-wells__wrapper-finish div b {
+  font-size: 20px;
 }
 
 .sewera-septik .calc-wells__sum {
@@ -4699,13 +4700,386 @@ sewera-septik .form-qwiz__user-contact {
   align-items: center;
 }
 
-@media (min-width: 102.5em) {
-  .sewera-septik .banner__left-blcok {
-    padding-top: 4.6875rem;
+.about-well {
+  padding: 30px;
+  border-radius: 8px;
+  display: flex;
+}
+@media (max-width: 1279.98px) {
+  .about-well {
+    padding: 20px;
   }
-  .sewera-septik .banner__left-blcok {
-    padding-bottom: 4.6875rem;
+}
+@media (max-width: 767.98px) {
+  .about-well {
+    flex-direction: column-reverse;
+    row-gap: 15px;
   }
+}
+.about-well__left {
+  max-width: 703px;
+  color: hsla(203, 56%, 14%, 0.8);
+  margin-right: 120px;
+}
+@media (max-width: 1279.98px) {
+  .about-well__left {
+    margin-right: 45px;
+  }
+}
+@media (max-width: 1023.98px) {
+  .about-well__left {
+    margin-right: 30px;
+  }
+}
+@media (max-width: 767.98px) {
+  .about-well__left {
+    margin-right: 0;
+  }
+}
+.about-well__title {
+  margin-bottom: 30px;
+}
+@media (max-width: 1279.98px) {
+  .about-well__title {
+    margin-bottom: 20px !important;
+  }
+}
+@media (max-width: 767.98px) {
+  .about-well__title {
+    margin-bottom: 15px;
+  }
+}
+@media (max-width: 767.98px) {
+  .about-well__list, .about-well__text, .about-well__title {
+    margin-bottom: 15px !important;
+  }
+}
+@media (max-width: 767.98px) {
+  .about-well__list, .about-well__text, .about-well__title {
+    margin-bottom: 15px !important;
+  }
+}
+@media (max-width: 1023.98px) {
+  .about-well__list, .about-well__text {
+    font-size: 14px;
+    line-height: 140%;
+  }
+}
+@media (max-width: 1279.98px) {
+  .about-well__list {
+    margin-bottom: 20px !important;
+  }
+}
+@media (max-width: 767.98px) {
+  .about-well__list {
+    margin-bottom: 15px !important;
+  }
+}
+.about-well__item {
+  list-style: disc !important;
+  line-height: 150%;
+}
+.about-well__item:not(:last-child) {
+  margin-bottom: 3px;
+}
+.about-well__text {
+  margin-bottom: 30px;
+  padding-bottom: 0 !important;
+}
+@media (max-width: 1279.98px) {
+  .about-well__text {
+    margin-bottom: 20px;
+  }
+}
+.about-well__price {
+  margin-bottom: 37px;
+  font-weight: 700;
+  font-size: 20px;
+  line-height: 130%;
+  color: #102938;
+}
+@media (max-width: 1279.98px) {
+  .about-well__price {
+    margin-bottom: 20px;
+    font-size: 18px;
+  }
+}
+@media (max-width: 767.98px) {
+  .about-well__price {
+    margin-bottom: 15px !important;
+    font-size: 16px;
+  }
+}
+.about-well__btn {
+  padding: 14.5px 20px;
+}
+@media (max-width: 767.98px) {
+  .about-well__btn {
+    width: 100%;
+  }
+}
+.about-well__right {
+  align-self: stretch;
+  flex: 1 0 381px;
+  position: relative;
+}
+.about-well__right img {
+  border-radius: 4px;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  object-fit: cover;
+}
+@media (max-width: 1279.98px) {
+  .about-well__right {
+    flex: 1 0 351px;
+  }
+}
+@media (max-width: 1023.98px) {
+  .about-well__right {
+    flex: 1 0 301px;
+  }
+}
+@media (max-width: 767.98px) {
+  .about-well__right {
+    flex: none;
+    height: 260px;
+  }
+  .about-well__right img {
+    object-position: top;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .table-smeta .page-bl {
+    padding-right: 0 !important;
+  }
+}
+.table-smeta__wrapper {
+  padding: 30px;
+  border-radius: 8px;
+}
+@media (max-width: 1023.98px) {
+  .table-smeta__wrapper {
+    padding: 20px;
+  }
+}
+@media (max-width: 767.98px) {
+  .table-smeta__wrapper {
+    border-radius: 8px 0 0px 8px !important;
+    padding-right: 0;
+  }
+}
+.table-smeta__block {
+  margin-bottom: 30px;
+}
+@media (max-width: 767.98px) {
+  .table-smeta__block {
+    margin-bottom: 15px;
+  }
+}
+.table-smeta__showmore {
+  overflow-x: auto;
+}
+.table-smeta__top {
+  padding: 0 10px;
+}
+.table-smeta__sub-title {
+  font-size: 20px;
+  line-height: 130%;
+  margin-bottom: 5px;
+}
+@media (max-width: 1023.98px) {
+  .table-smeta__sub-title {
+    font-size: 18px;
+  }
+}
+.table-smeta__table {
+  padding: 10px;
+  display: grid;
+  grid-template-columns: minmax(260px, 729px) minmax(50px, 115px) minmax(115px, 134px) minmax(115px, 134px);
+  column-gap: 30px;
+  margin: 0 !important;
+  border-radius: 4px;
+  align-items: center;
+}
+.table-smeta__table:nth-child(even) {
+  background: hsla(213, 43%, 96%, 0.5);
+}
+.table-smeta__item {
+  line-height: 150%;
+  border-radius: 4px;
+}
+.table-smeta__item:not(:first-child) {
+  text-wrap: nowrap;
+}
+@media (max-width: 1023.98px) {
+  .table-smeta__item {
+    font-size: 14px;
+    line-height: 140%;
+  }
+}
+.table-smeta__body {
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 10px;
+  margin: 0 !important;
+  overflow-x: auto;
+}
+@media (max-width: 767.98px) {
+  .table-smeta__body {
+    width: 728px;
+  }
+}
+.table-smeta__more {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  column-gap: 8px;
+}
+.table-smeta__table-finish {
+  display: flex;
+  justify-content: space-between;
+  font-weight: 700;
+  font-size: 20px;
+  padding: 10px;
+  background: hsla(213, 43%, 96%, 0.5);
+  line-height: 130%;
+  column-gap: 10px;
+  border-radius: 4px;
+}
+
+.form-table__wrapper {
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 30px;
+}
+@media (max-width: 767.98px) {
+  .form-table__wrapper {
+    margin-right: 15px;
+  }
+}
+.form-table__res-sum {
+  font-size: 24px;
+  line-height: 135%;
+  padding-bottom: 30px;
+  font-weight: 700;
+  border-bottom: 1px solid rgba(16, 41, 56, 0.2);
+  margin-bottom: 30px;
+}
+@media (max-width: 1279.98px) {
+  .form-table__res-sum {
+    font-size: 22px;
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+  }
+}
+@media (max-width: 1023.98px) {
+  .form-table__res-sum {
+    font-size: 20px;
+    line-height: 125%;
+  }
+}
+.form-table__title {
+  margin-bottom: 20px;
+}
+@media (max-width: 1279.98px) {
+  .form-table__title {
+    font-size: 18px;
+  }
+}
+@media (max-width: 1023.98px) {
+  .form-table__title {
+    font-size: 16px;
+  }
+}
+.form-table__from {
+  display: flex;
+  column-gap: 30px;
+}
+@media (max-width: 767.98px) {
+  .form-table__from {
+    flex-direction: column;
+    row-gap: 20px;
+  }
+}
+.form-table__input {
+  flex: 0 1 33.333%;
+  border: 0 !important;
+  background-color: hsla(213, 43%, 96%, 0.5) !important;
+  border-radius: 4px !important;
+  padding: 13px 14px !important;
+}
+.form-table__input::placeholder {
+  font-weight: 400;
+}
+.form-table__btn {
+  flex: 0 1 33.333%;
+}
+
+.popular-models-obsrtv__slider {
+  border-top: 1px solid hsla(203, 56%, 14%, 0.2);
+  border-bottom: 1px solid hsla(203, 56%, 14%, 0.2);
+  border-left: 1px solid hsla(203, 56%, 14%, 0.2);
+}
+@media (max-width: 1023.98px) {
+  .popular-models-obsrtv__slider {
+    margin-left: 40px;
+  }
+}
+@media (max-width: 719.98px) {
+  .popular-models-obsrtv__slider {
+    margin-left: 14px;
+  }
+}
+.popular-models-obsrtv__slide {
+  border-right: 1px solid hsla(203, 56%, 14%, 0.2);
+  padding: 20px;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+}
+.popular-models-obsrtv__img {
+  margin-bottom: 20px;
+  background-color: #f0f4f9;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 246px;
+}
+.popular-models-obsrtv__img img {
+  max-width: 100%;
+  height: 220px;
+}
+.popular-models-obsrtv__wrap-name {
+  display: flex;
+  margin-bottom: 20px;
+  flex: 1 1 auto;
+}
+.popular-models-obsrtv__name-model {
+  align-self: center;
+  font-weight: 700;
+  line-height: 125%;
+}
+.popular-models-obsrtv__bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  column-gap: 10px;
+}
+.popular-models-obsrtv__price {
+  line-height: 125%;
+}
+.popular-models-obsrtv__currnet-p {
+  font-weight: 700;
+}
+.popular-models-obsrtv__discount-p {
+  font-weight: 500;
+  color: hsla(203, 56%, 14%, 0.5);
+  text-decoration: line-through;
 }
 @media (max-width: 1439.98px) {
   .sewera-septik .form-order__wrapper_bottom {
@@ -4771,6 +5145,12 @@ sewera-septik .form-qwiz__user-contact {
   }
 }
 @media (max-width: 1279.98px) {
+  .sewera-septik .types-wells__right-blog {
+    margin-left: -10px;
+  }
+  .sewera-septik .types-wells__price-list {
+    font-size: 18px;
+  }
   .sewera-septik .types-wells__slide_obustroystva:has(._showmore-active) {
     height: 860px;
   }
@@ -4780,17 +5160,14 @@ sewera-septik .form-qwiz__user-contact {
   .sewera-septik .types-wells__wrapper-slide_obustroystva {
     padding: 20px;
   }
-  .sewera-septik .banner__obustroystva-padding {
-    padding: 40px 0 !important;
-  }
   .sewera-septik .obustroystva-wells-page-bg-img {
-    background-position: bottom 15px right -110px;
+    background-position: bottom 57% right -110px;
     background-size: 470px auto;
     background-repeat: no-repeat;
   }
   .sewera-septik .pesok-wells-page-bg-img {
     background-size: 770px auto;
-    background-position: bottom 0px right -200px;
+    background-position: center right -200px;
   }
   .sewera-septik .completed-work__slide {
     padding: 20px 40px;
@@ -4821,10 +5198,9 @@ sewera-septik .form-qwiz__user-contact {
   .sewera-septik .wells-page-bg-img {
     right: -40%;
     background-size: 800px auto;
-    background-position: bottom -100px right 0;
   }
   .sewera-septik .artz-wells-page-bg-img {
-    background-position: bottom 20px right -100px;
+    background-position: center right -100px;
   }
   .sewera-septik .form-order__btn_mobile-decor::before {
     bottom: 41px;
@@ -4833,16 +5209,25 @@ sewera-septik .form-qwiz__user-contact {
     display: inline-block;
   }
   .sewera-septik .banner__left-blcok_wide {
-    padding: 76px 0 !important;
+    padding: 90px 0 !important;
   }
   .sewera-septik .septic-bg-img {
-    background-position: bottom -30px right -78px;
-    background-size: 40.9407114625% auto;
+    background-position: bottom -80px right -126px;
+    background-size: 46.9407114625% auto;
   }
 }
 @media (max-width: 1023.98px) {
+  .sewera-septik ._table-hidden {
+    display: none;
+  }
+  .sewera-septik ._table-show {
+    display: inline-block;
+  }
   ._after-none::after {
     display: none;
+  }
+  .sewera-septik .calc-wells__wrapper-finish div b {
+    font-size: 16px;
   }
   .sewera-septik .form-qwiz__right-finish {
     -ms-grid-columns: 1fr 1fr;
@@ -5495,18 +5880,13 @@ sewera-septik .form-qwiz__user-contact {
     flex-direction: column-reverse;
   }
   .sewera-septik .banner__left-blcok {
-    margin-top: -20px;
-    padding-top: 0;
-    padding-bottom: 20px;
     text-align: center;
     -webkit-box-flex: 0;
     -ms-flex: none;
     flex: none;
-    max-width: 100%;
     -ms-flex-item-align: stretch;
     -ms-grid-row-align: stretch;
     align-self: stretch;
-    padding-top: 180px;
     z-index: 2;
   }
   .sewera-septik .calc-wells__body {
@@ -5652,8 +6032,8 @@ sewera-septik .form-qwiz__user-contact {
     height: 640px;
   }
   .sewera-septik .obustroystva-wells-page-bg-img {
-    background-position: center bottom 365px;
-    background-size: 255px auto;
+    background-position: center bottom 318px;
+    background-size: 275px auto;
     background-repeat: no-repeat;
   }
   .sewera-septik .service-block__texts {
@@ -6586,11 +6966,6 @@ sewera-septik .form-qwiz__user-contact {
   .sewera-septik .types-wells__slide_obustroystva {
     height: 710px;
   }
-  .sewera-septik .obustroystva-wells-page-bg-img {
-    background-position: center top 230px;
-    background-size: 260px auto;
-    background-repeat: no-repeat;
-  }
   .sewera-septik .pesok-wells-page-bg-img {
     right: 0;
     background-size: 290px auto;
@@ -6667,14 +7042,6 @@ sewera-septik .form-qwiz__user-contact {
     background-size: 150px;
   }
 }
-@media (min-width: 64em) and (max-width: 102.5em) {
-  .sewera-septik .banner__left-blcok {
-    padding-top: clamp(3rem, 0.1948051948rem + 4.3831168831vw, 4.6875rem);
-  }
-  .sewera-septik .banner__left-blcok {
-    padding-bottom: clamp(3rem, 0.1948051948rem + 4.3831168831vw, 4.6875rem);
-  }
-}
 @media (min-width: 48em) and (max-width: 64em) {
   .sewera-septik .form-order__title {
     font-size: clamp(1.5rem, 0.75rem + 1.5625vw, 1.75rem);
@@ -6694,11 +7061,6 @@ sewera-septik .form-qwiz__user-contact {
   }
   .sewera-septik .banner__right img {
     margin-left: 0;
-  }
-}
-@media (max-width: 1440.98px) and (min-width: 64em) and (max-width: 89.99875em) {
-  .sewera-septik .banner__right img {
-    width: clamp(18.125rem, 10.2784689168rem + 12.2602048175vw, 21.3125rem);
   }
 }
 @media (max-width: 1023.98px) and (min-width: 63.9375em) {
