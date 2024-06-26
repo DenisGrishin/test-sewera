@@ -4937,9 +4937,9 @@ sewera-septik .form-qwiz__user-contact {
     column-gap: 0;
   }
 }
-@media (max-width: 390.98px) {
+@media (max-width: 395.98px) {
   .table-smeta__table {
-    grid-template-columns: 300px 60px 100px 100px;
+    grid-template-columns: 335px 60px 100px 100px;
   }
 }
 @media (max-width: 375px) {
@@ -4977,6 +4977,7 @@ sewera-septik .form-qwiz__user-contact {
   display: flex;
   align-items: center;
   column-gap: 8px;
+  line-height: 150%;
 }
 ._showmore-active .table-smeta__more {
   display: none;
