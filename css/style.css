@@ -4852,11 +4852,6 @@ sewera-septik .form-qwiz__user-contact {
   }
 }
 
-@media (max-width: 767.98px) {
-  .table-smeta .page-bl {
-    padding-right: 0 !important;
-  }
-}
 .table-smeta__wrapper {
   padding: 30px;
   border-radius: 8px;
@@ -4864,12 +4859,6 @@ sewera-septik .form-qwiz__user-contact {
 @media (max-width: 1023.98px) {
   .table-smeta__wrapper {
     padding: 20px;
-  }
-}
-@media (max-width: 767.98px) {
-  .table-smeta__wrapper {
-    border-radius: 8px 0 0px 8px !important;
-    padding-right: 0;
   }
 }
 .table-smeta__block {
