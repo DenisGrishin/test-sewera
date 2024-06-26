@@ -6375,7 +6375,6 @@ sewera-septik .form-qwiz__user-contact {
   }
   .sewera-septik .types-wells__wrapper-slide {
     padding: 15px;
-    align-items: flex-end;
   }
   .sewera-septik .types-wells__wrapper-slide {
     -webkit-box-orient: vertical;
@@ -6403,6 +6402,7 @@ sewera-septik .form-qwiz__user-contact {
     flex: none;
   }
   .sewera-septik .types-wells__right-blog {
+    align-self: end;
     text-align: center;
     width: 100%;
     -webkit-box-flex: 0;
