@@ -4845,13 +4845,27 @@ sewera-septik .form-qwiz__user-contact {
 @media (max-width: 767.98px) {
   .about-well__right {
     flex: none;
-    height: 260px;
+    height: 323px;
   }
   .about-well__right img {
     object-position: top;
   }
 }
+@media (max-width: 429.98px) {
+  .about-well__right {
+    height: auto;
+  }
+  .about-well__right img {
+    position: static;
+    max-width: 100%;
+  }
+}
 
+@media (max-width: 767.98px) {
+  .table-smeta .page-bl_np {
+    padding: 0 !important;
+  }
+}
 .table-smeta__wrapper {
   padding: 30px;
   border-radius: 8px;
@@ -4859,6 +4873,12 @@ sewera-septik .form-qwiz__user-contact {
 @media (max-width: 1023.98px) {
   .table-smeta__wrapper {
     padding: 20px;
+  }
+}
+@media (max-width: 767.98px) {
+  .table-smeta__wrapper {
+    padding-right: 0;
+    border-radius: 0px;
   }
 }
 .table-smeta__block {
@@ -4869,9 +4889,16 @@ sewera-septik .form-qwiz__user-contact {
     margin-bottom: 5px;
   }
 }
-.table-smeta__body {
+.table-smeta__wrap-body {
   overflow-x: auto;
+}
+.table-smeta__body {
   padding-bottom: 10px;
+}
+@media (max-width: 767.98px) {
+  .table-smeta__body {
+    width: 728px;
+  }
 }
 .table-smeta__top {
   padding: 0 10px;
@@ -4898,6 +4925,21 @@ sewera-septik .form-qwiz__user-contact {
 .table-smeta__table:nth-child(even) {
   background: hsla(213, 43%, 96%, 0.5);
 }
+@media (max-width: 431.98px) {
+  .table-smeta__table {
+    grid-template-columns: 240px 60px 100px 100px;
+  }
+}
+@media (max-width: 390.98px) {
+  .table-smeta__table {
+    grid-template-columns: 300px 60px 100px 100px;
+  }
+}
+@media (max-width: 375px) {
+  .table-smeta__table {
+    grid-template-columns: 285px 60px 100px 100px;
+  }
+}
 .table-smeta__item {
   line-height: 150%;
   border-radius: 4px;
@@ -4918,16 +4960,14 @@ sewera-septik .form-qwiz__user-contact {
   margin: 0 !important;
   overflow-x: auto;
 }
-@media (max-width: 767.98px) {
-  .table-smeta__list {
-    width: 728px;
-  }
-}
 .table-smeta__more {
   margin-top: 10px;
   display: flex;
   align-items: center;
   column-gap: 8px;
+}
+._showmore-active .table-smeta__more {
+  display: none;
 }
 .table-smeta__table-finish {
   display: flex;

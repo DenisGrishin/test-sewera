@@ -3437,7 +3437,7 @@ data-youtube - Атрибут для кода youtube
 
           767.98: {
             autoplay: false,
-            slidesPerView: 1.6,
+            slidesPerView: 1.4,
           },
           1023.98: {
             slidesPerView: 2,
