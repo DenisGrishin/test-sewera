@@ -4897,7 +4897,12 @@ sewera-septik .form-qwiz__user-contact {
 }
 @media (max-width: 767.98px) {
   .table-smeta__body {
-    width: 728px;
+    width: 650px;
+  }
+}
+@media (max-width: 431.98px) {
+  .table-smeta__body {
+    width: 600px;
   }
 }
 .table-smeta__top {
@@ -4916,7 +4921,7 @@ sewera-septik .form-qwiz__user-contact {
 .table-smeta__table {
   padding: 10px;
   display: grid;
-  grid-template-columns: minmax(260px, 729px) minmax(50px, 115px) minmax(115px, 134px) minmax(115px, 134px);
+  grid-template-columns: minmax(260px, 729px) minmax(50px, 115px) minmax(80px, 100px) minmax(80px, 100px);
   column-gap: 30px;
   margin: 0 !important;
   border-radius: 4px;
@@ -4927,17 +4932,8 @@ sewera-septik .form-qwiz__user-contact {
 }
 @media (max-width: 431.98px) {
   .table-smeta__table {
-    grid-template-columns: 240px 60px 100px 100px;
-  }
-}
-@media (max-width: 390.98px) {
-  .table-smeta__table {
     grid-template-columns: 300px 60px 100px 100px;
-  }
-}
-@media (max-width: 375px) {
-  .table-smeta__table {
-    grid-template-columns: 285px 60px 100px 100px;
+    column-gap: 0;
   }
 }
 .table-smeta__item {
@@ -4951,6 +4947,11 @@ sewera-septik .form-qwiz__user-contact {
   .table-smeta__item {
     font-size: 14px;
     line-height: 140%;
+  }
+}
+@media (max-width: 431.98px) {
+  .table-smeta__item:not(:last-child) {
+    margin-right: 7vw;
   }
 }
 .table-smeta__list {
@@ -4980,6 +4981,11 @@ sewera-septik .form-qwiz__user-contact {
   column-gap: 10px;
   border-radius: 4px;
   padding-right: 58px;
+}
+@media (max-width: 767.98px) {
+  .table-smeta__table-finish {
+    font-size: 16px;
+  }
 }
 
 .form-table__wrapper {
