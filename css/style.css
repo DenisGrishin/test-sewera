@@ -4992,7 +4992,11 @@ sewera-septik .form-qwiz__user-contact {
   line-height: 130%;
   column-gap: 10px;
   border-radius: 4px;
-  padding-right: 58px;
+}
+.table-smeta__table-finish span:last-child {
+  text-align: center;
+  flex: 0 1 105px;
+  padding-right: 4px;
 }
 @media (max-width: 767.98px) {
   .table-smeta__table-finish {
@@ -6097,6 +6101,15 @@ sewera-septik .form-qwiz__user-contact {
   }
 }
 @media (max-width: 767.98px) {
+  .sewera-septik .types-wells__slide_two-slide .types-wells__right-blog {
+    min-height: 281px;
+    flex: 1 1 auto;
+    padding-top: 20px;
+  }
+  .sewera-septik .types-wells__slide_two-slide .types-wells__right-blog img {
+    top: 50%;
+    transform: translate(0px, -50%);
+  }
   .sewera-septik .types-wells__slide_two-slide {
     height: 480px;
   }
