@@ -4887,7 +4887,7 @@ sewera-septik .form-qwiz__user-contact {
 @media (max-width: 767.98px) {
   .table-smeta__block {
     padding: 0 20px;
-    overflow-x: auto;
+    overflow-x: scroll;
     margin-bottom: 5px;
   }
 }
