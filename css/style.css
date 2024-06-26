@@ -4873,15 +4873,16 @@ sewera-septik .form-qwiz__user-contact {
   }
 }
 .table-smeta__block {
-  margin-bottom: 30px;
+  margin-bottom: 20px;
 }
 @media (max-width: 767.98px) {
   .table-smeta__block {
-    margin-bottom: 15px;
+    margin-bottom: 5px;
   }
 }
-.table-smeta__showmore {
+.table-smeta__body {
   overflow-x: auto;
+  padding-bottom: 10px;
 }
 .table-smeta__top {
   padding: 0 10px;
@@ -4921,7 +4922,7 @@ sewera-septik .form-qwiz__user-contact {
     line-height: 140%;
   }
 }
-.table-smeta__body {
+.table-smeta__list {
   background-color: #fff;
   border-radius: 8px;
   padding: 10px;
@@ -4929,7 +4930,7 @@ sewera-septik .form-qwiz__user-contact {
   overflow-x: auto;
 }
 @media (max-width: 767.98px) {
-  .table-smeta__body {
+  .table-smeta__list {
     width: 728px;
   }
 }
@@ -4949,6 +4950,7 @@ sewera-septik .form-qwiz__user-contact {
   line-height: 130%;
   column-gap: 10px;
   border-radius: 4px;
+  padding-right: 58px;
 }
 
 .form-table__wrapper {
@@ -5062,7 +5064,13 @@ sewera-septik .form-qwiz__user-contact {
 .popular-models-obsrtv__name-model {
   align-self: center;
   font-weight: 700;
+  transition: all 0.3s ease 0s;
   line-height: 125%;
+}
+@media (any-hover: hover) {
+  .popular-models-obsrtv__name-model:hover {
+    color: #ff6701;
+  }
 }
 .popular-models-obsrtv__bottom {
   display: flex;
@@ -5074,7 +5082,13 @@ sewera-septik .form-qwiz__user-contact {
   line-height: 125%;
 }
 .popular-models-obsrtv__currnet-p {
+  font-size: 20px;
   font-weight: 700;
+}
+@media (max-width: 1023.98px) {
+  .popular-models-obsrtv__currnet-p {
+    font-size: 16px;
+  }
 }
 .popular-models-obsrtv__discount-p {
   font-weight: 500;

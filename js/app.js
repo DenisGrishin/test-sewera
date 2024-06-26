@@ -3414,43 +3414,9 @@ data-youtube - Атрибут для кода youtube
 
   function initSliders() {
     bildSliders();
-    // слайдер 'Виды скважин на воду'
+    // слайдер 'Виды скважин на воду' два слайда
     if (document.querySelector("#types-wells__slider-one")) {
       new Swiper("#types-wells__slider-one", {
-        observer: true,
-        watchSlidesProgress: true,
-        observeParents: true,
-        slidesPerView: 3,
-        spaceBetween: 20,
-        speed: 300,
-        autoHeight: false,
-
-        breakpoints: {
-          319.98: {
-            slidesPerView: 1.3,
-            spaceBetween: 15,
-          },
-          429.98: {
-            slidesPerView: 1.3,
-            spaceBetween: 10,
-          },
-
-          767.98: {
-            autoplay: false,
-            slidesPerView: 1.6,
-          },
-          1023.98: {
-            slidesPerView: 3,
-            spaceBetween: 20,
-            autoplay: false,
-          },
-        },
-        on: {},
-      });
-    }
-    // слайдер 'Виды скважин на воду'
-    if (document.querySelector("#types-wells__slider")) {
-      new Swiper("#types-wells__slider", {
         observer: true,
         watchSlidesProgress: true,
         observeParents: true,
@@ -3480,6 +3446,37 @@ data-youtube - Атрибут для кода youtube
           },
           1279.98: {
             slidesPerView: 2,
+            spaceBetween: 20,
+            autoplay: false,
+          },
+        },
+        on: {},
+      });
+    }
+    // слайдер 'Виды скважин на воду' три слайда
+    if (document.querySelector("#types-wells__slider")) {
+      new Swiper("#types-wells__slider", {
+        slidesPerView: 3,
+        spaceBetween: 20,
+        speed: 300,
+        autoHeight: false,
+
+        breakpoints: {
+          319.98: {
+            slidesPerView: 1.3,
+            spaceBetween: 15,
+          },
+          429.98: {
+            slidesPerView: 1.3,
+            spaceBetween: 10,
+          },
+
+          767.98: {
+            autoplay: false,
+            slidesPerView: 1.6,
+          },
+          1023.98: {
+            slidesPerView: 3,
             spaceBetween: 20,
             autoplay: false,
           },
