@@ -4936,6 +4936,16 @@ sewera-septik .form-qwiz__user-contact {
     column-gap: 0;
   }
 }
+@media (max-width: 390.98px) {
+  .table-smeta__table {
+    grid-template-columns: 300px 60px 100px 100px;
+  }
+}
+@media (max-width: 375px) {
+  .table-smeta__table {
+    grid-template-columns: 285px 60px 100px 100px;
+  }
+}
 .table-smeta__item {
   line-height: 150%;
   border-radius: 4px;
