@@ -6931,10 +6931,14 @@ sewera-septik .form-qwiz__user-contact {
 }
 @media (max-width: 429.98px) {
   .sewera-septik .types-wells__slide_two-slide {
-    height: 520px;
+    height: 530px;
   }
   .sewera-septik .types-wells__slide_two-slide:has(._showmore-active) {
     height: 620px;
+  }
+  .sewera-septik .types-wells__slide_two-slide .types-wells__right-blog {
+    min-height: 240px;
+    padding: 0;
   }
   .sewera-septik .calc-wells__wrapper-inpt_obustroystva {
     grid-template-columns: 1fr;
