@@ -3634,6 +3634,8 @@ data-youtube - Атрибут для кода youtube
         on: {},
       });
     }
+    // слайдер 'Популярные модели скважины '
+
     if (document.querySelector(".popular-models-obsrtv__slider")) {
       new Swiper(".popular-models-obsrtv__slider", {
         slidesPerView: 1,
