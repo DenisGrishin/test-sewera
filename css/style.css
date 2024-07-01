@@ -5256,12 +5256,12 @@ sewera-septik .form-qwiz__user-contact {
     -ms-flex: 1 0 351px;
     flex: 1 0 351px;
   }
-  .form-table__res-sum {
+  .sewera-septik .form-table__res-sum {
     font-size: 22px;
     margin-bottom: 20px;
     padding-bottom: 20px;
   }
-  .form-table__title {
+  .sewera-septik .form-table__title {
     font-size: 18px;
   }
   .sewera-septik .obustroystva-wells-page-bg-img {
@@ -5367,24 +5367,24 @@ sewera-septik .form-qwiz__user-contact {
     -ms-flex: 1 0 301px;
     flex: 1 0 301px;
   }
-  .sewera-septik .table-smeta__wrapper {
+  .sewera-septik .sewera-septik .table-smeta__wrapper {
     padding: 20px 0;
   }
   .sewera-septik .table-smeta__sub-title {
     font-size: 18px;
   }
-  .sewera-septik .table-smeta__item {
+  .sewera-septik .sewera-septik .table-smeta__item {
     font-size: 14px;
     line-height: 140%;
   }
-  .form-table {
+  .sewera-septik .form-table {
     padding: 0 40px;
   }
-  .form-table__res-sum {
+  .sewera-septik .form-table__res-sum {
     font-size: 20px;
     line-height: 125%;
   }
-  .form-table__title {
+  .sewera-septik .form-table__title {
     font-size: 16px;
   }
   .sewera-septik .popular-models-obsrtv__slider {
@@ -6225,7 +6225,7 @@ sewera-septik .form-qwiz__user-contact {
   }
 }
 @media (max-width: 767.98px) {
-  .form-table__res-sum {
+  .sewera-septik .form-table__res-sum {
     font-size: 20px;
     line-height: 125%;
   }
