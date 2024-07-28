@@ -351,14 +351,7 @@
             const n = e.querySelector("[data-showmore-content]"),
               o = e.querySelector("[data-showmore-button]"),
               l = r(e, n);
-            (i.matches || !i) &&
-            l <
-              (function (e) {
-                let t = e.offsetHeight;
-                e.style.removeProperty("height");
-                let s = e.offsetHeight;
-                return (e.style.height = `${t}px`), s;
-              })(n)
+            (i.matches || !i) && l < c(n)
               ? (t(n, 0, l), (o.hidden = !1))
               : (s(n, 0, l), (o.hidden = !0));
           })(e, i);
@@ -377,32 +370,48 @@
         }
         return s;
       }
-      function a(e) {
-        const a = e.target,
-          c = e.type;
-        if ("click" === c) {
-          if (a.closest("[data-showmore-button]")) {
-            const e = a
+      function c(e) {
+        let t = e.offsetHeight;
+        e.style.removeProperty("height");
+        let s = e.offsetHeight;
+        return (e.style.height = `${t}px`), s;
+      }
+      function d(e) {
+        const d = e.target,
+          u = e.type;
+        if ("click" === u) {
+          if (d.closest("[data-showmore-button]")) {
+            const i = d
                 .closest("[data-showmore-button]")
                 .closest("[data-showmore]"),
-              i = e.querySelector("[data-showmore-content]"),
-              n = e.dataset.showmoreButton ? e.dataset.showmoreButton : "500",
-              o = r(e, i);
-            i.classList.contains("_slide") ||
-              (e.classList.contains("_showmore-active")
-                ? t(i, n, o)
-                : s(i, n, o),
-              e.classList.toggle("_showmore-active"));
+              n = i.querySelector("[data-showmore-content]");
+            c(n);
+            const o = i.dataset.showmoreButton
+                ? i.dataset.showmoreButton
+                : "500",
+              l = r(i, n);
+            n.classList.contains("_slide") ||
+              (e.target.closest("._showmore-active") ||
+                a(l, ".stages-work__content"),
+              i.classList.contains("_showmore-active")
+                ? t(n, o, l)
+                : s(n, o, l),
+              i.classList.toggle("_showmore-active"));
           }
-        } else "resize" === c && (i.length && l(i), n.length && o(n));
+        } else "resize" === u && (i.length && l(i), n.length && o(n));
+        document.querySelector(".ya-map__tab") &&
+          "click" === u &&
+          (e.target.matches(".ya-map__tab") || e.stopImmediatePropagation());
       }
       e.length &&
         ((i = Array.from(e).filter(function (e, t, s) {
           return !e.dataset.showmoreMedia;
         })),
         i.length && l(i),
-        document.addEventListener("click", a),
-        window.addEventListener("resize", a),
+        document.querySelectorAll("[data-showmore-button]").forEach((e) => {
+          e.addEventListener("click", d, !0);
+        }),
+        window.addEventListener("resize", d),
         (n = (function (e, t) {
           const s = Array.from(e).filter(function (e, s, i) {
             if (e.dataset[t]) return e.dataset[t].split(",")[0];
@@ -2301,7 +2310,7 @@
             },
             on: {},
           }).on("slideChange", function () {
-            a(0, ".stories__sh-content");
+            a(66, ".stories__sh-content");
           });
         }
         if (
@@ -2336,7 +2345,7 @@
             },
             on: {},
           }).on("slideChange", function () {
-            a(0, ".stages-work__content");
+            a(70, ".stages-work__content");
           });
         }
         if (
