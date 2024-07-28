@@ -1,5944 +1,4857 @@
-/******/ (() => {
-  // webpackBootstrap
-  /******/ "use strict";
-  var __webpack_exports__ = {}; // CONCATENATED MODULE: ./src/js/libs/popup.js
-
-  // Класс Popup
-  class Popup {
-    constructor(options) {
-      let config = {
-        logging: true,
-        init: true,
-        // Для кнопок
-        attributeOpenButton: "data-popup", // Атрибут для кнопки, которая вызывает попап
-        attributeCloseButton: "data-close", // Атрибут для кнопки, которая закрывает попап
-        // Для сторонних объектов
-        fixElementSelector: "[data-lp]", // Атрибут для элементов с левым паддингом (которые fixed)
-        // Для объекта попапа
-        youtubeAttribute: "data-youtube", // Атрибут для кода youtube
-        youtubePlaceAttribute: "data-youtube-place", // Атрибут для вставки ролика youtube
-        setAutoplayYoutube: true,
-        // Изменение классов
-        classes: {
-          popup: "popup",
-          popupWrapper: "popup__wrapper",
-          popupContent: "popup__content",
-          popupActive: "popup_show", // Добавляется для попапа, когда он открывается
-          bodyActive: "popup-show", // Добавляется для боди, когда попап открыт
-        },
-        focusCatch: false, // Фокус внутри попапа зациклен
-        closeEsc: true, // Закрытие по ESC
-        bodyLock: true, // Блокировка скролла
-        bodyLockDelay: 500, // Задержка блокировки скролла
-
-        on: {
-          // События
-          beforeOpen: function () {},
-          afterOpen: function () {},
-          beforeClose: function () {
-            let link = document.querySelectorAll("._video-yt-link");
-            let button = document.querySelectorAll("._video-yt-btn");
-            const videoBlock = document.querySelector("#youtube-slide");
-            if (videoBlock) {
-              button.forEach((element) => {
-                element.style.display = "block";
-              });
-              link.forEach((element) => {
-                element.style.display = "block";
-              });
-
-              videoBlock.remove();
-            }
+(() => {
+  "use strict";
+  (() => {
+    class e {
+      constructor(e) {
+        let t = {
+          logging: !0,
+          init: !0,
+          attributeOpenButton: "data-popup",
+          attributeCloseButton: "data-close",
+          fixElementSelector: "[data-lp]",
+          youtubeAttribute: "data-youtube",
+          youtubePlaceAttribute: "data-youtube-place",
+          setAutoplayYoutube: !0,
+          classes: {
+            popup: "popup",
+            popupWrapper: "popup__wrapper",
+            popupContent: "popup__content",
+            popupActive: "popup_show",
+            bodyActive: "popup-show",
           },
-          afterClose: function () {},
-        },
-      };
-      this.isOpen = false;
-      // Текущее окно
-      this.targetOpen = {
-        selector: false,
-        element: false,
-      };
-      // Предыдущее открытое
-      this.previousOpen = {
-        selector: false,
-        element: false,
-      };
-      // Последнее закрытое
-      this.lastClosed = {
-        selector: false,
-        element: false,
-      };
-      this._dataValue = false;
-      this.hash = false;
-
-      this._reopen = false;
-      this._selectorOpen = false;
-
-      this.lastFocusEl = false;
-      this._focusEl = [
-        "a[href]",
-        'input:not([disabled]):not([type="hidden"]):not([aria-hidden])',
-        "button:not([disabled]):not([aria-hidden])",
-        "select:not([disabled]):not([aria-hidden])",
-        "textarea:not([disabled]):not([aria-hidden])",
-        "area[href]",
-        "iframe",
-        "object",
-        "embed",
-        "[contenteditable]",
-        '[tabindex]:not([tabindex^="-"])',
-      ];
-      //this.options = Object.assign(config, options);
-      this.options = {
-        ...config,
-        ...options,
-        classes: {
-          ...config.classes,
-          ...options?.classes,
-        },
-        hashSettings: {
-          ...config.hashSettings,
-          ...options?.hashSettings,
-        },
-        on: {
-          ...config.on,
-          ...options?.on,
-        },
-      };
-      this.options.init ? this.initPopups() : null;
-    }
-    initPopups() {
-      this.eventsPopup();
-    }
-    eventsPopup() {
-      // Клик на всем документе
-      document.addEventListener(
-        "click",
-        function (e) {
-          // Клик по кнопке "открыть"
-          const buttonOpen = e.target.closest(
-            `[${this.options.attributeOpenButton}]`,
-          );
-          if (buttonOpen) {
-            e.preventDefault();
-            this._dataValue = buttonOpen.getAttribute(
-              this.options.attributeOpenButton,
-            )
-              ? buttonOpen.getAttribute(this.options.attributeOpenButton)
-              : "error";
-            if (this._dataValue !== "error") {
-              if (!this.isOpen) this.lastFocusEl = buttonOpen;
-              this.targetOpen.selector = `${this._dataValue}`;
-              this._selectorOpen = true;
-              this.open();
-              return;
-            }
-
-            return;
-          }
-          // Закрытие на пустом месте (popup__wrapper) и кнопки закрытия (popup__close) для закрытия
-          const buttonClose = e.target.closest(
-            `[${this.options.attributeCloseButton}]`,
-          );
-          console.log();
-          if (
-            buttonClose ||
-            (!e.target.closest(`.submitted__slider-navigation-next`) &&
-              !e.target.closest(`.submitted__slider-navigation-prev`) &&
-              !e.target.closest(`.popup-reels__slide`) &&
-              !e.target.closest(`.popup-video__slide`) &&
-              this.isOpen)
-          ) {
-            e.preventDefault();
-
-            this.close();
-            return;
-          }
-        }.bind(this),
-      );
-      // Закрытие по ESC
-      document.addEventListener(
-        "keydown",
-        function (e) {
-          if (
-            this.options.closeEsc &&
-            e.which == 27 &&
-            e.code === "Escape" &&
-            this.isOpen
-          ) {
-            e.preventDefault();
-            this.close();
-            return;
-          }
-          if (this.options.focusCatch && e.which == 9 && this.isOpen) {
-            this._focusCatch(e);
-            return;
-          }
-        }.bind(this),
-      );
-      // Событие отправки формы
-      if (document.querySelector("form[data-ajax],form[data-dev]")) {
-        document.addEventListener(
-          "formSent",
-          function (e) {
-            const popup = e.detail.form.dataset.popupMessage;
-            if (popup) {
-              this.open(popup);
-            }
-          }.bind(this),
-        );
-      }
-      // Открытие по хешу
-      if (this.options.hashSettings.goHash) {
-        // Проверка изменения адресной строки
-        window.addEventListener(
-          "hashchange",
-          function () {
-            if (window.location.hash) {
-              this._openToHash();
-            } else {
-              this.close(this.targetOpen.selector);
-            }
-          }.bind(this),
-        );
-
-        window.addEventListener(
-          "load",
-          function () {
-            if (window.location.hash) {
-              this._openToHash();
-            }
-          }.bind(this),
-        );
-      }
-    }
-    open(selectorValue) {
-      // Если ввести значение селектора (селектор настраивается в options)
-      if (
-        selectorValue &&
-        typeof selectorValue === "string" &&
-        selectorValue.trim() !== ""
-      ) {
-        this.targetOpen.selector = selectorValue;
-        this._selectorOpen = true;
-      }
-      if (this.isOpen) {
-        this._reopen = true;
-        this.close();
-      }
-      if (!this._selectorOpen)
-        this.targetOpen.selector = this.lastClosed.selector;
-      if (!this._reopen) this.previousActiveElement = document.activeElement;
-
-      this.targetOpen.element = document.querySelector(
-        this.targetOpen.selector,
-      );
-
-      if (this.targetOpen.element) {
-        // YouTube
-        if (
-          this.targetOpen.element.hasAttribute(this.options.youtubeAttribute)
-        ) {
-          const codeVideo = this.targetOpen.element.getAttribute(
-            this.options.youtubeAttribute,
-          );
-
-          const urlVideo = `https://www.youtube.com/embed/${codeVideo}?rel=0&showinfo=0&autoplay=1`;
-
-          const iframe = document.createElement("iframe");
-          iframe.setAttribute("allowfullscreen", "");
-
-          const autoplay = this.options.setAutoplayYoutube ? "autoplay;" : "";
-          iframe.setAttribute("allow", `${autoplay}; encrypted-media`);
-
-          iframe.setAttribute("src", urlVideo);
-
-          if (
-            this.targetOpen.element.querySelector(
-              `[${this.options.youtubePlaceAttribute}]`,
-            )
-          )
-            this.targetOpen.element
-              .querySelector(`[${this.options.youtubePlaceAttribute}]`)
-              .appendChild(iframe);
-        }
-        if (this.options.hashSettings.location) {
-          // Получение хэша и его выставление
-          this._getHash();
-          this._setHash();
-        }
-
-        // До открытия
-        this.options.on.beforeOpen(this);
-
-        this.targetOpen.element.classList.add(this.options.classes.popupActive);
-        document.body.classList.add(this.options.classes.bodyActive);
-
-        // if (!this._reopen) bodyLockToggle();
-        // else this._reopen = false;
-
-        this.targetOpen.element.setAttribute("aria-hidden", "false");
-
-        // // Запоминаю это открытое окно. Оно будет последним открытым
-        this.previousOpen.selector = this.targetOpen.selector;
-        this.previousOpen.element = this.targetOpen.element;
-
-        this._selectorOpen = false;
-
-        this.isOpen = true;
-
-        // После открытия
-        //this.options.on.afterOpen(this);
-
-        // Создаем свое событие после открытия попапа
-        document.dispatchEvent(
-          new CustomEvent("afterPopupOpen", {
-            detail: {
-              popup: this,
+          focusCatch: !1,
+          closeEsc: !0,
+          bodyLock: !0,
+          bodyLockDelay: 500,
+          on: {
+            beforeOpen: function () {},
+            afterOpen: function () {},
+            beforeClose: function () {
+              let e = document.querySelectorAll("._video-yt-link"),
+                t = document.querySelectorAll("._video-yt-btn");
+              const s = document.querySelector("#youtube-slide");
+              s &&
+                (t.forEach((e) => {
+                  e.style.display = "block";
+                }),
+                e.forEach((e) => {
+                  e.style.display = "block";
+                }),
+                s.remove());
             },
-          }),
-        );
-      }
-    }
-
-    close(selectorValue) {
-      if (
-        selectorValue &&
-        typeof selectorValue === "string" &&
-        selectorValue.trim() !== ""
-      ) {
-        this.previousOpen.selector = selectorValue;
-      }
-
-      if (!this.isOpen || !bodyLockStatus) {
-        return;
-      }
-      // До закрытия
-
-      this.options.on.beforeClose(this);
-      // YouTube
-
-      if (this.targetOpen.element.hasAttribute(this.options.youtubeAttribute)) {
-        if (
-          this.targetOpen.element.querySelector(
-            `[${this.options.youtubePlaceAttribute}]`,
-          )
-        )
-          this.targetOpen.element.querySelector(
-            `[${this.options.youtubePlaceAttribute}]`,
-          ).innerHTML = "";
-      }
-
-      this.previousOpen.element.classList.remove(
-        this.options.classes.popupActive,
-      );
-      // aria-hidden
-      this.previousOpen.element.setAttribute("aria-hidden", "true");
-
-      if (!this._reopen) {
-        document.body.classList.remove(this.options.classes.bodyActive);
-        bodyLockToggle();
-        this.isOpen = false;
-      }
-      // Очищение адресной строки
-
-      if (this._selectorOpen) {
-        this.lastClosed.selector = this.previousOpen.selector;
-        this.lastClosed.element = this.previousOpen.element;
-      }
-      // После закрытия
-      this.options.on.afterClose(this);
-    }
-  } // CONCATENATED MODULE: ./src/js/files/functions.js
-
-  // Вспомогательные модули плавного расскрытия и закрытия объекта ======================================================================================================================================================================
-  let _slideUp = (target, duration = 500, showmore = 0) => {
-    if (!target.classList.contains("_slide")) {
-      target.classList.add("_slide");
-      target.style.transitionProperty = "height, margin, padding";
-      target.style.transitionDuration = duration + "ms";
-      target.style.height = `${target.offsetHeight}px`;
-      target.offsetHeight;
-      target.style.overflow = "hidden";
-      target.style.height = showmore ? `${showmore}px` : `0px`;
-      target.style.paddingTop = 0;
-      target.style.paddingBottom = 0;
-      target.style.marginTop = 0;
-      target.style.marginBottom = 0;
-      window.setTimeout(() => {
-        target.hidden = !showmore ? true : false;
-        !showmore ? target.style.removeProperty("height") : null;
-        target.style.removeProperty("padding-top");
-        target.style.removeProperty("padding-bottom");
-        target.style.removeProperty("margin-top");
-        target.style.removeProperty("margin-bottom");
-        !showmore ? target.style.removeProperty("overflow") : null;
-        target.style.removeProperty("transition-duration");
-        target.style.removeProperty("transition-property");
-        target.classList.remove("_slide");
-      }, duration);
-    }
-  };
-  let _slideDown = (target, duration = 500, showmore = 0) => {
-    if (!target.classList.contains("_slide")) {
-      target.classList.add("_slide");
-      target.hidden = target.hidden ? false : null;
-      showmore ? target.style.removeProperty("height") : null;
-      let height = target.offsetHeight;
-      target.style.overflow = "hidden";
-      target.style.height = showmore ? `${showmore}px` : `0px`;
-      target.style.paddingTop = 0;
-      target.style.paddingBottom = 0;
-      target.style.marginTop = 0;
-      target.style.marginBottom = 0;
-      target.offsetHeight;
-      target.style.transitionProperty = "height, margin, padding";
-      target.style.transitionDuration = duration + "ms";
-      target.style.height = height + "px";
-      target.style.removeProperty("padding-top");
-      target.style.removeProperty("padding-bottom");
-      target.style.removeProperty("margin-top");
-      target.style.removeProperty("margin-bottom");
-      window.setTimeout(() => {
-        target.style.removeProperty("height");
-        target.style.removeProperty("overflow");
-        target.style.removeProperty("transition-duration");
-        target.style.removeProperty("transition-property");
-        target.classList.remove("_slide");
-      }, duration);
-    }
-  };
-  let _slideToggle = (target, duration = 500) => {
-    if (target.hidden) {
-      return _slideDown(target, duration);
-    } else {
-      return _slideUp(target, duration);
-    }
-  };
-  // Вспомогательные модули блокировки прокрутки и скочка ====================================================================================================================================================================================================================================================================================
-  // Вспомогательные модули блокировки прокрутки и скочка ====================================================================================================================================================================================================================================================================================
-  let bodyLockStatus = true;
-  let bodyLockToggle = (delay = 1) => {
-    if (document.documentElement.classList.contains("lock")) {
-      bodyUnlock(delay);
-    } else {
-      bodyLock(delay);
-    }
-  };
-  let bodyUnlock = (delay = 1) => {
-    let body = document.querySelector("body");
-    if (bodyLockStatus) {
-      let lock_padding = document.querySelectorAll("[data-lp]");
-      setTimeout(() => {
-        for (let index = 0; index < lock_padding.length; index++) {
-          const el = lock_padding[index];
-          el.style.paddingRight = "0px";
-        }
-        body.style.paddingRight = "0px";
-        document.documentElement.classList.remove("lock");
-      }, delay);
-      bodyLockStatus = false;
-      setTimeout(function () {
-        bodyLockStatus = true;
-      }, delay);
-    }
-  };
-  let bodyLock = (delay = 1) => {
-    let body = document.querySelector("body");
-    if (bodyLockStatus) {
-      let lock_padding = document.querySelectorAll("[data-lp]");
-      for (let index = 0; index < lock_padding.length; index++) {
-        const el = lock_padding[index];
-        el.style.paddingRight =
-          window.innerWidth -
-          document.querySelector(".wrapper").offsetWidth +
-          "px";
-      }
-
-      body.style.paddingRight =
-        window.innerWidth - document.querySelector("body").offsetWidth + "px";
-      document.documentElement.classList.add("lock");
-
-      bodyLockStatus = false;
-      setTimeout(function () {
-        bodyLockStatus = true;
-      }, delay);
-    }
-  };
-  // Модуль работы со спойлерами =======================================================================================================================================================================================================================
-  /*
-Для родителя слойлеров пишем атрибут data-spollers
-Для заголовков слойлеров пишем атрибут data-spoller
-Если нужно включать\выключать работу спойлеров на разных размерах экранов
-пишем параметры ширины и типа брейкпоинта.
-
-Например: 
-data-spollers="992,max" - спойлеры будут работать только на экранах меньше или равно 992px
-data-spollers="768,min" - спойлеры будут работать только на экранах больше или равно 768px
-
-Если нужно что бы в блоке открывался болько один слойлер добавляем атрибут data-one-spoller
-*/
-  function spollers() {
-    const spollersArray = document.querySelectorAll("[data-spollers]");
-    if (spollersArray.length > 0) {
-      // Получение обычных слойлеров
-      const spollersRegular = Array.from(spollersArray).filter(
-        function (item, index, self) {
-          return !item.dataset.spollers.split(",")[0];
-        },
-      );
-      // Инициализация обычных слойлеров
-      if (spollersRegular.length) {
-        initSpollers(spollersRegular);
-      }
-
-      // Инициализация
-      function initSpollers(spollersArray, matchMedia = false) {
-        spollersArray.forEach((spollersBlock) => {
-          spollersBlock = matchMedia ? spollersBlock.item : spollersBlock;
-          if (matchMedia.matches || !matchMedia) {
-            spollersBlock.classList.add("_spoller-init");
-            initSpollerBody(spollersBlock);
-            spollersBlock.addEventListener("click", setSpollerAction);
-          } else {
-            spollersBlock.classList.remove("_spoller-init");
-            initSpollerBody(spollersBlock, false);
-            spollersBlock.removeEventListener("click", setSpollerAction);
-          }
-        });
-      }
-      // Работа с контентом
-      function initSpollerBody(spollersBlock, hideSpollerBody = true) {
-        const spollerTitles = spollersBlock.querySelectorAll("[data-spoller]");
-        if (spollerTitles.length > 0) {
-          spollerTitles.forEach((spollerTitle) => {
-            if (hideSpollerBody) {
-              spollerTitle.removeAttribute("tabindex");
-              if (!spollerTitle.classList.contains("_spoller-active")) {
-                spollerTitle.nextElementSibling.hidden = true;
-              }
-            } else {
-              spollerTitle.setAttribute("tabindex", "-1");
-              spollerTitle.nextElementSibling.hidden = false;
-            }
-          });
-        }
-      }
-      function setSpollerAction(e) {
-        const el = e.target;
-        if (el.closest("[data-spoller]")) {
-          const spollerTitle = el.closest("[data-spoller]");
-          const spollersBlock = spollerTitle.closest("[data-spollers]");
-          const oneSpoller = spollersBlock.hasAttribute("data-one-spoller")
-            ? true
-            : false;
-          if (!spollersBlock.querySelectorAll("._slide").length) {
-            if (
-              oneSpoller &&
-              !spollerTitle.classList.contains("_spoller-active")
-            ) {
-              hideSpollersBody(spollersBlock);
-            }
-            spollerTitle.classList.toggle("_spoller-active");
-            _slideToggle(spollerTitle.nextElementSibling, 300);
-          }
-          e.preventDefault();
-        }
-      }
-      function hideSpollersBody(spollersBlock) {
-        const spollerActiveTitle = spollersBlock.querySelector(
-          "[data-spoller]._spoller-active",
-        );
-        if (spollerActiveTitle) {
-          spollerActiveTitle.classList.remove("_spoller-active");
-          _slideUp(spollerActiveTitle.nextElementSibling, 300);
-        }
-      }
-    }
-  }
-  // Модуь работы с табами =======================================================================================================================================================================================================================
-  /*
-Для родителя табов пишем атрибут data-tabs
-Для родителя заголовков табов пишем атрибут data-tabs-titles
-Для родителя блоков табов пишем атрибут data-tabs-body
-
-Если нужно чтобы табы открывались с анимацией 
-добавляем к data-tabs data-tabs-animate
-По умолчанию, скорость анимации 500ms, 
-указать свою скорость можно так: data-tabs-animate="1000"
-
-Если нужно чтобы табы превращались в "спойлеры" на неком размере экранов пишем параметры ширины.
-Например: data-tabs="992" - табы будут превращаться в спойлеры на экранах меньше или равно 992px
-*/
-  function tabs() {
-    const tabs = document.querySelectorAll("[data-tabs]");
-    let tabsActiveHash = [];
-
-    if (tabs.length > 0) {
-      const hash = location.hash.replace("#", "");
-      if (hash.startsWith("tab-")) {
-        tabsActiveHash = hash.replace("tab-", "").split("-");
-      }
-      tabs.forEach((tabsBlock, index) => {
-        tabsBlock.classList.add("_tab-init");
-        tabsBlock.setAttribute("data-tabs-index", index);
-        tabsBlock.addEventListener("click", setTabsAction);
-        initTabs(tabsBlock);
-      });
-    }
-
-    // Работа с контентом
-    function initTabs(tabsBlock) {
-      const tabsTitles = tabsBlock.querySelectorAll("[data-tabs-titles]>*");
-      const tabsContent = tabsBlock.querySelectorAll("[data-tabs-body]>*");
-      const tabsBlockIndex = tabsBlock.dataset.tabsIndex;
-      const tabsActiveHashBlock = tabsActiveHash[0] == tabsBlockIndex;
-
-      if (tabsActiveHashBlock) {
-        const tabsActiveTitle = tabsBlock.querySelector(
-          "[data-tabs-titles]>._tab-active",
-        );
-        tabsActiveTitle.classList.remove("_tab-active");
-      }
-      if (tabsContent.length > 0) {
-        tabsContent.forEach((tabsContentItem, index) => {
-          tabsTitles[index].setAttribute("data-tabs-title", "");
-          tabsContentItem.setAttribute("data-tabs-item", "");
-
-          if (tabsActiveHashBlock && index == tabsActiveHash[1]) {
-            tabsTitles[index].classList.add("_tab-active");
-          }
-          tabsContentItem.hidden =
-            !tabsTitles[index].classList.contains("_tab-active");
-        });
-      }
-    }
-    function setTabsStatus(tabsBlock) {
-      const tabsTitles = tabsBlock.querySelectorAll("[data-tabs-title]");
-      const tabsContent = tabsBlock.querySelectorAll("[data-tabs-item]");
-      const tabsBlockIndex = tabsBlock.dataset.tabsIndex;
-
-      function isTabsAnamate(tabsBlock) {
-        if (tabsBlock.hasAttribute("data-tabs-animate")) {
-          return tabsBlock.dataset.tabsAnimate > 0
-            ? tabsBlock.dataset.tabsAnimate
-            : 500;
-        }
-      }
-      const tabsBlockAnimate = isTabsAnamate(tabsBlock);
-
-      if (tabsContent.length > 0) {
-        tabsContent.forEach((tabsContentItem, index) => {
-          if (tabsTitles[index].classList.contains("_tab-active")) {
-            if (tabsBlockAnimate) {
-              _slideDown(tabsContentItem, tabsBlockAnimate);
-            } else {
-              tabsContentItem.hidden = false;
-            }
-            if (!tabsContentItem.closest(".popup")) {
-              location.hash = `tab-${tabsBlockIndex}-${index}`;
-            }
-          } else {
-            if (tabsBlockAnimate) {
-              _slideUp(tabsContentItem, tabsBlockAnimate);
-            } else {
-              tabsContentItem.hidden = true;
-            }
-          }
-        });
-      }
-    }
-    function setTabsAction(e) {
-      const el = e.target;
-      if (el.closest("[data-tabs-title]")) {
-        const tabTitle = el.closest("[data-tabs-title]");
-        const tabsBlock = tabTitle.closest("[data-tabs]");
-        if (
-          !tabTitle.classList.contains("_tab-active") &&
-          !tabsBlock.querySelectorAll("._slide").length
-        ) {
-          const tabActiveTitle = tabsBlock.querySelector(
-            "[data-tabs-title]._tab-active",
-          );
-          if (tabActiveTitle) {
-            tabActiveTitle.classList.remove("_tab-active");
-          }
-
-          tabTitle.classList.add("_tab-active");
-          setTabsStatus(tabsBlock);
-        }
-        e.preventDefault();
-      }
-    }
-  }
-
-  // Модуль "показать еще" =======================================================================================================================================================================================================================
-  /*
-Документация по работе в шаблоне:
-data-showmore-media = "768,min"
-data-showmore="size/items"
-data-showmore-content="размер/кол-во"
-data-showmore-button="скорость"
-Сниппет (HTML): showmore
-*/
-  function showMore() {
-    const showMoreBlocks = document.querySelectorAll("[data-showmore]");
-    let showMoreBlocksRegular;
-    let mdQueriesArray;
-    if (showMoreBlocks.length) {
-      // Получение обычных объектов
-      showMoreBlocksRegular = Array.from(showMoreBlocks).filter(
-        function (item, index, self) {
-          return !item.dataset.showmoreMedia;
-        },
-      );
-      // Инициализация обычных объектов
-      showMoreBlocksRegular.length ? initItems(showMoreBlocksRegular) : null;
-
-      document.addEventListener("click", showMoreActions);
-      window.addEventListener("resize", showMoreActions);
-    }
-    function initItemsMedia(mdQueriesArray) {
-      mdQueriesArray.forEach((mdQueriesItem) => {
-        initItems(mdQueriesItem.itemsArray, mdQueriesItem.matchMedia);
-      });
-    }
-    function initItems(showMoreBlocks, matchMedia) {
-      showMoreBlocks.forEach((showMoreBlock) => {
-        initItem(showMoreBlock, matchMedia);
-      });
-    }
-    function initItem(showMoreBlock, matchMedia = false) {
-      showMoreBlock = matchMedia ? showMoreBlock.item : showMoreBlock;
-      const showMoreContent = showMoreBlock.querySelector(
-        "[data-showmore-content]",
-      );
-      const showMoreButton = showMoreBlock.querySelector(
-        "[data-showmore-button]",
-      );
-      const hiddenHeight = getHeight(showMoreBlock, showMoreContent);
-      if (matchMedia.matches || !matchMedia) {
-        if (hiddenHeight < getOriginalHeight(showMoreContent)) {
-          _slideUp(showMoreContent, 0, hiddenHeight);
-          showMoreButton.hidden = false;
-        } else {
-          _slideDown(showMoreContent, 0, hiddenHeight);
-          showMoreButton.hidden = true;
-        }
-      } else {
-        _slideDown(showMoreContent, 0, hiddenHeight);
-        showMoreButton.hidden = true;
-      }
-    }
-    function getHeight(showMoreBlock, showMoreContent) {
-      let hiddenHeight = 0;
-      const showMoreType = showMoreBlock.dataset.showmore
-        ? showMoreBlock.dataset.showmore
-        : "size";
-      if (showMoreType === "items") {
-        const showMoreTypeValue = showMoreContent.dataset.showmoreContent
-          ? showMoreContent.dataset.showmoreContent
-          : 3;
-        const showMoreItems = showMoreContent.children;
-        for (let index = 1; index < showMoreItems.length; index++) {
-          const showMoreItem = showMoreItems[index - 1];
-          hiddenHeight += showMoreItem.offsetHeight;
-          if (index === showMoreTypeValue) break;
-        }
-      } else {
-        const showMoreTypeValue = showMoreContent.dataset.showmoreContent
-          ? showMoreContent.dataset.showmoreContent
-          : 150;
-        hiddenHeight = showMoreTypeValue;
-      }
-      return hiddenHeight;
-    }
-    function getOriginalHeight(showMoreContent) {
-      let hiddenHeight = showMoreContent.offsetHeight;
-      showMoreContent.style.removeProperty("height");
-      let originalHeight = showMoreContent.offsetHeight;
-      showMoreContent.style.height = `${hiddenHeight}px`;
-      return originalHeight;
-    }
-    function showMoreActions(e) {
-      const targetEvent = e.target;
-      const targetType = e.type;
-      if (targetType === "click") {
-        if (targetEvent.closest("[data-showmore-button]")) {
-          const showMoreButton = targetEvent.closest("[data-showmore-button]");
-          const showMoreBlock = showMoreButton.closest("[data-showmore]");
-          const showMoreContent = showMoreBlock.querySelector(
-            "[data-showmore-content]",
-          );
-          const showMoreSpeed = showMoreBlock.dataset.showmoreButton
-            ? showMoreBlock.dataset.showmoreButton
-            : "500";
-          const hiddenHeight = getHeight(showMoreBlock, showMoreContent);
-          if (!showMoreContent.classList.contains("_slide")) {
-            showMoreBlock.classList.contains("_showmore-active")
-              ? _slideUp(showMoreContent, showMoreSpeed, hiddenHeight)
-              : _slideDown(showMoreContent, showMoreSpeed, hiddenHeight);
-            showMoreBlock.classList.toggle("_showmore-active");
-          }
-        }
-      } else if (targetType === "resize") {
-        showMoreBlocksRegular.length ? initItems(showMoreBlocksRegular) : null;
-        // mdQueriesArray.length ? initItemsMedia(mdQueriesArray) : null;
-      }
-    }
-  }
-  // Модуль попапов ===========================================================================================================================================================================================================================
-  /*
-Документация по работе в шаблоне:
-data-popup - Атрибут для кнопки, которая вызывает попап
-data-close - Атрибут для кнопки, которая закрывает попап
-data-youtube - Атрибут для кода youtube
-Сниппет (HTML): pl
-*/
-
-  const initPopups = () => new Popup({}); // CONCATENATED MODULE: ./node_modules/nouislider/dist/nouislider.mjs
-
-  //================================================================================================================================================================================================================================================================================================================
-  // Прочие полезные функции ================================================================================================================================================================================================================================================================================================================
-  //================================================================================================================================================================================================================================================================================================================
-
-  //================================================================================================================================================================================================================================================================================================================
-
-  var PipsMode;
-  (function (PipsMode) {
-    PipsMode["Range"] = "range";
-    PipsMode["Steps"] = "steps";
-    PipsMode["Positions"] = "positions";
-    PipsMode["Count"] = "count";
-    PipsMode["Values"] = "values";
-  })(PipsMode || (PipsMode = {}));
-  var PipsType;
-  (function (PipsType) {
-    PipsType[(PipsType["None"] = -1)] = "None";
-    PipsType[(PipsType["NoValue"] = 0)] = "NoValue";
-    PipsType[(PipsType["LargeValue"] = 1)] = "LargeValue";
-    PipsType[(PipsType["SmallValue"] = 2)] = "SmallValue";
-  })(PipsType || (PipsType = {}));
-  //region Helper Methods
-  function isValidFormatter(entry) {
-    return isValidPartialFormatter(entry) && typeof entry.from === "function";
-  }
-  function isValidPartialFormatter(entry) {
-    // partial formatters only need a to function and not a from function
-    return typeof entry === "object" && typeof entry.to === "function";
-  }
-  function removeElement(el) {
-    el.parentElement.removeChild(el);
-  }
-  function isSet(value) {
-    return value !== null && value !== undefined;
-  }
-  // Bindable version
-  function preventDefault(e) {
-    e.preventDefault();
-  }
-  // Removes duplicates from an array.
-  function unique(array) {
-    return array.filter(function (a) {
-      return !this[a] ? (this[a] = true) : false;
-    }, {});
-  }
-  // Round a value to the closest 'to'.
-  function closest(value, to) {
-    return Math.round(value / to) * to;
-  }
-  // Current position of an element relative to the document.
-  function offset(elem, orientation) {
-    var rect = elem.getBoundingClientRect();
-    var doc = elem.ownerDocument;
-    var docElem = doc.documentElement;
-    var pageOffset = getPageOffset(doc);
-    // getBoundingClientRect contains left scroll in Chrome on Android.
-    // I haven't found a feature detection that proves this. Worst case
-    // scenario on mis-match: the 'tap' feature on horizontal sliders breaks.
-    if (/webkit.*Chrome.*Mobile/i.test(navigator.userAgent)) {
-      pageOffset.x = 0;
-    }
-    return orientation
-      ? rect.top + pageOffset.y - docElem.clientTop
-      : rect.left + pageOffset.x - docElem.clientLeft;
-  }
-  // Checks whether a value is numerical.
-  function isNumeric(a) {
-    return typeof a === "number" && !isNaN(a) && isFinite(a);
-  }
-  // Sets a class and removes it after [duration] ms.
-  function addClassFor(element, className, duration) {
-    if (duration > 0) {
-      addClass(element, className);
-      setTimeout(function () {
-        removeClass(element, className);
-      }, duration);
-    }
-  }
-  // Limits a value to 0 - 100
-  function limit(a) {
-    return Math.max(Math.min(a, 100), 0);
-  }
-  // Wraps a variable as an array, if it isn't one yet.
-  // Note that an input array is returned by reference!
-  function asArray(a) {
-    return Array.isArray(a) ? a : [a];
-  }
-  // Counts decimals
-  function countDecimals(numStr) {
-    numStr = String(numStr);
-    var pieces = numStr.split(".");
-    return pieces.length > 1 ? pieces[1].length : 0;
-  }
-  // http://youmightnotneedjquery.com/#add_class
-  function addClass(el, className) {
-    if (el.classList && !/\s/.test(className)) {
-      el.classList.add(className);
-    } else {
-      el.className += " " + className;
-    }
-  }
-  // http://youmightnotneedjquery.com/#remove_class
-  function removeClass(el, className) {
-    if (el.classList && !/\s/.test(className)) {
-      el.classList.remove(className);
-    } else {
-      el.className = el.className.replace(
-        new RegExp(
-          "(^|\\b)" + className.split(" ").join("|") + "(\\b|$)",
-          "gi",
-        ),
-        " ",
-      );
-    }
-  }
-  // https://plainjs.com/javascript/attributes/adding-removing-and-testing-for-classes-9/
-  function hasClass(el, className) {
-    return el.classList
-      ? el.classList.contains(className)
-      : new RegExp("\\b" + className + "\\b").test(el.className);
-  }
-  // https://developer.mozilla.org/en-US/docs/Web/API/Window/scrollY#Notes
-  function getPageOffset(doc) {
-    var supportPageOffset = window.pageXOffset !== undefined;
-    var isCSS1Compat = (doc.compatMode || "") === "CSS1Compat";
-    var x = supportPageOffset
-      ? window.pageXOffset
-      : isCSS1Compat
-        ? doc.documentElement.scrollLeft
-        : doc.body.scrollLeft;
-    var y = supportPageOffset
-      ? window.pageYOffset
-      : isCSS1Compat
-        ? doc.documentElement.scrollTop
-        : doc.body.scrollTop;
-    return {
-      x: x,
-      y: y,
-    };
-  }
-  // we provide a function to compute constants instead
-  // of accessing window.* as soon as the module needs it
-  // so that we do not compute anything if not needed
-  function getActions() {
-    // Determine the events to bind. IE11 implements pointerEvents without
-    // a prefix, which breaks compatibility with the IE10 implementation.
-    return window.navigator.pointerEnabled
-      ? {
-          start: "pointerdown",
-          move: "pointermove",
-          end: "pointerup",
-        }
-      : window.navigator.msPointerEnabled
-        ? {
-            start: "MSPointerDown",
-            move: "MSPointerMove",
-            end: "MSPointerUp",
-          }
-        : {
-            start: "mousedown touchstart",
-            move: "mousemove touchmove",
-            end: "mouseup touchend",
-          };
-  }
-  // https://github.com/WICG/EventListenerOptions/blob/gh-pages/explainer.md
-  // Issue #785
-  function getSupportsPassive() {
-    var supportsPassive = false;
-    /* eslint-disable */
-    try {
-      var opts = Object.defineProperty({}, "passive", {
-        get: function () {
-          supportsPassive = true;
-        },
-      });
-      // @ts-ignore
-      window.addEventListener("test", null, opts);
-    } catch (e) {}
-    /* eslint-enable */
-    return supportsPassive;
-  }
-  function getSupportsTouchActionNone() {
-    return window.CSS && CSS.supports && CSS.supports("touch-action", "none");
-  }
-  //endregion
-  //region Range Calculation
-  // Determine the size of a sub-range in relation to a full range.
-  function subRangeRatio(pa, pb) {
-    return 100 / (pb - pa);
-  }
-  // (percentage) How many percent is this value of this range?
-  function fromPercentage(range, value, startRange) {
-    return (value * 100) / (range[startRange + 1] - range[startRange]);
-  }
-  // (percentage) Where is this value on this range?
-  function toPercentage(range, value) {
-    return fromPercentage(
-      range,
-      range[0] < 0 ? value + Math.abs(range[0]) : value - range[0],
-      0,
-    );
-  }
-  // (value) How much is this percentage on this range?
-  function isPercentage(range, value) {
-    return (value * (range[1] - range[0])) / 100 + range[0];
-  }
-  function getJ(value, arr) {
-    var j = 1;
-    while (value >= arr[j]) {
-      j += 1;
-    }
-    return j;
-  }
-  // (percentage) Input a value, find where, on a scale of 0-100, it applies.
-  function toStepping(xVal, xPct, value) {
-    if (value >= xVal.slice(-1)[0]) {
-      return 100;
-    }
-    var j = getJ(value, xVal);
-    var va = xVal[j - 1];
-    var vb = xVal[j];
-    var pa = xPct[j - 1];
-    var pb = xPct[j];
-    return pa + toPercentage([va, vb], value) / subRangeRatio(pa, pb);
-  }
-  // (value) Input a percentage, find where it is on the specified range.
-  function fromStepping(xVal, xPct, value) {
-    // There is no range group that fits 100
-    if (value >= 100) {
-      return xVal.slice(-1)[0];
-    }
-    var j = getJ(value, xPct);
-    var va = xVal[j - 1];
-    var vb = xVal[j];
-    var pa = xPct[j - 1];
-    var pb = xPct[j];
-    return isPercentage([va, vb], (value - pa) * subRangeRatio(pa, pb));
-  }
-  // (percentage) Get the step that applies at a certain value.
-  function getStep(xPct, xSteps, snap, value) {
-    if (value === 100) {
-      return value;
-    }
-    var j = getJ(value, xPct);
-    var a = xPct[j - 1];
-    var b = xPct[j];
-    // If 'snap' is set, steps are used as fixed points on the slider.
-    if (snap) {
-      // Find the closest position, a or b.
-      if (value - a > (b - a) / 2) {
-        return b;
-      }
-      return a;
-    }
-    if (!xSteps[j - 1]) {
-      return value;
-    }
-    return xPct[j - 1] + closest(value - xPct[j - 1], xSteps[j - 1]);
-  }
-  //endregion
-  //region Spectrum
-  var Spectrum = /** @class */ (function () {
-    function Spectrum(entry, snap, singleStep) {
-      this.xPct = [];
-      this.xVal = [];
-      this.xSteps = [];
-      this.xNumSteps = [];
-      this.xHighestCompleteStep = [];
-      this.xSteps = [singleStep || false];
-      this.xNumSteps = [false];
-      this.snap = snap;
-      var index;
-      var ordered = [];
-      // Map the object keys to an array.
-      Object.keys(entry).forEach(function (index) {
-        ordered.push([asArray(entry[index]), index]);
-      });
-      // Sort all entries by value (numeric sort).
-      ordered.sort(function (a, b) {
-        return a[0][0] - b[0][0];
-      });
-      // Convert all entries to subranges.
-      for (index = 0; index < ordered.length; index++) {
-        this.handleEntryPoint(ordered[index][1], ordered[index][0]);
-      }
-      // Store the actual step values.
-      // xSteps is sorted in the same order as xPct and xVal.
-      this.xNumSteps = this.xSteps.slice(0);
-      // Convert all numeric steps to the percentage of the subrange they represent.
-      for (index = 0; index < this.xNumSteps.length; index++) {
-        this.handleStepPoint(index, this.xNumSteps[index]);
-      }
-    }
-    Spectrum.prototype.getDistance = function (value) {
-      var distances = [];
-      for (var index = 0; index < this.xNumSteps.length - 1; index++) {
-        distances[index] = fromPercentage(this.xVal, value, index);
-      }
-      return distances;
-    };
-    // Calculate the percentual distance over the whole scale of ranges.
-    // direction: 0 = backwards / 1 = forwards
-    Spectrum.prototype.getAbsoluteDistance = function (
-      value,
-      distances,
-      direction,
-    ) {
-      var xPct_index = 0;
-      // Calculate range where to start calculation
-      if (value < this.xPct[this.xPct.length - 1]) {
-        while (value > this.xPct[xPct_index + 1]) {
-          xPct_index++;
-        }
-      } else if (value === this.xPct[this.xPct.length - 1]) {
-        xPct_index = this.xPct.length - 2;
-      }
-      // If looking backwards and the value is exactly at a range separator then look one range further
-      if (!direction && value === this.xPct[xPct_index + 1]) {
-        xPct_index++;
-      }
-      if (distances === null) {
-        distances = [];
-      }
-      var start_factor;
-      var rest_factor = 1;
-      var rest_rel_distance = distances[xPct_index];
-      var range_pct = 0;
-      var rel_range_distance = 0;
-      var abs_distance_counter = 0;
-      var range_counter = 0;
-      // Calculate what part of the start range the value is
-      if (direction) {
-        start_factor =
-          (value - this.xPct[xPct_index]) /
-          (this.xPct[xPct_index + 1] - this.xPct[xPct_index]);
-      } else {
-        start_factor =
-          (this.xPct[xPct_index + 1] - value) /
-          (this.xPct[xPct_index + 1] - this.xPct[xPct_index]);
-      }
-      // Do until the complete distance across ranges is calculated
-      while (rest_rel_distance > 0) {
-        // Calculate the percentage of total range
-        range_pct =
-          this.xPct[xPct_index + 1 + range_counter] -
-          this.xPct[xPct_index + range_counter];
-        // Detect if the margin, padding or limit is larger then the current range and calculate
-        if (
-          distances[xPct_index + range_counter] * rest_factor +
-            100 -
-            start_factor * 100 >
-          100
-        ) {
-          // If larger then take the percentual distance of the whole range
-          rel_range_distance = range_pct * start_factor;
-          // Rest factor of relative percentual distance still to be calculated
-          rest_factor =
-            (rest_rel_distance - 100 * start_factor) /
-            distances[xPct_index + range_counter];
-          // Set start factor to 1 as for next range it does not apply.
-          start_factor = 1;
-        } else {
-          // If smaller or equal then take the percentual distance of the calculate percentual part of that range
-          rel_range_distance =
-            ((distances[xPct_index + range_counter] * range_pct) / 100) *
-            rest_factor;
-          // No rest left as the rest fits in current range
-          rest_factor = 0;
-        }
-        if (direction) {
-          abs_distance_counter = abs_distance_counter - rel_range_distance;
-          // Limit range to first range when distance becomes outside of minimum range
-          if (this.xPct.length + range_counter >= 1) {
-            range_counter--;
-          }
-        } else {
-          abs_distance_counter = abs_distance_counter + rel_range_distance;
-          // Limit range to last range when distance becomes outside of maximum range
-          if (this.xPct.length - range_counter >= 1) {
-            range_counter++;
-          }
-        }
-        // Rest of relative percentual distance still to be calculated
-        rest_rel_distance = distances[xPct_index + range_counter] * rest_factor;
-      }
-      return value + abs_distance_counter;
-    };
-    Spectrum.prototype.toStepping = function (value) {
-      value = toStepping(this.xVal, this.xPct, value);
-      return value;
-    };
-    Spectrum.prototype.fromStepping = function (value) {
-      return fromStepping(this.xVal, this.xPct, value);
-    };
-    Spectrum.prototype.getStep = function (value) {
-      value = getStep(this.xPct, this.xSteps, this.snap, value);
-      return value;
-    };
-    Spectrum.prototype.getDefaultStep = function (value, isDown, size) {
-      var j = getJ(value, this.xPct);
-      // When at the top or stepping down, look at the previous sub-range
-      if (value === 100 || (isDown && value === this.xPct[j - 1])) {
-        j = Math.max(j - 1, 1);
-      }
-      return (this.xVal[j] - this.xVal[j - 1]) / size;
-    };
-    Spectrum.prototype.getNearbySteps = function (value) {
-      var j = getJ(value, this.xPct);
-      return {
-        stepBefore: {
-          startValue: this.xVal[j - 2],
-          step: this.xNumSteps[j - 2],
-          highestStep: this.xHighestCompleteStep[j - 2],
-        },
-        thisStep: {
-          startValue: this.xVal[j - 1],
-          step: this.xNumSteps[j - 1],
-          highestStep: this.xHighestCompleteStep[j - 1],
-        },
-        stepAfter: {
-          startValue: this.xVal[j],
-          step: this.xNumSteps[j],
-          highestStep: this.xHighestCompleteStep[j],
-        },
-      };
-    };
-    Spectrum.prototype.countStepDecimals = function () {
-      var stepDecimals = this.xNumSteps.map(countDecimals);
-      return Math.max.apply(null, stepDecimals);
-    };
-    Spectrum.prototype.hasNoSize = function () {
-      return this.xVal[0] === this.xVal[this.xVal.length - 1];
-    };
-    // Outside testing
-    Spectrum.prototype.convert = function (value) {
-      return this.getStep(this.toStepping(value));
-    };
-    Spectrum.prototype.handleEntryPoint = function (index, value) {
-      var percentage;
-      // Covert min/max syntax to 0 and 100.
-      if (index === "min") {
-        percentage = 0;
-      } else if (index === "max") {
-        percentage = 100;
-      } else {
-        percentage = parseFloat(index);
-      }
-      // Check for correct input.
-      if (!isNumeric(percentage) || !isNumeric(value[0])) {
-        throw new Error("noUiSlider: 'range' value isn't numeric.");
-      }
-      // Store values.
-      this.xPct.push(percentage);
-      this.xVal.push(value[0]);
-      var value1 = Number(value[1]);
-      // NaN will evaluate to false too, but to keep
-      // logging clear, set step explicitly. Make sure
-      // not to override the 'step' setting with false.
-      if (!percentage) {
-        if (!isNaN(value1)) {
-          this.xSteps[0] = value1;
-        }
-      } else {
-        this.xSteps.push(isNaN(value1) ? false : value1);
-      }
-      this.xHighestCompleteStep.push(0);
-    };
-    Spectrum.prototype.handleStepPoint = function (i, n) {
-      // Ignore 'false' stepping.
-      if (!n) {
-        return;
-      }
-      // Step over zero-length ranges (#948);
-      if (this.xVal[i] === this.xVal[i + 1]) {
-        this.xSteps[i] = this.xHighestCompleteStep[i] = this.xVal[i];
-        return;
-      }
-      // Factor to range ratio
-      this.xSteps[i] =
-        fromPercentage([this.xVal[i], this.xVal[i + 1]], n, 0) /
-        subRangeRatio(this.xPct[i], this.xPct[i + 1]);
-      var totalSteps = (this.xVal[i + 1] - this.xVal[i]) / this.xNumSteps[i];
-      var highestStep = Math.ceil(Number(totalSteps.toFixed(3)) - 1);
-      var step = this.xVal[i] + this.xNumSteps[i] * highestStep;
-      this.xHighestCompleteStep[i] = step;
-    };
-    return Spectrum;
-  })();
-  //endregion
-  //region Options
-  /*	Every input option is tested and parsed. This will prevent
-    endless validation in internal methods. These tests are
-    structured with an item for every option available. An
-    option can be marked as required by setting the 'r' flag.
-    The testing function is provided with three arguments:
-        - The provided value for the option;
-        - A reference to the options object;
-        - The name for the option;
-
-    The testing function returns false when an error is detected,
-    or true when everything is OK. It can also modify the option
-    object, to make sure all values can be correctly looped elsewhere. */
-  //region Defaults
-  var defaultFormatter = {
-    to: function (value) {
-      return value === undefined ? "" : value.toFixed(2);
-    },
-    from: Number,
-  };
-  var cssClasses = {
-    target: "target",
-    base: "base",
-    origin: "origin",
-    handle: "handle",
-    handleLower: "handle-lower",
-    handleUpper: "handle-upper",
-    touchArea: "touch-area",
-    horizontal: "horizontal",
-    vertical: "vertical",
-    background: "background",
-    connect: "connect",
-    connects: "connects",
-    ltr: "ltr",
-    rtl: "rtl",
-    textDirectionLtr: "txt-dir-ltr",
-    textDirectionRtl: "txt-dir-rtl",
-    draggable: "draggable",
-    drag: "state-drag",
-    tap: "state-tap",
-    active: "active",
-    tooltip: "tooltip",
-    pips: "pips",
-    pipsHorizontal: "pips-horizontal",
-    pipsVertical: "pips-vertical",
-    marker: "marker",
-    markerHorizontal: "marker-horizontal",
-    markerVertical: "marker-vertical",
-    markerNormal: "marker-normal",
-    markerLarge: "marker-large",
-    markerSub: "marker-sub",
-    value: "value",
-    valueHorizontal: "value-horizontal",
-    valueVertical: "value-vertical",
-    valueNormal: "value-normal",
-    valueLarge: "value-large",
-    valueSub: "value-sub",
-  };
-  // Namespaces of internal event listeners
-  var INTERNAL_EVENT_NS = {
-    tooltips: ".__tooltips",
-    aria: ".__aria",
-  };
-  //endregion
-  function testStep(parsed, entry) {
-    if (!isNumeric(entry)) {
-      throw new Error("noUiSlider: 'step' is not numeric.");
-    }
-    // The step option can still be used to set stepping
-    // for linear sliders. Overwritten if set in 'range'.
-    parsed.singleStep = entry;
-  }
-  function testKeyboardPageMultiplier(parsed, entry) {
-    if (!isNumeric(entry)) {
-      throw new Error("noUiSlider: 'keyboardPageMultiplier' is not numeric.");
-    }
-    parsed.keyboardPageMultiplier = entry;
-  }
-  function testKeyboardMultiplier(parsed, entry) {
-    if (!isNumeric(entry)) {
-      throw new Error("noUiSlider: 'keyboardMultiplier' is not numeric.");
-    }
-    parsed.keyboardMultiplier = entry;
-  }
-  function testKeyboardDefaultStep(parsed, entry) {
-    if (!isNumeric(entry)) {
-      throw new Error("noUiSlider: 'keyboardDefaultStep' is not numeric.");
-    }
-    parsed.keyboardDefaultStep = entry;
-  }
-  function testRange(parsed, entry) {
-    // Filter incorrect input.
-    if (typeof entry !== "object" || Array.isArray(entry)) {
-      throw new Error("noUiSlider: 'range' is not an object.");
-    }
-    // Catch missing start or end.
-    if (entry.min === undefined || entry.max === undefined) {
-      throw new Error("noUiSlider: Missing 'min' or 'max' in 'range'.");
-    }
-    parsed.spectrum = new Spectrum(
-      entry,
-      parsed.snap || false,
-      parsed.singleStep,
-    );
-  }
-  function testStart(parsed, entry) {
-    entry = asArray(entry);
-    // Validate input. Values aren't tested, as the public .val method
-    // will always provide a valid location.
-    if (!Array.isArray(entry) || !entry.length) {
-      throw new Error("noUiSlider: 'start' option is incorrect.");
-    }
-    // Store the number of handles.
-    parsed.handles = entry.length;
-    // When the slider is initialized, the .val method will
-    // be called with the start options.
-    parsed.start = entry;
-  }
-  function testSnap(parsed, entry) {
-    if (typeof entry !== "boolean") {
-      throw new Error("noUiSlider: 'snap' option must be a boolean.");
-    }
-    // Enforce 100% stepping within subranges.
-    parsed.snap = entry;
-  }
-  function testAnimate(parsed, entry) {
-    if (typeof entry !== "boolean") {
-      throw new Error("noUiSlider: 'animate' option must be a boolean.");
-    }
-    // Enforce 100% stepping within subranges.
-    parsed.animate = entry;
-  }
-  function testAnimationDuration(parsed, entry) {
-    if (typeof entry !== "number") {
-      throw new Error(
-        "noUiSlider: 'animationDuration' option must be a number.",
-      );
-    }
-    parsed.animationDuration = entry;
-  }
-  function testConnect(parsed, entry) {
-    var connect = [false];
-    var i;
-    // Map legacy options
-    if (entry === "lower") {
-      entry = [true, false];
-    } else if (entry === "upper") {
-      entry = [false, true];
-    }
-    // Handle boolean options
-    if (entry === true || entry === false) {
-      for (i = 1; i < parsed.handles; i++) {
-        connect.push(entry);
-      }
-      connect.push(false);
-    }
-    // Reject invalid input
-    else if (
-      !Array.isArray(entry) ||
-      !entry.length ||
-      entry.length !== parsed.handles + 1
-    ) {
-      throw new Error(
-        "noUiSlider: 'connect' option doesn't match handle count.",
-      );
-    } else {
-      connect = entry;
-    }
-    parsed.connect = connect;
-  }
-  function testOrientation(parsed, entry) {
-    // Set orientation to an a numerical value for easy
-    // array selection.
-    switch (entry) {
-      case "horizontal":
-        parsed.ort = 0;
-        break;
-      case "vertical":
-        parsed.ort = 1;
-        break;
-      default:
-        throw new Error("noUiSlider: 'orientation' option is invalid.");
-    }
-  }
-  function testMargin(parsed, entry) {
-    if (!isNumeric(entry)) {
-      throw new Error("noUiSlider: 'margin' option must be numeric.");
-    }
-    // Issue #582
-    if (entry === 0) {
-      return;
-    }
-    parsed.margin = parsed.spectrum.getDistance(entry);
-  }
-  function testLimit(parsed, entry) {
-    if (!isNumeric(entry)) {
-      throw new Error("noUiSlider: 'limit' option must be numeric.");
-    }
-    parsed.limit = parsed.spectrum.getDistance(entry);
-    if (!parsed.limit || parsed.handles < 2) {
-      throw new Error(
-        "noUiSlider: 'limit' option is only supported on linear sliders with 2 or more handles.",
-      );
-    }
-  }
-  function testPadding(parsed, entry) {
-    var index;
-    if (!isNumeric(entry) && !Array.isArray(entry)) {
-      throw new Error(
-        "noUiSlider: 'padding' option must be numeric or array of exactly 2 numbers.",
-      );
-    }
-    if (
-      Array.isArray(entry) &&
-      !(entry.length === 2 || isNumeric(entry[0]) || isNumeric(entry[1]))
-    ) {
-      throw new Error(
-        "noUiSlider: 'padding' option must be numeric or array of exactly 2 numbers.",
-      );
-    }
-    if (entry === 0) {
-      return;
-    }
-    if (!Array.isArray(entry)) {
-      entry = [entry, entry];
-    }
-    // 'getDistance' returns false for invalid values.
-    parsed.padding = [
-      parsed.spectrum.getDistance(entry[0]),
-      parsed.spectrum.getDistance(entry[1]),
-    ];
-    for (index = 0; index < parsed.spectrum.xNumSteps.length - 1; index++) {
-      // last "range" can't contain step size as it is purely an endpoint.
-      if (parsed.padding[0][index] < 0 || parsed.padding[1][index] < 0) {
-        throw new Error(
-          "noUiSlider: 'padding' option must be a positive number(s).",
-        );
-      }
-    }
-    var totalPadding = entry[0] + entry[1];
-    var firstValue = parsed.spectrum.xVal[0];
-    var lastValue = parsed.spectrum.xVal[parsed.spectrum.xVal.length - 1];
-    if (totalPadding / (lastValue - firstValue) > 1) {
-      throw new Error(
-        "noUiSlider: 'padding' option must not exceed 100% of the range.",
-      );
-    }
-  }
-  function testDirection(parsed, entry) {
-    // Set direction as a numerical value for easy parsing.
-    // Invert connection for RTL sliders, so that the proper
-    // handles get the connect/background classes.
-    switch (entry) {
-      case "ltr":
-        parsed.dir = 0;
-        break;
-      case "rtl":
-        parsed.dir = 1;
-        break;
-      default:
-        throw new Error("noUiSlider: 'direction' option was not recognized.");
-    }
-  }
-  function testBehaviour(parsed, entry) {
-    // Make sure the input is a string.
-    if (typeof entry !== "string") {
-      throw new Error(
-        "noUiSlider: 'behaviour' must be a string containing options.",
-      );
-    }
-    // Check if the string contains any keywords.
-    // None are required.
-    var tap = entry.indexOf("tap") >= 0;
-    var drag = entry.indexOf("drag") >= 0;
-    var fixed = entry.indexOf("fixed") >= 0;
-    var snap = entry.indexOf("snap") >= 0;
-    var hover = entry.indexOf("hover") >= 0;
-    var unconstrained = entry.indexOf("unconstrained") >= 0;
-    var dragAll = entry.indexOf("drag-all") >= 0;
-    var smoothSteps = entry.indexOf("smooth-steps") >= 0;
-    if (fixed) {
-      if (parsed.handles !== 2) {
-        throw new Error(
-          "noUiSlider: 'fixed' behaviour must be used with 2 handles",
-        );
-      }
-      // Use margin to enforce fixed state
-      testMargin(parsed, parsed.start[1] - parsed.start[0]);
-    }
-    if (unconstrained && (parsed.margin || parsed.limit)) {
-      throw new Error(
-        "noUiSlider: 'unconstrained' behaviour cannot be used with margin or limit",
-      );
-    }
-    parsed.events = {
-      tap: tap || snap,
-      drag: drag,
-      dragAll: dragAll,
-      smoothSteps: smoothSteps,
-      fixed: fixed,
-      snap: snap,
-      hover: hover,
-      unconstrained: unconstrained,
-    };
-  }
-  function testTooltips(parsed, entry) {
-    if (entry === false) {
-      return;
-    }
-    if (entry === true || isValidPartialFormatter(entry)) {
-      parsed.tooltips = [];
-      for (var i = 0; i < parsed.handles; i++) {
-        parsed.tooltips.push(entry);
-      }
-    } else {
-      entry = asArray(entry);
-      if (entry.length !== parsed.handles) {
-        throw new Error("noUiSlider: must pass a formatter for all handles.");
-      }
-      entry.forEach(function (formatter) {
-        if (
-          typeof formatter !== "boolean" &&
-          !isValidPartialFormatter(formatter)
-        ) {
-          throw new Error(
-            "noUiSlider: 'tooltips' must be passed a formatter or 'false'.",
-          );
-        }
-      });
-      parsed.tooltips = entry;
-    }
-  }
-  function testHandleAttributes(parsed, entry) {
-    if (entry.length !== parsed.handles) {
-      throw new Error("noUiSlider: must pass a attributes for all handles.");
-    }
-    parsed.handleAttributes = entry;
-  }
-  function testAriaFormat(parsed, entry) {
-    if (!isValidPartialFormatter(entry)) {
-      throw new Error("noUiSlider: 'ariaFormat' requires 'to' method.");
-    }
-    parsed.ariaFormat = entry;
-  }
-  function testFormat(parsed, entry) {
-    if (!isValidFormatter(entry)) {
-      throw new Error("noUiSlider: 'format' requires 'to' and 'from' methods.");
-    }
-    parsed.format = entry;
-  }
-  function testKeyboardSupport(parsed, entry) {
-    if (typeof entry !== "boolean") {
-      throw new Error(
-        "noUiSlider: 'keyboardSupport' option must be a boolean.",
-      );
-    }
-    parsed.keyboardSupport = entry;
-  }
-  function testDocumentElement(parsed, entry) {
-    // This is an advanced option. Passed values are used without validation.
-    parsed.documentElement = entry;
-  }
-  function testCssPrefix(parsed, entry) {
-    if (typeof entry !== "string" && entry !== false) {
-      throw new Error("noUiSlider: 'cssPrefix' must be a string or `false`.");
-    }
-    parsed.cssPrefix = entry;
-  }
-  function testCssClasses(parsed, entry) {
-    if (typeof entry !== "object") {
-      throw new Error("noUiSlider: 'cssClasses' must be an object.");
-    }
-    if (typeof parsed.cssPrefix === "string") {
-      parsed.cssClasses = {};
-      Object.keys(entry).forEach(function (key) {
-        parsed.cssClasses[key] = parsed.cssPrefix + entry[key];
-      });
-    } else {
-      parsed.cssClasses = entry;
-    }
-  }
-  // Test all developer settings and parse to assumption-safe values.
-  function testOptions(options) {
-    // To prove a fix for #537, freeze options here.
-    // If the object is modified, an error will be thrown.
-    // Object.freeze(options);
-    var parsed = {
-      margin: null,
-      limit: null,
-      padding: null,
-      animate: true,
-      animationDuration: 300,
-      ariaFormat: defaultFormatter,
-      format: defaultFormatter,
-    };
-    // Tests are executed in the order they are presented here.
-    var tests = {
-      step: { r: false, t: testStep },
-      keyboardPageMultiplier: { r: false, t: testKeyboardPageMultiplier },
-      keyboardMultiplier: { r: false, t: testKeyboardMultiplier },
-      keyboardDefaultStep: { r: false, t: testKeyboardDefaultStep },
-      start: { r: true, t: testStart },
-      connect: { r: true, t: testConnect },
-      direction: { r: true, t: testDirection },
-      snap: { r: false, t: testSnap },
-      animate: { r: false, t: testAnimate },
-      animationDuration: { r: false, t: testAnimationDuration },
-      range: { r: true, t: testRange },
-      orientation: { r: false, t: testOrientation },
-      margin: { r: false, t: testMargin },
-      limit: { r: false, t: testLimit },
-      padding: { r: false, t: testPadding },
-      behaviour: { r: true, t: testBehaviour },
-      ariaFormat: { r: false, t: testAriaFormat },
-      format: { r: false, t: testFormat },
-      tooltips: { r: false, t: testTooltips },
-      keyboardSupport: { r: true, t: testKeyboardSupport },
-      documentElement: { r: false, t: testDocumentElement },
-      cssPrefix: { r: true, t: testCssPrefix },
-      cssClasses: { r: true, t: testCssClasses },
-      handleAttributes: { r: false, t: testHandleAttributes },
-    };
-    var defaults = {
-      connect: false,
-      direction: "ltr",
-      behaviour: "tap",
-      orientation: "horizontal",
-      keyboardSupport: true,
-      cssPrefix: "noUi-",
-      cssClasses: cssClasses,
-      keyboardPageMultiplier: 5,
-      keyboardMultiplier: 1,
-      keyboardDefaultStep: 10,
-    };
-    // AriaFormat defaults to regular format, if any.
-    if (options.format && !options.ariaFormat) {
-      options.ariaFormat = options.format;
-    }
-    // Run all options through a testing mechanism to ensure correct
-    // input. It should be noted that options might get modified to
-    // be handled properly. E.g. wrapping integers in arrays.
-    Object.keys(tests).forEach(function (name) {
-      // If the option isn't set, but it is required, throw an error.
-      if (!isSet(options[name]) && defaults[name] === undefined) {
-        if (tests[name].r) {
-          throw new Error("noUiSlider: '" + name + "' is required.");
-        }
-        return;
-      }
-      tests[name].t(
-        parsed,
-        !isSet(options[name]) ? defaults[name] : options[name],
-      );
-    });
-    // Forward pips options
-    parsed.pips = options.pips;
-    // All recent browsers accept unprefixed transform.
-    // We need -ms- for IE9 and -webkit- for older Android;
-    // Assume use of -webkit- if unprefixed and -ms- are not supported.
-    // https://caniuse.com/#feat=transforms2d
-    var d = document.createElement("div");
-    var msPrefix = d.style.msTransform !== undefined;
-    var noPrefix = d.style.transform !== undefined;
-    parsed.transformRule = noPrefix
-      ? "transform"
-      : msPrefix
-        ? "msTransform"
-        : "webkitTransform";
-    // Pips don't move, so we can place them using left/top.
-    var styles = [
-      ["left", "top"],
-      ["right", "bottom"],
-    ];
-    parsed.style = styles[parsed.dir][parsed.ort];
-    return parsed;
-  }
-  //endregion
-  function scope(target, options, originalOptions) {
-    var actions = getActions();
-    var supportsTouchActionNone = getSupportsTouchActionNone();
-    var supportsPassive = supportsTouchActionNone && getSupportsPassive();
-    // All variables local to 'scope' are prefixed with 'scope_'
-    // Slider DOM Nodes
-    var scope_Target = target;
-    var scope_Base;
-    var scope_Handles;
-    var scope_Connects;
-    var scope_Pips;
-    var scope_Tooltips;
-    // Slider state values
-    var scope_Spectrum = options.spectrum;
-    var scope_Values = [];
-    var scope_Locations = [];
-    var scope_HandleNumbers = [];
-    var scope_ActiveHandlesCount = 0;
-    var scope_Events = {};
-    // Document Nodes
-    var scope_Document = target.ownerDocument;
-    var scope_DocumentElement =
-      options.documentElement || scope_Document.documentElement;
-    var scope_Body = scope_Document.body;
-    // For horizontal sliders in standard ltr documents,
-    // make .noUi-origin overflow to the left so the document doesn't scroll.
-    var scope_DirOffset =
-      scope_Document.dir === "rtl" || options.ort === 1 ? 0 : 100;
-    // Creates a node, adds it to target, returns the new node.
-    function addNodeTo(addTarget, className) {
-      var div = scope_Document.createElement("div");
-      if (className) {
-        addClass(div, className);
-      }
-      addTarget.appendChild(div);
-      return div;
-    }
-    // Append a origin to the base
-    function addOrigin(base, handleNumber) {
-      var origin = addNodeTo(base, options.cssClasses.origin);
-      var handle = addNodeTo(origin, options.cssClasses.handle);
-      addNodeTo(handle, options.cssClasses.touchArea);
-      handle.setAttribute("data-handle", String(handleNumber));
-      if (options.keyboardSupport) {
-        // https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/tabindex
-        // 0 = focusable and reachable
-        handle.setAttribute("tabindex", "0");
-        handle.addEventListener("keydown", function (event) {
-          return eventKeydown(event, handleNumber);
-        });
-      }
-      if (options.handleAttributes !== undefined) {
-        var attributes_1 = options.handleAttributes[handleNumber];
-        Object.keys(attributes_1).forEach(function (attribute) {
-          handle.setAttribute(attribute, attributes_1[attribute]);
-        });
-      }
-      handle.setAttribute("role", "slider");
-      handle.setAttribute(
-        "aria-orientation",
-        options.ort ? "vertical" : "horizontal",
-      );
-      if (handleNumber === 0) {
-        addClass(handle, options.cssClasses.handleLower);
-      } else if (handleNumber === options.handles - 1) {
-        addClass(handle, options.cssClasses.handleUpper);
-      }
-      origin.handle = handle;
-      return origin;
-    }
-    // Insert nodes for connect elements
-    function addConnect(base, add) {
-      if (!add) {
-        return false;
-      }
-      return addNodeTo(base, options.cssClasses.connect);
-    }
-    // Add handles to the slider base.
-    function addElements(connectOptions, base) {
-      var connectBase = addNodeTo(base, options.cssClasses.connects);
-      scope_Handles = [];
-      scope_Connects = [];
-      scope_Connects.push(addConnect(connectBase, connectOptions[0]));
-      // [::::O====O====O====]
-      // connectOptions = [0, 1, 1, 1]
-      for (var i = 0; i < options.handles; i++) {
-        // Keep a list of all added handles.
-        scope_Handles.push(addOrigin(base, i));
-        scope_HandleNumbers[i] = i;
-        scope_Connects.push(addConnect(connectBase, connectOptions[i + 1]));
-      }
-    }
-    // Initialize a single slider.
-    function addSlider(addTarget) {
-      // Apply classes and data to the target.
-      addClass(addTarget, options.cssClasses.target);
-      if (options.dir === 0) {
-        addClass(addTarget, options.cssClasses.ltr);
-      } else {
-        addClass(addTarget, options.cssClasses.rtl);
-      }
-      if (options.ort === 0) {
-        addClass(addTarget, options.cssClasses.horizontal);
-      } else {
-        addClass(addTarget, options.cssClasses.vertical);
-      }
-      var textDirection = getComputedStyle(addTarget).direction;
-      if (textDirection === "rtl") {
-        addClass(addTarget, options.cssClasses.textDirectionRtl);
-      } else {
-        addClass(addTarget, options.cssClasses.textDirectionLtr);
-      }
-      return addNodeTo(addTarget, options.cssClasses.base);
-    }
-    function addTooltip(handle, handleNumber) {
-      if (!options.tooltips || !options.tooltips[handleNumber]) {
-        return false;
-      }
-      return addNodeTo(handle.firstChild, options.cssClasses.tooltip);
-    }
-    function isSliderDisabled() {
-      return scope_Target.hasAttribute("disabled");
-    }
-    // Disable the slider dragging if any handle is disabled
-    function isHandleDisabled(handleNumber) {
-      var handleOrigin = scope_Handles[handleNumber];
-      return handleOrigin.hasAttribute("disabled");
-    }
-    function disable(handleNumber) {
-      if (handleNumber !== null && handleNumber !== undefined) {
-        scope_Handles[handleNumber].setAttribute("disabled", "");
-        scope_Handles[handleNumber].handle.removeAttribute("tabindex");
-      } else {
-        scope_Target.setAttribute("disabled", "");
-        scope_Handles.forEach(function (handle) {
-          handle.handle.removeAttribute("tabindex");
-        });
-      }
-    }
-    function enable(handleNumber) {
-      if (handleNumber !== null && handleNumber !== undefined) {
-        scope_Handles[handleNumber].removeAttribute("disabled");
-        scope_Handles[handleNumber].handle.setAttribute("tabindex", "0");
-      } else {
-        scope_Target.removeAttribute("disabled");
-        scope_Handles.forEach(function (handle) {
-          handle.removeAttribute("disabled");
-          handle.handle.setAttribute("tabindex", "0");
-        });
-      }
-    }
-    function removeTooltips() {
-      if (scope_Tooltips) {
-        removeEvent("update" + INTERNAL_EVENT_NS.tooltips);
-        scope_Tooltips.forEach(function (tooltip) {
-          if (tooltip) {
-            removeElement(tooltip);
-          }
-        });
-        scope_Tooltips = null;
-      }
-    }
-    // The tooltips option is a shorthand for using the 'update' event.
-    function tooltips() {
-      removeTooltips();
-      // Tooltips are added with options.tooltips in original order.
-      scope_Tooltips = scope_Handles.map(addTooltip);
-      bindEvent(
-        "update" + INTERNAL_EVENT_NS.tooltips,
-        function (values, handleNumber, unencoded) {
-          if (!scope_Tooltips || !options.tooltips) {
-            return;
-          }
-          if (scope_Tooltips[handleNumber] === false) {
-            return;
-          }
-          var formattedValue = values[handleNumber];
-          if (options.tooltips[handleNumber] !== true) {
-            formattedValue = options.tooltips[handleNumber].to(
-              unencoded[handleNumber],
-            );
-          }
-          scope_Tooltips[handleNumber].innerHTML = formattedValue;
-        },
-      );
-    }
-    function aria() {
-      removeEvent("update" + INTERNAL_EVENT_NS.aria);
-      bindEvent(
-        "update" + INTERNAL_EVENT_NS.aria,
-        function (values, handleNumber, unencoded, tap, positions) {
-          // Update Aria Values for all handles, as a change in one changes min and max values for the next.
-          scope_HandleNumbers.forEach(function (index) {
-            var handle = scope_Handles[index];
-            var min = checkHandlePosition(
-              scope_Locations,
-              index,
-              0,
-              true,
-              true,
-              true,
-            );
-            var max = checkHandlePosition(
-              scope_Locations,
-              index,
-              100,
-              true,
-              true,
-              true,
-            );
-            var now = positions[index];
-            // Formatted value for display
-            var text = String(options.ariaFormat.to(unencoded[index]));
-            // Map to slider range values
-            min = scope_Spectrum.fromStepping(min).toFixed(1);
-            max = scope_Spectrum.fromStepping(max).toFixed(1);
-            now = scope_Spectrum.fromStepping(now).toFixed(1);
-            handle.children[0].setAttribute("aria-valuemin", min);
-            handle.children[0].setAttribute("aria-valuemax", max);
-            handle.children[0].setAttribute("aria-valuenow", now);
-            handle.children[0].setAttribute("aria-valuetext", text);
-          });
-        },
-      );
-    }
-    function getGroup(pips) {
-      // Use the range.
-      if (pips.mode === PipsMode.Range || pips.mode === PipsMode.Steps) {
-        return scope_Spectrum.xVal;
-      }
-      if (pips.mode === PipsMode.Count) {
-        if (pips.values < 2) {
-          throw new Error(
-            "noUiSlider: 'values' (>= 2) required for mode 'count'.",
-          );
-        }
-        // Divide 0 - 100 in 'count' parts.
-        var interval = pips.values - 1;
-        var spread = 100 / interval;
-        var values = [];
-        // List these parts and have them handled as 'positions'.
-        while (interval--) {
-          values[interval] = interval * spread;
-        }
-        values.push(100);
-        return mapToRange(values, pips.stepped);
-      }
-      if (pips.mode === PipsMode.Positions) {
-        // Map all percentages to on-range values.
-        return mapToRange(pips.values, pips.stepped);
-      }
-      if (pips.mode === PipsMode.Values) {
-        // If the value must be stepped, it needs to be converted to a percentage first.
-        if (pips.stepped) {
-          return pips.values.map(function (value) {
-            // Convert to percentage, apply step, return to value.
-            return scope_Spectrum.fromStepping(
-              scope_Spectrum.getStep(scope_Spectrum.toStepping(value)),
-            );
-          });
-        }
-        // Otherwise, we can simply use the values.
-        return pips.values;
-      }
-      return []; // pips.mode = never
-    }
-    function mapToRange(values, stepped) {
-      return values.map(function (value) {
-        return scope_Spectrum.fromStepping(
-          stepped ? scope_Spectrum.getStep(value) : value,
-        );
-      });
-    }
-    function generateSpread(pips) {
-      function safeIncrement(value, increment) {
-        // Avoid floating point variance by dropping the smallest decimal places.
-        return Number((value + increment).toFixed(7));
-      }
-      var group = getGroup(pips);
-      var indexes = {};
-      var firstInRange = scope_Spectrum.xVal[0];
-      var lastInRange = scope_Spectrum.xVal[scope_Spectrum.xVal.length - 1];
-      var ignoreFirst = false;
-      var ignoreLast = false;
-      var prevPct = 0;
-      // Create a copy of the group, sort it and filter away all duplicates.
-      group = unique(
-        group.slice().sort(function (a, b) {
-          return a - b;
-        }),
-      );
-      // Make sure the range starts with the first element.
-      if (group[0] !== firstInRange) {
-        group.unshift(firstInRange);
-        ignoreFirst = true;
-      }
-      // Likewise for the last one.
-      if (group[group.length - 1] !== lastInRange) {
-        group.push(lastInRange);
-        ignoreLast = true;
-      }
-      group.forEach(function (current, index) {
-        // Get the current step and the lower + upper positions.
-        var step;
-        var i;
-        var q;
-        var low = current;
-        var high = group[index + 1];
-        var newPct;
-        var pctDifference;
-        var pctPos;
-        var type;
-        var steps;
-        var realSteps;
-        var stepSize;
-        var isSteps = pips.mode === PipsMode.Steps;
-        // When using 'steps' mode, use the provided steps.
-        // Otherwise, we'll step on to the next subrange.
-        if (isSteps) {
-          step = scope_Spectrum.xNumSteps[index];
-        }
-        // Default to a 'full' step.
-        if (!step) {
-          step = high - low;
-        }
-        // If high is undefined we are at the last subrange. Make sure it iterates once (#1088)
-        if (high === undefined) {
-          high = low;
-        }
-        // Make sure step isn't 0, which would cause an infinite loop (#654)
-        step = Math.max(step, 0.0000001);
-        // Find all steps in the subrange.
-        for (i = low; i <= high; i = safeIncrement(i, step)) {
-          // Get the percentage value for the current step,
-          // calculate the size for the subrange.
-          newPct = scope_Spectrum.toStepping(i);
-          pctDifference = newPct - prevPct;
-          steps = pctDifference / (pips.density || 1);
-          realSteps = Math.round(steps);
-          // This ratio represents the amount of percentage-space a point indicates.
-          // For a density 1 the points/percentage = 1. For density 2, that percentage needs to be re-divided.
-          // Round the percentage offset to an even number, then divide by two
-          // to spread the offset on both sides of the range.
-          stepSize = pctDifference / realSteps;
-          // Divide all points evenly, adding the correct number to this subrange.
-          // Run up to <= so that 100% gets a point, event if ignoreLast is set.
-          for (q = 1; q <= realSteps; q += 1) {
-            // The ratio between the rounded value and the actual size might be ~1% off.
-            // Correct the percentage offset by the number of points
-            // per subrange. density = 1 will result in 100 points on the
-            // full range, 2 for 50, 4 for 25, etc.
-            pctPos = prevPct + q * stepSize;
-            indexes[pctPos.toFixed(5)] = [
-              scope_Spectrum.fromStepping(pctPos),
-              0,
-            ];
-          }
-          // Determine the point type.
-          type =
-            group.indexOf(i) > -1
-              ? PipsType.LargeValue
-              : isSteps
-                ? PipsType.SmallValue
-                : PipsType.NoValue;
-          // Enforce the 'ignoreFirst' option by overwriting the type for 0.
-          if (!index && ignoreFirst && i !== high) {
-            type = 0;
-          }
-          if (!(i === high && ignoreLast)) {
-            // Mark the 'type' of this point. 0 = plain, 1 = real value, 2 = step value.
-            indexes[newPct.toFixed(5)] = [i, type];
-          }
-          // Update the percentage count.
-          prevPct = newPct;
-        }
-      });
-      return indexes;
-    }
-    function addMarking(spread, filterFunc, formatter) {
-      var _a, _b;
-      var element = scope_Document.createElement("div");
-      var valueSizeClasses =
-        ((_a = {}),
-        (_a[PipsType.None] = ""),
-        (_a[PipsType.NoValue] = options.cssClasses.valueNormal),
-        (_a[PipsType.LargeValue] = options.cssClasses.valueLarge),
-        (_a[PipsType.SmallValue] = options.cssClasses.valueSub),
-        _a);
-      var markerSizeClasses =
-        ((_b = {}),
-        (_b[PipsType.None] = ""),
-        (_b[PipsType.NoValue] = options.cssClasses.markerNormal),
-        (_b[PipsType.LargeValue] = options.cssClasses.markerLarge),
-        (_b[PipsType.SmallValue] = options.cssClasses.markerSub),
-        _b);
-      var valueOrientationClasses = [
-        options.cssClasses.valueHorizontal,
-        options.cssClasses.valueVertical,
-      ];
-      var markerOrientationClasses = [
-        options.cssClasses.markerHorizontal,
-        options.cssClasses.markerVertical,
-      ];
-      addClass(element, options.cssClasses.pips);
-      addClass(
-        element,
-        options.ort === 0
-          ? options.cssClasses.pipsHorizontal
-          : options.cssClasses.pipsVertical,
-      );
-      function getClasses(type, source) {
-        var a = source === options.cssClasses.value;
-        var orientationClasses = a
-          ? valueOrientationClasses
-          : markerOrientationClasses;
-        var sizeClasses = a ? valueSizeClasses : markerSizeClasses;
-        return (
-          source +
-          " " +
-          orientationClasses[options.ort] +
-          " " +
-          sizeClasses[type]
-        );
-      }
-      function addSpread(offset, value, type) {
-        // Apply the filter function, if it is set.
-        type = filterFunc ? filterFunc(value, type) : type;
-        if (type === PipsType.None) {
-          return;
-        }
-        // Add a marker for every point
-        var node = addNodeTo(element, false);
-        node.className = getClasses(type, options.cssClasses.marker);
-        node.style[options.style] = offset + "%";
-        // Values are only appended for points marked '1' or '2'.
-        if (type > PipsType.NoValue) {
-          node = addNodeTo(element, false);
-          node.className = getClasses(type, options.cssClasses.value);
-          node.setAttribute("data-value", String(value));
-          node.style[options.style] = offset + "%";
-          node.innerHTML = String(formatter.to(value));
-        }
-      }
-      // Append all points.
-      Object.keys(spread).forEach(function (offset) {
-        addSpread(offset, spread[offset][0], spread[offset][1]);
-      });
-      return element;
-    }
-    function removePips() {
-      if (scope_Pips) {
-        removeElement(scope_Pips);
-        scope_Pips = null;
-      }
-    }
-    function pips(pips) {
-      // Fix #669
-      removePips();
-      var spread = generateSpread(pips);
-      var filter = pips.filter;
-      var format = pips.format || {
-        to: function (value) {
-          return String(Math.round(value));
-        },
-      };
-      scope_Pips = scope_Target.appendChild(addMarking(spread, filter, format));
-      return scope_Pips;
-    }
-    // Shorthand for base dimensions.
-    function baseSize() {
-      var rect = scope_Base.getBoundingClientRect();
-      var alt = "offset" + ["Width", "Height"][options.ort];
-      return options.ort === 0
-        ? rect.width || scope_Base[alt]
-        : rect.height || scope_Base[alt];
-    }
-    // Handler for attaching events trough a proxy.
-    function attachEvent(events, element, callback, data) {
-      // This function can be used to 'filter' events to the slider.
-      // element is a node, not a nodeList
-      var method = function (event) {
-        var e = fixEvent(event, data.pageOffset, data.target || element);
-        // fixEvent returns false if this event has a different target
-        // when handling (multi-) touch events;
-        if (!e) {
-          return false;
-        }
-        // doNotReject is passed by all end events to make sure released touches
-        // are not rejected, leaving the slider "stuck" to the cursor;
-        if (isSliderDisabled() && !data.doNotReject) {
-          return false;
-        }
-        // Stop if an active 'tap' transition is taking place.
-        if (
-          hasClass(scope_Target, options.cssClasses.tap) &&
-          !data.doNotReject
-        ) {
-          return false;
-        }
-        // Ignore right or middle clicks on start #454
-        if (
-          events === actions.start &&
-          e.buttons !== undefined &&
-          e.buttons > 1
-        ) {
-          return false;
-        }
-        // Ignore right or middle clicks on start #454
-        if (data.hover && e.buttons) {
-          return false;
-        }
-        // 'supportsPassive' is only true if a browser also supports touch-action: none in CSS.
-        // iOS safari does not, so it doesn't get to benefit from passive scrolling. iOS does support
-        // touch-action: manipulation, but that allows panning, which breaks
-        // sliders after zooming/on non-responsive pages.
-        // See: https://bugs.webkit.org/show_bug.cgi?id=133112
-        if (!supportsPassive) {
-          e.preventDefault();
-        }
-        e.calcPoint = e.points[options.ort];
-        // Call the event handler with the event [ and additional data ].
-        callback(e, data);
-        return;
-      };
-      var methods = [];
-      // Bind a closure on the target for every event type.
-      events.split(" ").forEach(function (eventName) {
-        element.addEventListener(
-          eventName,
-          method,
-          supportsPassive ? { passive: true } : false,
-        );
-        methods.push([eventName, method]);
-      });
-      return methods;
-    }
-    // Provide a clean event with standardized offset values.
-    function fixEvent(e, pageOffset, eventTarget) {
-      // Filter the event to register the type, which can be
-      // touch, mouse or pointer. Offset changes need to be
-      // made on an event specific basis.
-      var touch = e.type.indexOf("touch") === 0;
-      var mouse = e.type.indexOf("mouse") === 0;
-      var pointer = e.type.indexOf("pointer") === 0;
-      var x = 0;
-      var y = 0;
-      // IE10 implemented pointer events with a prefix;
-      if (e.type.indexOf("MSPointer") === 0) {
-        pointer = true;
-      }
-      // Erroneous events seem to be passed in occasionally on iOS/iPadOS after user finishes interacting with
-      // the slider. They appear to be of type MouseEvent, yet they don't have usual properties set. Ignore
-      // events that have no touches or buttons associated with them. (#1057, #1079, #1095)
-      if (e.type === "mousedown" && !e.buttons && !e.touches) {
-        return false;
-      }
-      // The only thing one handle should be concerned about is the touches that originated on top of it.
-      if (touch) {
-        // Returns true if a touch originated on the target.
-        var isTouchOnTarget = function (checkTouch) {
-          var target = checkTouch.target;
-          return (
-            target === eventTarget ||
-            eventTarget.contains(target) ||
-            (e.composed && e.composedPath().shift() === eventTarget)
-          );
+            afterClose: function () {},
+          },
         };
-        // In the case of touchstart events, we need to make sure there is still no more than one
-        // touch on the target so we look amongst all touches.
-        if (e.type === "touchstart") {
-          var targetTouches = Array.prototype.filter.call(
-            e.touches,
-            isTouchOnTarget,
-          );
-          // Do not support more than one touch per handle.
-          if (targetTouches.length > 1) {
-            return false;
-          }
-          x = targetTouches[0].pageX;
-          y = targetTouches[0].pageY;
-        } else {
-          // In the other cases, find on changedTouches is enough.
-          var targetTouch = Array.prototype.find.call(
-            e.changedTouches,
-            isTouchOnTarget,
-          );
-          // Cancel if the target touch has not moved.
-          if (!targetTouch) {
-            return false;
-          }
-          x = targetTouch.pageX;
-          y = targetTouch.pageY;
-        }
+        (this.isOpen = !1),
+          (this.targetOpen = { selector: !1, element: !1 }),
+          (this.previousOpen = { selector: !1, element: !1 }),
+          (this.lastClosed = { selector: !1, element: !1 }),
+          (this._dataValue = !1),
+          (this.hash = !1),
+          (this._reopen = !1),
+          (this._selectorOpen = !1),
+          (this.lastFocusEl = !1),
+          (this._focusEl = [
+            "a[href]",
+            'input:not([disabled]):not([type="hidden"]):not([aria-hidden])',
+            "button:not([disabled]):not([aria-hidden])",
+            "select:not([disabled]):not([aria-hidden])",
+            "textarea:not([disabled]):not([aria-hidden])",
+            "area[href]",
+            "iframe",
+            "object",
+            "embed",
+            "[contenteditable]",
+            '[tabindex]:not([tabindex^="-"])',
+          ]),
+          (this.options = {
+            ...t,
+            ...e,
+            classes: { ...t.classes, ...e?.classes },
+            hashSettings: { ...t.hashSettings, ...e?.hashSettings },
+            on: { ...t.on, ...e?.on },
+          }),
+          this.options.init && this.initPopups();
       }
-      pageOffset = pageOffset || getPageOffset(scope_Document);
-      if (mouse || pointer) {
-        x = e.clientX + pageOffset.x;
-        y = e.clientY + pageOffset.y;
+      initPopups() {
+        this.eventsPopup();
       }
-      e.pageOffset = pageOffset;
-      e.points = [x, y];
-      e.cursor = mouse || pointer; // Fix #435
-      return e;
-    }
-    // Translate a coordinate in the document to a percentage on the slider
-    function calcPointToPercentage(calcPoint) {
-      var location = calcPoint - offset(scope_Base, options.ort);
-      var proposal = (location * 100) / baseSize();
-      // Clamp proposal between 0% and 100%
-      // Out-of-bound coordinates may occur when .noUi-base pseudo-elements
-      // are used (e.g. contained handles feature)
-      proposal = limit(proposal);
-      return options.dir ? 100 - proposal : proposal;
-    }
-    // Find handle closest to a certain percentage on the slider
-    function getClosestHandle(clickedPosition) {
-      var smallestDifference = 100;
-      var handleNumber = false;
-      scope_Handles.forEach(function (handle, index) {
-        // Disabled handles are ignored
-        if (isHandleDisabled(index)) {
-          return;
-        }
-        var handlePosition = scope_Locations[index];
-        var differenceWithThisHandle = Math.abs(
-          handlePosition - clickedPosition,
-        );
-        // Initial state
-        var clickAtEdge =
-          differenceWithThisHandle === 100 && smallestDifference === 100;
-        // Difference with this handle is smaller than the previously checked handle
-        var isCloser = differenceWithThisHandle < smallestDifference;
-        var isCloserAfter =
-          differenceWithThisHandle <= smallestDifference &&
-          clickedPosition > handlePosition;
-        if (isCloser || isCloserAfter || clickAtEdge) {
-          handleNumber = index;
-          smallestDifference = differenceWithThisHandle;
-        }
-      });
-      return handleNumber;
-    }
-    // Fire 'end' when a mouse or pen leaves the document.
-    function documentLeave(event, data) {
-      if (
-        event.type === "mouseout" &&
-        event.target.nodeName === "HTML" &&
-        event.relatedTarget === null
-      ) {
-        eventEnd(event, data);
-      }
-    }
-    // Handle movement on document for handle and range drag.
-    function eventMove(event, data) {
-      // Fix #498
-      // Check value of .buttons in 'start' to work around a bug in IE10 mobile (data.buttonsProperty).
-      // https://connect.microsoft.com/IE/feedback/details/927005/mobile-ie10-windows-phone-buttons-property-of-pointermove-event-always-zero
-      // IE9 has .buttons and .which zero on mousemove.
-      // Firefox breaks the spec MDN defines.
-      if (
-        navigator.appVersion.indexOf("MSIE 9") === -1 &&
-        event.buttons === 0 &&
-        data.buttonsProperty !== 0
-      ) {
-        return eventEnd(event, data);
-      }
-      // Check if we are moving up or down
-      var movement =
-        (options.dir ? -1 : 1) * (event.calcPoint - data.startCalcPoint);
-      // Convert the movement into a percentage of the slider width/height
-      var proposal = (movement * 100) / data.baseSize;
-      moveHandles(
-        movement > 0,
-        proposal,
-        data.locations,
-        data.handleNumbers,
-        data.connect,
-      );
-    }
-    // Unbind move events on document, call callbacks.
-    function eventEnd(event, data) {
-      // The handle is no longer active, so remove the class.
-      if (data.handle) {
-        removeClass(data.handle, options.cssClasses.active);
-        scope_ActiveHandlesCount -= 1;
-      }
-      // Unbind the move and end events, which are added on 'start'.
-      data.listeners.forEach(function (c) {
-        scope_DocumentElement.removeEventListener(c[0], c[1]);
-      });
-      if (scope_ActiveHandlesCount === 0) {
-        // Remove dragging class.
-        removeClass(scope_Target, options.cssClasses.drag);
-        setZindex();
-        // Remove cursor styles and text-selection events bound to the body.
-        if (event.cursor) {
-          scope_Body.style.cursor = "";
-          scope_Body.removeEventListener("selectstart", preventDefault);
-        }
-      }
-      if (options.events.smoothSteps) {
-        data.handleNumbers.forEach(function (handleNumber) {
-          setHandle(
-            handleNumber,
-            scope_Locations[handleNumber],
-            true,
-            true,
-            false,
-            false,
-          );
-        });
-        data.handleNumbers.forEach(function (handleNumber) {
-          fireEvent("update", handleNumber);
-        });
-      }
-      data.handleNumbers.forEach(function (handleNumber) {
-        fireEvent("change", handleNumber);
-        fireEvent("set", handleNumber);
-        fireEvent("end", handleNumber);
-      });
-    }
-    // Bind move events on document.
-    function eventStart(event, data) {
-      // Ignore event if any handle is disabled
-      if (data.handleNumbers.some(isHandleDisabled)) {
-        return;
-      }
-      var handle;
-      if (data.handleNumbers.length === 1) {
-        var handleOrigin = scope_Handles[data.handleNumbers[0]];
-        handle = handleOrigin.children[0];
-        scope_ActiveHandlesCount += 1;
-        // Mark the handle as 'active' so it can be styled.
-        addClass(handle, options.cssClasses.active);
-      }
-      // A drag should never propagate up to the 'tap' event.
-      event.stopPropagation();
-      // Record the event listeners.
-      var listeners = [];
-      // Attach the move and end events.
-      var moveEvent = attachEvent(
-        actions.move,
-        scope_DocumentElement,
-        eventMove,
-        {
-          // The event target has changed so we need to propagate the original one so that we keep
-          // relying on it to extract target touches.
-          target: event.target,
-          handle: handle,
-          connect: data.connect,
-          listeners: listeners,
-          startCalcPoint: event.calcPoint,
-          baseSize: baseSize(),
-          pageOffset: event.pageOffset,
-          handleNumbers: data.handleNumbers,
-          buttonsProperty: event.buttons,
-          locations: scope_Locations.slice(),
-        },
-      );
-      var endEvent = attachEvent(actions.end, scope_DocumentElement, eventEnd, {
-        target: event.target,
-        handle: handle,
-        listeners: listeners,
-        doNotReject: true,
-        handleNumbers: data.handleNumbers,
-      });
-      var outEvent = attachEvent(
-        "mouseout",
-        scope_DocumentElement,
-        documentLeave,
-        {
-          target: event.target,
-          handle: handle,
-          listeners: listeners,
-          doNotReject: true,
-          handleNumbers: data.handleNumbers,
-        },
-      );
-      // We want to make sure we pushed the listeners in the listener list rather than creating
-      // a new one as it has already been passed to the event handlers.
-      listeners.push.apply(listeners, moveEvent.concat(endEvent, outEvent));
-      // Text selection isn't an issue on touch devices,
-      // so adding cursor styles can be skipped.
-      if (event.cursor) {
-        // Prevent the 'I' cursor and extend the range-drag cursor.
-        scope_Body.style.cursor = getComputedStyle(event.target).cursor;
-        // Mark the target with a dragging state.
-        if (scope_Handles.length > 1) {
-          addClass(scope_Target, options.cssClasses.drag);
-        }
-        // Prevent text selection when dragging the handles.
-        // In noUiSlider <= 9.2.0, this was handled by calling preventDefault on mouse/touch start/move,
-        // which is scroll blocking. The selectstart event is supported by FireFox starting from version 52,
-        // meaning the only holdout is iOS Safari. This doesn't matter: text selection isn't triggered there.
-        // The 'cursor' flag is false.
-        // See: http://caniuse.com/#search=selectstart
-        scope_Body.addEventListener("selectstart", preventDefault, false);
-      }
-      data.handleNumbers.forEach(function (handleNumber) {
-        fireEvent("start", handleNumber);
-      });
-    }
-    // Move closest handle to tapped location.
-    function eventTap(event) {
-      // The tap event shouldn't propagate up
-      event.stopPropagation();
-      var proposal = calcPointToPercentage(event.calcPoint);
-      var handleNumber = getClosestHandle(proposal);
-      // Tackle the case that all handles are 'disabled'.
-      if (handleNumber === false) {
-        return;
-      }
-      // Flag the slider as it is now in a transitional state.
-      // Transition takes a configurable amount of ms (default 300). Re-enable the slider after that.
-      if (!options.events.snap) {
-        addClassFor(
-          scope_Target,
-          options.cssClasses.tap,
-          options.animationDuration,
-        );
-      }
-      setHandle(handleNumber, proposal, true, true);
-      setZindex();
-      fireEvent("slide", handleNumber, true);
-      fireEvent("update", handleNumber, true);
-      if (!options.events.snap) {
-        fireEvent("change", handleNumber, true);
-        fireEvent("set", handleNumber, true);
-      } else {
-        eventStart(event, { handleNumbers: [handleNumber] });
-      }
-    }
-    // Fires a 'hover' event for a hovered mouse/pen position.
-    function eventHover(event) {
-      var proposal = calcPointToPercentage(event.calcPoint);
-      var to = scope_Spectrum.getStep(proposal);
-      var value = scope_Spectrum.fromStepping(to);
-      Object.keys(scope_Events).forEach(function (targetEvent) {
-        if ("hover" === targetEvent.split(".")[0]) {
-          scope_Events[targetEvent].forEach(function (callback) {
-            callback.call(scope_Self, value);
-          });
-        }
-      });
-    }
-    // Handles keydown on focused handles
-    // Don't move the document when pressing arrow keys on focused handles
-    function eventKeydown(event, handleNumber) {
-      if (isSliderDisabled() || isHandleDisabled(handleNumber)) {
-        return false;
-      }
-      var horizontalKeys = ["Left", "Right"];
-      var verticalKeys = ["Down", "Up"];
-      var largeStepKeys = ["PageDown", "PageUp"];
-      var edgeKeys = ["Home", "End"];
-      if (options.dir && !options.ort) {
-        // On an right-to-left slider, the left and right keys act inverted
-        horizontalKeys.reverse();
-      } else if (options.ort && !options.dir) {
-        // On a top-to-bottom slider, the up and down keys act inverted
-        verticalKeys.reverse();
-        largeStepKeys.reverse();
-      }
-      // Strip "Arrow" for IE compatibility. https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key
-      var key = event.key.replace("Arrow", "");
-      var isLargeDown = key === largeStepKeys[0];
-      var isLargeUp = key === largeStepKeys[1];
-      var isDown =
-        key === verticalKeys[0] || key === horizontalKeys[0] || isLargeDown;
-      var isUp =
-        key === verticalKeys[1] || key === horizontalKeys[1] || isLargeUp;
-      var isMin = key === edgeKeys[0];
-      var isMax = key === edgeKeys[1];
-      if (!isDown && !isUp && !isMin && !isMax) {
-        return true;
-      }
-      event.preventDefault();
-      var to;
-      if (isUp || isDown) {
-        var direction = isDown ? 0 : 1;
-        var steps = getNextStepsForHandle(handleNumber);
-        var step = steps[direction];
-        // At the edge of a slider, do nothing
-        if (step === null) {
-          return false;
-        }
-        // No step set, use the default of 10% of the sub-range
-        if (step === false) {
-          step = scope_Spectrum.getDefaultStep(
-            scope_Locations[handleNumber],
-            isDown,
-            options.keyboardDefaultStep,
-          );
-        }
-        if (isLargeUp || isLargeDown) {
-          step *= options.keyboardPageMultiplier;
-        } else {
-          step *= options.keyboardMultiplier;
-        }
-        // Step over zero-length ranges (#948);
-        step = Math.max(step, 0.0000001);
-        // Decrement for down steps
-        step = (isDown ? -1 : 1) * step;
-        to = scope_Values[handleNumber] + step;
-      } else if (isMax) {
-        // End key
-        to = options.spectrum.xVal[options.spectrum.xVal.length - 1];
-      } else {
-        // Home key
-        to = options.spectrum.xVal[0];
-      }
-      setHandle(handleNumber, scope_Spectrum.toStepping(to), true, true);
-      fireEvent("slide", handleNumber);
-      fireEvent("update", handleNumber);
-      fireEvent("change", handleNumber);
-      fireEvent("set", handleNumber);
-      return false;
-    }
-    // Attach events to several slider parts.
-    function bindSliderEvents(behaviour) {
-      // Attach the standard drag event to the handles.
-      if (!behaviour.fixed) {
-        scope_Handles.forEach(function (handle, index) {
-          // These events are only bound to the visual handle
-          // element, not the 'real' origin element.
-          attachEvent(actions.start, handle.children[0], eventStart, {
-            handleNumbers: [index],
-          });
-        });
-      }
-      // Attach the tap event to the slider base.
-      if (behaviour.tap) {
-        attachEvent(actions.start, scope_Base, eventTap, {});
-      }
-      // Fire hover events
-      if (behaviour.hover) {
-        attachEvent(actions.move, scope_Base, eventHover, {
-          hover: true,
-        });
-      }
-      // Make the range draggable.
-      if (behaviour.drag) {
-        scope_Connects.forEach(function (connect, index) {
-          if (
-            connect === false ||
-            index === 0 ||
-            index === scope_Connects.length - 1
-          ) {
-            return;
-          }
-          var handleBefore = scope_Handles[index - 1];
-          var handleAfter = scope_Handles[index];
-          var eventHolders = [connect];
-          var handlesToDrag = [handleBefore, handleAfter];
-          var handleNumbersToDrag = [index - 1, index];
-          addClass(connect, options.cssClasses.draggable);
-          // When the range is fixed, the entire range can
-          // be dragged by the handles. The handle in the first
-          // origin will propagate the start event upward,
-          // but it needs to be bound manually on the other.
-          if (behaviour.fixed) {
-            eventHolders.push(handleBefore.children[0]);
-            eventHolders.push(handleAfter.children[0]);
-          }
-          if (behaviour.dragAll) {
-            handlesToDrag = scope_Handles;
-            handleNumbersToDrag = scope_HandleNumbers;
-          }
-          eventHolders.forEach(function (eventHolder) {
-            attachEvent(actions.start, eventHolder, eventStart, {
-              handles: handlesToDrag,
-              handleNumbers: handleNumbersToDrag,
-              connect: connect,
-            });
-          });
-        });
-      }
-    }
-    // Attach an event to this slider, possibly including a namespace
-    function bindEvent(namespacedEvent, callback) {
-      scope_Events[namespacedEvent] = scope_Events[namespacedEvent] || [];
-      scope_Events[namespacedEvent].push(callback);
-      // If the event bound is 'update,' fire it immediately for all handles.
-      if (namespacedEvent.split(".")[0] === "update") {
-        scope_Handles.forEach(function (a, index) {
-          fireEvent("update", index);
-        });
-      }
-    }
-    function isInternalNamespace(namespace) {
-      return (
-        namespace === INTERNAL_EVENT_NS.aria ||
-        namespace === INTERNAL_EVENT_NS.tooltips
-      );
-    }
-    // Undo attachment of event
-    function removeEvent(namespacedEvent) {
-      var event = namespacedEvent && namespacedEvent.split(".")[0];
-      var namespace = event
-        ? namespacedEvent.substring(event.length)
-        : namespacedEvent;
-      Object.keys(scope_Events).forEach(function (bind) {
-        var tEvent = bind.split(".")[0];
-        var tNamespace = bind.substring(tEvent.length);
-        if (
-          (!event || event === tEvent) &&
-          (!namespace || namespace === tNamespace)
-        ) {
-          // only delete protected internal event if intentional
-          if (!isInternalNamespace(tNamespace) || namespace === tNamespace) {
-            delete scope_Events[bind];
-          }
-        }
-      });
-    }
-    // External event handling
-    function fireEvent(eventName, handleNumber, tap) {
-      Object.keys(scope_Events).forEach(function (targetEvent) {
-        var eventType = targetEvent.split(".")[0];
-        if (eventName === eventType) {
-          scope_Events[targetEvent].forEach(function (callback) {
-            callback.call(
-              // Use the slider public API as the scope ('this')
-              scope_Self,
-              // Return values as array, so arg_1[arg_2] is always valid.
-              scope_Values.map(options.format.to),
-              // Handle index, 0 or 1
-              handleNumber,
-              // Un-formatted slider values
-              scope_Values.slice(),
-              // Event is fired by tap, true or false
-              tap || false,
-              // Left offset of the handle, in relation to the slider
-              scope_Locations.slice(),
-              // add the slider public API to an accessible parameter when this is unavailable
-              scope_Self,
+      eventsPopup() {
+        document.addEventListener(
+          "click",
+          function (e) {
+            const t = e.target.closest(`[${this.options.attributeOpenButton}]`);
+            if (t)
+              return (
+                e.preventDefault(),
+                (this._dataValue = t.getAttribute(
+                  this.options.attributeOpenButton,
+                )
+                  ? t.getAttribute(this.options.attributeOpenButton)
+                  : "error"),
+                "error" !== this._dataValue
+                  ? (this.isOpen || (this.lastFocusEl = t),
+                    (this.targetOpen.selector = `${this._dataValue}`),
+                    (this._selectorOpen = !0),
+                    void this.open())
+                  : void 0
+              );
+            const s = e.target.closest(
+              `[${this.options.attributeCloseButton}]`,
             );
-          });
-        }
-      });
-    }
-    // Split out the handle positioning logic so the Move event can use it, too
-    function checkHandlePosition(
-      reference,
-      handleNumber,
-      to,
-      lookBackward,
-      lookForward,
-      getValue,
-      smoothSteps,
-    ) {
-      var distance;
-      // For sliders with multiple handles, limit movement to the other handle.
-      // Apply the margin option by adding it to the handle positions.
-      if (scope_Handles.length > 1 && !options.events.unconstrained) {
-        if (lookBackward && handleNumber > 0) {
-          distance = scope_Spectrum.getAbsoluteDistance(
-            reference[handleNumber - 1],
-            options.margin,
-            false,
-          );
-          to = Math.max(to, distance);
-        }
-        if (lookForward && handleNumber < scope_Handles.length - 1) {
-          distance = scope_Spectrum.getAbsoluteDistance(
-            reference[handleNumber + 1],
-            options.margin,
-            true,
-          );
-          to = Math.min(to, distance);
-        }
+            return (
+              console.log(),
+              s ||
+              (!e.target.closest(".submitted__slider-navigation-next") &&
+                !e.target.closest(".submitted__slider-navigation-prev") &&
+                !e.target.closest(".popup-reels__slide") &&
+                !e.target.closest(".popup-video__slide") &&
+                this.isOpen)
+                ? (e.preventDefault(), void this.close())
+                : void 0
+            );
+          }.bind(this),
+        ),
+          document.addEventListener(
+            "keydown",
+            function (e) {
+              if (
+                this.options.closeEsc &&
+                27 == e.which &&
+                "Escape" === e.code &&
+                this.isOpen
+              )
+                return e.preventDefault(), void this.close();
+              this.options.focusCatch &&
+                9 == e.which &&
+                this.isOpen &&
+                this._focusCatch(e);
+            }.bind(this),
+          ),
+          document.querySelector("form[data-ajax],form[data-dev]") &&
+            document.addEventListener(
+              "formSent",
+              function (e) {
+                const t = e.detail.form.dataset.popupMessage;
+                t && this.open(t);
+              }.bind(this),
+            ),
+          this.options.hashSettings.goHash &&
+            (window.addEventListener(
+              "hashchange",
+              function () {
+                window.location.hash
+                  ? this._openToHash()
+                  : this.close(this.targetOpen.selector);
+              }.bind(this),
+            ),
+            window.addEventListener(
+              "load",
+              function () {
+                window.location.hash && this._openToHash();
+              }.bind(this),
+            ));
       }
-      // The limit option has the opposite effect, limiting handles to a
-      // maximum distance from another. Limit must be > 0, as otherwise
-      // handles would be unmovable.
-      if (scope_Handles.length > 1 && options.limit) {
-        if (lookBackward && handleNumber > 0) {
-          distance = scope_Spectrum.getAbsoluteDistance(
-            reference[handleNumber - 1],
-            options.limit,
-            false,
-          );
-          to = Math.min(to, distance);
-        }
-        if (lookForward && handleNumber < scope_Handles.length - 1) {
-          distance = scope_Spectrum.getAbsoluteDistance(
-            reference[handleNumber + 1],
-            options.limit,
-            true,
-          );
-          to = Math.max(to, distance);
-        }
-      }
-      // The padding option keeps the handles a certain distance from the
-      // edges of the slider. Padding must be > 0.
-      if (options.padding) {
-        if (handleNumber === 0) {
-          distance = scope_Spectrum.getAbsoluteDistance(
-            0,
-            options.padding[0],
-            false,
-          );
-          to = Math.max(to, distance);
-        }
-        if (handleNumber === scope_Handles.length - 1) {
-          distance = scope_Spectrum.getAbsoluteDistance(
-            100,
-            options.padding[1],
-            true,
-          );
-          to = Math.min(to, distance);
-        }
-      }
-      if (!smoothSteps) {
-        to = scope_Spectrum.getStep(to);
-      }
-      // Limit percentage to the 0 - 100 range
-      to = limit(to);
-      // Return false if handle can't move
-      if (to === reference[handleNumber] && !getValue) {
-        return false;
-      }
-      return to;
-    }
-    // Uses slider orientation to create CSS rules. a = base value;
-    function inRuleOrder(v, a) {
-      var o = options.ort;
-      return (o ? a : v) + ", " + (o ? v : a);
-    }
-    // Moves handle(s) by a percentage
-    // (bool, % to move, [% where handle started, ...], [index in scope_Handles, ...])
-    function moveHandles(upward, proposal, locations, handleNumbers, connect) {
-      var proposals = locations.slice();
-      // Store first handle now, so we still have it in case handleNumbers is reversed
-      var firstHandle = handleNumbers[0];
-      var smoothSteps = options.events.smoothSteps;
-      var b = [!upward, upward];
-      var f = [upward, !upward];
-      // Copy handleNumbers so we don't change the dataset
-      handleNumbers = handleNumbers.slice();
-      // Check to see which handle is 'leading'.
-      // If that one can't move the second can't either.
-      if (upward) {
-        handleNumbers.reverse();
-      }
-      // Step 1: get the maximum percentage that any of the handles can move
-      if (handleNumbers.length > 1) {
-        handleNumbers.forEach(function (handleNumber, o) {
-          var to = checkHandlePosition(
-            proposals,
-            handleNumber,
-            proposals[handleNumber] + proposal,
-            b[o],
-            f[o],
-            false,
-            smoothSteps,
-          );
-          // Stop if one of the handles can't move.
-          if (to === false) {
-            proposal = 0;
-          } else {
-            proposal = to - proposals[handleNumber];
-            proposals[handleNumber] = to;
+      open(e) {
+        if (
+          (e &&
+            "string" == typeof e &&
+            "" !== e.trim() &&
+            ((this.targetOpen.selector = e), (this._selectorOpen = !0)),
+          this.isOpen && ((this._reopen = !0), this.close()),
+          this._selectorOpen ||
+            (this.targetOpen.selector = this.lastClosed.selector),
+          this._reopen || (this.previousActiveElement = document.activeElement),
+          (this.targetOpen.element = document.querySelector(
+            this.targetOpen.selector,
+          )),
+          this.targetOpen.element)
+        ) {
+          if (
+            this.targetOpen.element.hasAttribute(this.options.youtubeAttribute)
+          ) {
+            const e = `https://www.youtube.com/embed/${this.targetOpen.element.getAttribute(this.options.youtubeAttribute)}?rel=0&showinfo=0&autoplay=1`,
+              t = document.createElement("iframe");
+            t.setAttribute("allowfullscreen", "");
+            const s = this.options.setAutoplayYoutube ? "autoplay;" : "";
+            t.setAttribute("allow", `${s}; encrypted-media`),
+              t.setAttribute("src", e),
+              this.targetOpen.element.querySelector(
+                `[${this.options.youtubePlaceAttribute}]`,
+              ) &&
+                this.targetOpen.element
+                  .querySelector(`[${this.options.youtubePlaceAttribute}]`)
+                  .appendChild(t);
           }
-        });
-      }
-      // If using one handle, check backward AND forward
-      else {
-        b = f = [true];
-      }
-      var state = false;
-      // Step 2: Try to set the handles with the found percentage
-      handleNumbers.forEach(function (handleNumber, o) {
-        state =
-          setHandle(
-            handleNumber,
-            locations[handleNumber] + proposal,
-            b[o],
-            f[o],
-            false,
-            smoothSteps,
-          ) || state;
-      });
-      // Step 3: If a handle moved, fire events
-      if (state) {
-        handleNumbers.forEach(function (handleNumber) {
-          fireEvent("update", handleNumber);
-          fireEvent("slide", handleNumber);
-        });
-        // If target is a connect, then fire drag event
-        if (connect != undefined) {
-          fireEvent("drag", firstHandle);
+          this.options.hashSettings.location &&
+            (this._getHash(), this._setHash()),
+            this.options.on.beforeOpen(this),
+            this.targetOpen.element.classList.add(
+              this.options.classes.popupActive,
+            ),
+            document.body.classList.add(this.options.classes.bodyActive),
+            this.targetOpen.element.setAttribute("aria-hidden", "false"),
+            (this.previousOpen.selector = this.targetOpen.selector),
+            (this.previousOpen.element = this.targetOpen.element),
+            (this._selectorOpen = !1),
+            (this.isOpen = !0),
+            document.dispatchEvent(
+              new CustomEvent("afterPopupOpen", { detail: { popup: this } }),
+            );
         }
       }
+      close(e) {
+        e &&
+          "string" == typeof e &&
+          "" !== e.trim() &&
+          (this.previousOpen.selector = e),
+          this.isOpen &&
+            n &&
+            (this.options.on.beforeClose(this),
+            this.targetOpen.element.hasAttribute(
+              this.options.youtubeAttribute,
+            ) &&
+              this.targetOpen.element.querySelector(
+                `[${this.options.youtubePlaceAttribute}]`,
+              ) &&
+              (this.targetOpen.element.querySelector(
+                `[${this.options.youtubePlaceAttribute}]`,
+              ).innerHTML = ""),
+            this.previousOpen.element.classList.remove(
+              this.options.classes.popupActive,
+            ),
+            this.previousOpen.element.setAttribute("aria-hidden", "true"),
+            this._reopen ||
+              (document.body.classList.remove(this.options.classes.bodyActive),
+              o(),
+              (this.isOpen = !1)),
+            this._selectorOpen &&
+              ((this.lastClosed.selector = this.previousOpen.selector),
+              (this.lastClosed.element = this.previousOpen.element)),
+            this.options.on.afterClose(this));
+      }
     }
-    // Takes a base value and an offset. This offset is used for the connect bar size.
-    // In the initial design for this feature, the origin element was 1% wide.
-    // Unfortunately, a rounding bug in Chrome makes it impossible to implement this feature
-    // in this manner: https://bugs.chromium.org/p/chromium/issues/detail?id=798223
-    function transformDirection(a, b) {
-      return options.dir ? 100 - a - b : a;
-    }
-    // Updates scope_Locations and scope_Values, updates visual state
-    function updateHandlePosition(handleNumber, to) {
-      // Update locations.
-      scope_Locations[handleNumber] = to;
-      // Convert the value to the slider stepping/range.
-      scope_Values[handleNumber] = scope_Spectrum.fromStepping(to);
-      var translation = transformDirection(to, 0) - scope_DirOffset;
-      var translateRule =
-        "translate(" + inRuleOrder(translation + "%", "0") + ")";
-      scope_Handles[handleNumber].style[options.transformRule] = translateRule;
-      updateConnect(handleNumber);
-      updateConnect(handleNumber + 1);
-    }
-    // Handles before the slider middle are stacked later = higher,
-    // Handles after the middle later is lower
-    // [[7] [8] .......... | .......... [5] [4]
-    function setZindex() {
-      scope_HandleNumbers.forEach(function (handleNumber) {
-        var dir = scope_Locations[handleNumber] > 50 ? -1 : 1;
-        var zIndex = 3 + (scope_Handles.length + dir * handleNumber);
-        scope_Handles[handleNumber].style.zIndex = String(zIndex);
-      });
-    }
-    // Test suggested values and apply margin, step.
-    // if exactInput is true, don't run checkHandlePosition, then the handle can be placed in between steps (#436)
-    function setHandle(
-      handleNumber,
-      to,
-      lookBackward,
-      lookForward,
-      exactInput,
-      smoothSteps,
-    ) {
-      if (!exactInput) {
-        to = checkHandlePosition(
-          scope_Locations,
-          handleNumber,
-          to,
-          lookBackward,
-          lookForward,
-          false,
-          smoothSteps,
-        );
-      }
-      if (to === false) {
-        return false;
-      }
-      updateHandlePosition(handleNumber, to);
-      return true;
-    }
-    // Updates style attribute for connect nodes
-    function updateConnect(index) {
-      // Skip connects set to false
-      if (!scope_Connects[index]) {
-        return;
-      }
-      var l = 0;
-      var h = 100;
-      if (index !== 0) {
-        l = scope_Locations[index - 1];
-      }
-      if (index !== scope_Connects.length - 1) {
-        h = scope_Locations[index];
-      }
-      // We use two rules:
-      // 'translate' to change the left/top offset;
-      // 'scale' to change the width of the element;
-      // As the element has a width of 100%, a translation of 100% is equal to 100% of the parent (.noUi-base)
-      var connectWidth = h - l;
-      var translateRule =
-        "translate(" +
-        inRuleOrder(transformDirection(l, connectWidth) + "%", "0") +
-        ")";
-      var scaleRule = "scale(" + inRuleOrder(connectWidth / 100, "1") + ")";
-      scope_Connects[index].style[options.transformRule] =
-        translateRule + " " + scaleRule;
-    }
-    // Parses value passed to .set method. Returns current value if not parse-able.
-    function resolveToValue(to, handleNumber) {
-      // Setting with null indicates an 'ignore'.
-      // Inputting 'false' is invalid.
-      if (to === null || to === false || to === undefined) {
-        return scope_Locations[handleNumber];
-      }
-      // If a formatted number was passed, attempt to decode it.
-      if (typeof to === "number") {
-        to = String(to);
-      }
-      to = options.format.from(to);
-      if (to !== false) {
-        to = scope_Spectrum.toStepping(to);
-      }
-      // If parsing the number failed, use the current value.
-      if (to === false || isNaN(to)) {
-        return scope_Locations[handleNumber];
-      }
-      return to;
-    }
-    // Set the slider value.
-    function valueSet(input, fireSetEvent, exactInput) {
-      var values = asArray(input);
-      var isInit = scope_Locations[0] === undefined;
-      // Event fires by default
-      fireSetEvent = fireSetEvent === undefined ? true : fireSetEvent;
-      // Animation is optional.
-      // Make sure the initial values were set before using animated placement.
-      if (options.animate && !isInit) {
-        addClassFor(
-          scope_Target,
-          options.cssClasses.tap,
-          options.animationDuration,
-        );
-      }
-      // First pass, without lookAhead but with lookBackward. Values are set from left to right.
-      scope_HandleNumbers.forEach(function (handleNumber) {
-        setHandle(
-          handleNumber,
-          resolveToValue(values[handleNumber], handleNumber),
-          true,
-          false,
-          exactInput,
-        );
-      });
-      var i = scope_HandleNumbers.length === 1 ? 0 : 1;
-      // Spread handles evenly across the slider if the range has no size (min=max)
-      if (isInit && scope_Spectrum.hasNoSize()) {
-        exactInput = true;
-        scope_Locations[0] = 0;
-        if (scope_HandleNumbers.length > 1) {
-          var space_1 = 100 / (scope_HandleNumbers.length - 1);
-          scope_HandleNumbers.forEach(function (handleNumber) {
-            scope_Locations[handleNumber] = handleNumber * space_1;
-          });
+    let t = (e, t = 500, s = 0) => {
+        e.classList.contains("_slide") ||
+          (e.classList.add("_slide"),
+          (e.style.transitionProperty = "height, margin, padding"),
+          (e.style.transitionDuration = t + "ms"),
+          (e.style.height = `${e.offsetHeight}px`),
+          e.offsetHeight,
+          (e.style.overflow = "hidden"),
+          (e.style.height = s ? `${s}px` : "0px"),
+          (e.style.paddingTop = 0),
+          (e.style.paddingBottom = 0),
+          (e.style.marginTop = 0),
+          (e.style.marginBottom = 0),
+          window.setTimeout(() => {
+            (e.hidden = !s),
+              !s && e.style.removeProperty("height"),
+              e.style.removeProperty("padding-top"),
+              e.style.removeProperty("padding-bottom"),
+              e.style.removeProperty("margin-top"),
+              e.style.removeProperty("margin-bottom"),
+              !s && e.style.removeProperty("overflow"),
+              e.style.removeProperty("transition-duration"),
+              e.style.removeProperty("transition-property"),
+              e.classList.remove("_slide");
+          }, t));
+      },
+      s = (e, t = 500, s = 0) => {
+        if (!e.classList.contains("_slide")) {
+          e.classList.add("_slide"),
+            (e.hidden = !e.hidden && null),
+            s && e.style.removeProperty("height");
+          let i = e.offsetHeight;
+          (e.style.overflow = "hidden"),
+            (e.style.height = s ? `${s}px` : "0px"),
+            (e.style.paddingTop = 0),
+            (e.style.paddingBottom = 0),
+            (e.style.marginTop = 0),
+            (e.style.marginBottom = 0),
+            e.offsetHeight,
+            (e.style.transitionProperty = "height, margin, padding"),
+            (e.style.transitionDuration = t + "ms"),
+            (e.style.height = i + "px"),
+            e.style.removeProperty("padding-top"),
+            e.style.removeProperty("padding-bottom"),
+            e.style.removeProperty("margin-top"),
+            e.style.removeProperty("margin-bottom"),
+            window.setTimeout(() => {
+              e.style.removeProperty("height"),
+                e.style.removeProperty("overflow"),
+                e.style.removeProperty("transition-duration"),
+                e.style.removeProperty("transition-property"),
+                e.classList.remove("_slide");
+            }, t);
         }
-      }
-      // Secondary passes. Now that all base values are set, apply constraints.
-      // Iterate all handles to ensure constraints are applied for the entire slider (Issue #1009)
-      for (; i < scope_HandleNumbers.length; ++i) {
-        scope_HandleNumbers.forEach(function (handleNumber) {
-          setHandle(
-            handleNumber,
-            scope_Locations[handleNumber],
-            true,
-            true,
-            exactInput,
-          );
-        });
-      }
-      setZindex();
-      scope_HandleNumbers.forEach(function (handleNumber) {
-        fireEvent("update", handleNumber);
-        // Fire the event only for handles that received a new value, as per #579
-        if (values[handleNumber] !== null && fireSetEvent) {
-          fireEvent("set", handleNumber);
-        }
-      });
-    }
-    // Reset slider to initial values
-    function valueReset(fireSetEvent) {
-      valueSet(options.start, fireSetEvent);
-    }
-    // Set value for a single handle
-    function valueSetHandle(handleNumber, value, fireSetEvent, exactInput) {
-      // Ensure numeric input
-      handleNumber = Number(handleNumber);
-      if (!(handleNumber >= 0 && handleNumber < scope_HandleNumbers.length)) {
-        throw new Error(
-          "noUiSlider: invalid handle number, got: " + handleNumber,
-        );
-      }
-      // Look both backward and forward, since we don't want this handle to "push" other handles (#960);
-      // The exactInput argument can be used to ignore slider stepping (#436)
-      setHandle(
-        handleNumber,
-        resolveToValue(value, handleNumber),
-        true,
-        true,
-        exactInput,
-      );
-      fireEvent("update", handleNumber);
-      if (fireSetEvent) {
-        fireEvent("set", handleNumber);
-      }
-    }
-    // Get the slider value.
-    function valueGet(unencoded) {
-      if (unencoded === void 0) {
-        unencoded = false;
-      }
-      if (unencoded) {
-        // return a copy of the raw values
-        return scope_Values.length === 1
-          ? scope_Values[0]
-          : scope_Values.slice(0);
-      }
-      var values = scope_Values.map(options.format.to);
-      // If only one handle is used, return a single value.
-      if (values.length === 1) {
-        return values[0];
-      }
-      return values;
-    }
-    // Removes classes from the root and empties it.
-    function destroy() {
-      // remove protected internal listeners
-      removeEvent(INTERNAL_EVENT_NS.aria);
-      removeEvent(INTERNAL_EVENT_NS.tooltips);
-      Object.keys(options.cssClasses).forEach(function (key) {
-        removeClass(scope_Target, options.cssClasses[key]);
-      });
-      while (scope_Target.firstChild) {
-        scope_Target.removeChild(scope_Target.firstChild);
-      }
-      delete scope_Target.noUiSlider;
-    }
-    function getNextStepsForHandle(handleNumber) {
-      var location = scope_Locations[handleNumber];
-      var nearbySteps = scope_Spectrum.getNearbySteps(location);
-      var value = scope_Values[handleNumber];
-      var increment = nearbySteps.thisStep.step;
-      var decrement = null;
-      // If snapped, directly use defined step value
-      if (options.snap) {
-        return [
-          value - nearbySteps.stepBefore.startValue || null,
-          nearbySteps.stepAfter.startValue - value || null,
-        ];
-      }
-      // If the next value in this step moves into the next step,
-      // the increment is the start of the next step - the current value
-      if (increment !== false) {
-        if (value + increment > nearbySteps.stepAfter.startValue) {
-          increment = nearbySteps.stepAfter.startValue - value;
-        }
-      }
-      // If the value is beyond the starting point
-      if (value > nearbySteps.thisStep.startValue) {
-        decrement = nearbySteps.thisStep.step;
-      } else if (nearbySteps.stepBefore.step === false) {
-        decrement = false;
-      }
-      // If a handle is at the start of a step, it always steps back into the previous step first
-      else {
-        decrement = value - nearbySteps.stepBefore.highestStep;
-      }
-      // Now, if at the slider edges, there is no in/decrement
-      if (location === 100) {
-        increment = null;
-      } else if (location === 0) {
-        decrement = null;
-      }
-      // As per #391, the comparison for the decrement step can have some rounding issues.
-      var stepDecimals = scope_Spectrum.countStepDecimals();
-      // Round per #391
-      if (increment !== null && increment !== false) {
-        increment = Number(increment.toFixed(stepDecimals));
-      }
-      if (decrement !== null && decrement !== false) {
-        decrement = Number(decrement.toFixed(stepDecimals));
-      }
-      return [decrement, increment];
-    }
-    // Get the current step size for the slider.
-    function getNextSteps() {
-      return scope_HandleNumbers.map(getNextStepsForHandle);
-    }
-    // Updatable: margin, limit, padding, step, range, animate, snap
-    function updateOptions(optionsToUpdate, fireSetEvent) {
-      // Spectrum is created using the range, snap, direction and step options.
-      // 'snap' and 'step' can be updated.
-      // If 'snap' and 'step' are not passed, they should remain unchanged.
-      var v = valueGet();
-      var updateAble = [
-        "margin",
-        "limit",
-        "padding",
-        "range",
-        "animate",
-        "snap",
-        "step",
-        "format",
-        "pips",
-        "tooltips",
-      ];
-      // Only change options that we're actually passed to update.
-      updateAble.forEach(function (name) {
-        // Check for undefined. null removes the value.
-        if (optionsToUpdate[name] !== undefined) {
-          originalOptions[name] = optionsToUpdate[name];
-        }
-      });
-      var newOptions = testOptions(originalOptions);
-      // Load new options into the slider state
-      updateAble.forEach(function (name) {
-        if (optionsToUpdate[name] !== undefined) {
-          options[name] = newOptions[name];
-        }
-      });
-      scope_Spectrum = newOptions.spectrum;
-      // Limit, margin and padding depend on the spectrum but are stored outside of it. (#677)
-      options.margin = newOptions.margin;
-      options.limit = newOptions.limit;
-      options.padding = newOptions.padding;
-      // Update pips, removes existing.
-      if (options.pips) {
-        pips(options.pips);
-      } else {
-        removePips();
-      }
-      // Update tooltips, removes existing.
-      if (options.tooltips) {
-        tooltips();
-      } else {
-        removeTooltips();
-      }
-      // Invalidate the current positioning so valueSet forces an update.
-      scope_Locations = [];
-      valueSet(
-        isSet(optionsToUpdate.start) ? optionsToUpdate.start : v,
-        fireSetEvent,
-      );
-    }
-    // Initialization steps
-    function setupSlider() {
-      // Create the base element, initialize HTML and set classes.
-      // Add handles and connect elements.
-      scope_Base = addSlider(scope_Target);
-      addElements(options.connect, scope_Base);
-      // Attach user events.
-      bindSliderEvents(options.events);
-      // Use the public value method to set the start values.
-      valueSet(options.start);
-      if (options.pips) {
-        pips(options.pips);
-      }
-      if (options.tooltips) {
-        tooltips();
-      }
-      aria();
-    }
-    setupSlider();
-    var scope_Self = {
-      destroy: destroy,
-      steps: getNextSteps,
-      on: bindEvent,
-      off: removeEvent,
-      get: valueGet,
-      set: valueSet,
-      setHandle: valueSetHandle,
-      reset: valueReset,
-      disable: disable,
-      enable: enable,
-      // Exposed for unit testing, don't use this in your application.
-      __moveHandles: function (upward, proposal, handleNumbers) {
-        moveHandles(upward, proposal, scope_Locations, handleNumbers);
       },
-      options: originalOptions,
-      updateOptions: updateOptions,
-      target: scope_Target,
-      removePips: removePips,
-      removeTooltips: removeTooltips,
-      getPositions: function () {
-        return scope_Locations.slice();
+      i = (e, i = 500) => (e.hidden ? s(e, i) : t(e, i)),
+      n = !0,
+      o = (e = 1) => {
+        document.documentElement.classList.contains("lock") ? l(e) : r(e);
       },
-      getTooltips: function () {
-        return scope_Tooltips;
-      },
-      getOrigins: function () {
-        return scope_Handles;
-      },
-      pips: pips, // Issue #594
-    };
-    return scope_Self;
-  }
-  // Run the standard initializer
-  function initialize(target, originalOptions) {
-    if (!target || !target.nodeName) {
-      throw new Error(
-        "noUiSlider: create requires a single element, got: " + target,
-      );
-    }
-    // Throw an error if the slider was already initialized.
-    if (target.noUiSlider) {
-      throw new Error("noUiSlider: Slider was already initialized.");
-    }
-    // Test the options and create the slider environment;
-    var options = testOptions(originalOptions);
-    var api = scope(target, options, originalOptions);
-    target.noUiSlider = api;
-    return api;
-  }
-
-  /* harmony default export */ const nouislider = {
-    // Exposed for unit testing, don't use this in your application.
-    __spectrum: Spectrum,
-    // A reference to the default classes, allows global changes.
-    // Use the cssClasses option for changes to one slider.
-    cssClasses: cssClasses,
-    create: initialize,
-  }; // CONCATENATED MODULE: ./src/js/files/script.js
-
-  // Подключение из node_modules
-
-  function bildSliders() {
-    //BildSlider
-    let sliders = document.querySelectorAll(
-      '[class*="__swiper"]:not(.swiper-wrapper)',
-    );
-    if (sliders) {
-      sliders.forEach((slider) => {
-        slider.parentElement.classList.add("swiper");
-        slider.classList.add("swiper-wrapper");
-        for (const slide of slider.children) {
-          slide.classList.add("swiper-slide");
-        }
-      });
-    }
-  }
-
-  function initSliders() {
-    bildSliders();
-    // слайдер 'Выполненные работы'
-    if (document.querySelector(".completed-work__slider")) {
-      new Swiper(".completed-work__slider", {
-        observer: true,
-        observeParents: true,
-        slidesPerView: 2,
-        spaceBetween: 30,
-        speed: 300,
-
-        navigation: {
-          nextEl: ".completed-work__nav .completed-work__next",
-          prevEl: ".completed-work__nav .completed-work__prev",
-        },
-        breakpoints: {
-          320: {
-            slidesPerView: 1.2,
-            spaceBetween: 15,
-          },
-          430: {
-            slidesPerView: 1.3,
-            spaceBetween: 15,
-          },
-          768: { slidesPerView: 1, spaceBetween: 30 },
-          1023.98: {
-            slidesPerView: 1,
-          },
-          1279.98: {
-            slidesPerView: 2,
-          },
-        },
-        on: {},
-      });
-    }
-    // слайдер 'Бренды септиков'
-    if (document.querySelector(".brand-carusel__slider")) {
-      new Swiper(".brand-carusel__slider", {
-        observer: true,
-        watchSlidesProgress: true,
-        observeParents: true,
-        slidesPerView: 3,
-        spaceBetween: 30,
-        speed: 300,
-        autoHeight: false,
-        navigation: {
-          nextEl: ".brand-carusel__nav .brand-carusel__next",
-          prevEl: ".brand-carusel__nav .brand-carusel__prev",
-        },
-        breakpoints: {
-          319.98: {
-            slidesPerView: 1.3,
-            spaceBetween: 15,
-          },
-
-          767.98: {
-            autoplay: false,
-            slidesPerView: 2.6,
-          },
-          1023.98: {
-            slidesPerView: 3,
-            spaceBetween: 20,
-            autoplay: false,
-          },
-          1279.98: {
-            slidesPerView: 3,
-            spaceBetween: 20,
-            autoplay: false,
-          },
-        },
-        on: {},
-      });
-    }
-    // слайдер 'Популярные модели септиков'
-    if (document.querySelector(".popular-models__slider")) {
-      let pop = new Swiper(".popular-models__slider", {
-        watchSlidesProgress: true,
-        slidesPerView: 4,
-        spaceBetween: 0,
-        speed: 300,
-
-        loop: false,
-        navigation: {
-          nextEl: ".popular-models__nav .popular-models__next",
-          prevEl: ".popular-models__nav .popular-models__prev",
-        },
-        breakpoints: {
-          320: {
-            slidesPerView: 1.2,
-            centeredSlides: false,
-          },
-          374.98: {
-            slidesPerView: 1.4,
-            // initialSlide: 1,
-            // centeredSlides: true,
-          },
-
-          768: {
-            centeredSlides: false,
-            slidesPerView: 2.5,
-          },
-          1024: { slidesPerView: 3 },
-          1280: {
-            slidesPerView: 4,
-            initialSlide: 0,
-          },
-        },
-        on: {},
-      });
-    }
-
-    // слайдер телеграм
-    if (document.querySelector(".submitted__slider-post")) {
-      new Swiper(".submitted__slider-post", {
-        observer: true,
-        observeParents: true,
-        slidesPerView: 3,
-        spaceBetween: 30,
-        autoHeight: false,
-        speed: 300,
-
-        navigation: {
-          nextEl: ".submitted__nav .submitted__next",
-          prevEl: ".submitted__nav .submitted__prev",
-        },
-        breakpoints: {
-          320: {
-            slidesPerView: 1.2,
-            spaceBetween: 15,
-          },
-          430: { slidesPerView: 1.4, spaceBetween: 15 },
-          768: {
-            slidesPerView: "2.5",
-          },
-          1023.98: {
-            spaceBetween: 30,
-            slidesPerView: "3",
-          },
-        },
-
-        on: {},
-      });
-    }
-    // слайдер youtube
-    if (document.querySelector("#slider-video")) {
-      new Swiper("#slider-video", {
-        observer: true,
-        observeParents: true,
-        slidesPerView: "2",
-        spaceBetween: 30,
-        autoHeight: false,
-        speed: 300,
-
-        // Arrows
-        navigation: {
-          nextEl: ".submitted__youtube-nav .submitted__youtube-next",
-          prevEl: ".submitted__youtube-nav .submitted__youtube-prev",
-        },
-        breakpoints: {
-          320: {
-            slidesPerView: 1.5,
-            spaceBetween: 15,
-          },
-          430: {
-            centeredSlides: false,
-            slidesPerView: 1.6,
-            spaceBetween: 15,
-          },
-          768: { centeredSlides: false, spaceBetween: 20 },
-          1024: {
-            slidesPerView: 2,
-            spaceBetween: 30,
-          },
-        },
-
-        on: {},
-      });
-    }
-
-    // слайдер журнал
-    if (document.querySelector("#magazine-slide")) {
-      new Swiper("#magazine-slide", {
-        observer: true,
-        observeParents: true,
-        slidesPerView: 3,
-        speed: 300,
-        navigation: {
-          nextEl: ".submitted__magazine-nav .submitted__magazine-next",
-          prevEl: ".submitted__magazine-nav .submitted__magazine-prev",
-        },
-        breakpoints: {
-          320: {
-            slidesPerView: 1.3,
-            spaceBetween: 15,
-          },
-          430: {
-            centeredSlides: false,
-            slidesPerView: 1.6,
-            spaceBetween: 20,
-          },
-          768: { slidesPerView: 2.5, spaceBetween: 20 },
-          1024: {
-            slidesPerView: 3,
-            spaceBetween: 30,
-          },
-        },
-
-        on: {},
-      });
-    }
-    // слайдер 'Варианты анализа воды'
-    if (document.querySelector(".water-analysis__slider")) {
-      new Swiper(".water-analysis__slider", {
-        observer: true,
-        observeParents: true,
-        slidesPerView: 3,
-        spaceBetween: 30,
-        autoHeight: false,
-        speed: 300,
-
-        breakpoints: {
-          319.98: {
-            slidesPerView: 1.2,
-            spaceBetween: 20,
-          },
-
-          767.98: {
-            slidesPerView: 1.2,
-            spaceBetween: 30,
-          },
-          1023.98: { slidesPerView: 2 },
-        },
-
-        on: {},
-      });
-    }
-    // слайдер 'Что мы можем?'
-    if (document.querySelector("#we-doing")) {
-      new Swiper("#we-doing", {
-        observer: true,
-        observeParents: true,
-        slidesPerView: 4,
-        spaceBetween: 25,
-        autoHeight: false,
-        speed: 300,
-        loop: true,
-        autoplay: {
-          delay: 3000,
-        },
-        // Arrows
-        navigation: {
-          nextEl: ".we-doing__nav .we-doing__next",
-          prevEl: ".we-doing__nav .we-doing__prev",
-        },
-
-        breakpoints: {
-          319.98: {
-            slidesPerView: 1.1,
-            spaceBetween: 15,
-            loop: true,
-            autoplay: {
-              delay: 3000,
-            },
-            centeredSlides: true,
-          },
-          429.98: { slidesPerView: 1.1 },
-
-          767.98: {
-            slidesPerView: 2.3,
-            spaceBetween: 15,
-          },
-          1023.98: { slidesPerView: 3, spaceBetween: 20 },
-          1439.98: {
-            spaceBetween: 24,
-          },
-        },
-
-        on: {},
-      });
-    }
-    // слайдер 'Примеры работ'
-    if (document.querySelector("#work-examples")) {
-      new Swiper("#work-examples", {
-        observer: true,
-        observeParents: true,
-        slidesPerView: 4,
-        spaceBetween: 25,
-        autoHeight: false,
-        speed: 300,
-        loop: true,
-        autoplay: {
-          delay: 4000,
-        },
-        // Arrows
-        navigation: {
-          nextEl: ".work-examples__nav .work-examples__next",
-          prevEl: ".work-examples__nav .work-examples__prev",
-        },
-
-        breakpoints: {
-          319.98: {
-            slidesPerView: 1.1,
-            spaceBetween: 15,
-            loop: true,
-            autoplay: {
-              delay: 3000,
-            },
-            centeredSlides: true,
-          },
-          429.98: { slidesPerView: 1.2 },
-          529.98: { slidesPerView: 1.8 },
-
-          767.98: {
-            slidesPerView: 2.3,
-            spaceBetween: 15,
-          },
-          1023.98: { slidesPerView: 3, spaceBetween: 20 },
-          1439.98: {
-            spaceBetween: 24,
-          },
-        },
-
-        on: {},
-      });
-    }
-    // слайдер 'Варианты ухода за газоном'
-    if (document.querySelector(".lawn-options__slider")) {
-      new Swiper(".lawn-options__slider", {
-        observer: true,
-        observeParents: true,
-        slidesPerView: 3,
-        spaceBetween: 30,
-        autoHeight: false,
-        speed: 300,
-        pagination: {
-          el: ".so-discount__pagging",
-          clickable: true,
-        },
-
-        breakpoints: {
-          319.98: {
-            slidesPerView: 1.1,
-            spaceBetween: 30,
-          },
-          429.98: { slidesPerView: 1.28 },
-
-          767.98: {
-            slidesPerView: 2.25,
-            spaceBetween: 30,
-          },
-          1023.98: { slidesPerView: 3 },
-        },
-
-        on: {},
-      });
-    }
-    // слайдер 'Как выгоднее с нами работать?'
-    if (document.querySelector(".so-discount__slider")) {
-      new Swiper(".so-discount__slider", {
-        observer: true,
-        observeParents: true,
-        slidesPerView: 3,
-        spaceBetween: 30,
-        autoHeight: false,
-        speed: 300,
-        pagination: {
-          el: ".so-discount__pagging",
-          clickable: true,
-        },
-
-        breakpoints: {
-          319.98: {
-            slidesPerView: 1.1,
-            spaceBetween: 30,
-          },
-          429.98: { slidesPerView: 1.28 },
-
-          767.98: {
-            slidesPerView: 2.25,
-            spaceBetween: 30,
-          },
-          1023.98: { slidesPerView: 3 },
-        },
-
-        on: {},
-      });
-    }
-    // слайдер c sewera
-    if (
-      document.querySelector(".banner-gallery__slider:not(.swiper-initialized)")
-    ) {
-      new Swiper(".banner-gallery__slider:not(.swiper-initialized)", {
-        observer: true,
-        observeParents: true,
-        slidesPerView: 1,
-        spaceBetween: 0,
-        autoHeight: false,
-        speed: 300,
-        autoplay: {
-          delay: 3000,
-        },
-        loop: true,
-        navigation: {
-          prevEl: ".banner-gallery__navigation .banner-gallery__btn_prev",
-          nextEl: ".banner-gallery__navigation .banner-gallery__btn_next",
-        },
-        pagination: {
-          el: ".banner-gallery__pagination",
-          clickable: true,
-        },
-
-        breakpoints: {},
-
-        on: {},
-      });
-    }
-  }
-  window.addEventListener("load", function (e) {
-    // Запуск инициализации слайдеров
-    initSliders();
-    initPopupSlider();
-  });
-  function initPopupSlider() {
-    const pop = new Popup();
-
-    const containerSlider = document.querySelector(".submitted__swiper-yt");
-
-    if (!containerSlider) return;
-
-    containerSlider.addEventListener("click", function (event) {
-      if (!event.target.closest(".submitted__slide-yt_video")) return;
-
-      let slideTargetVideo = event.target.closest(".submitted__slide-yt_video")
-        .dataset.slide;
-
-      bildSliders();
-
-      if (document.querySelector(".popup-video__slider")) {
-        const swiper = new Swiper(".popup-video__slider", {
-          observer: true,
-          observeParents: true,
-
-          spaceBetween: 30,
-          autoHeight: false,
-          speed: 500,
-          pagination: {
-            el: "",
-            clickable: true,
-          },
-          slideToClickedSlide: true,
-          navigation: {
-            nextEl: "#slider-popup-video_navigation #slider-popup-video_next",
-            prevEl: "#slider-popup-video_navigation #slider-popup-video_prev",
-          },
-          breakpoints: {
-            320: {
-              spaceBetween: 15,
-              centeredSlides: true,
-              slidesPerView: "1.3",
-            },
-            430: {
-              centeredSlides: true,
-              spaceBetween: 15,
-              slidesPerView: "1.2",
-              initialSlide: 0,
-            },
-            768: {
-              spaceBetween: 25,
-              centeredSlides: false,
-              slidesPerView: "1",
-            },
-            992: {
-              slidesPerView: "1",
-              spaceBetween: 30,
-            },
-          },
-
-          on: {},
-        });
-        swiper.on("update", function () {
-          swiper.slideTo(slideTargetVideo, 1, false);
-        });
-        swiper.on("slideChange", function () {
-          pop.options.on.beforeClose();
-        });
-        swiper.update();
-      }
-    });
-
-    function findVideos() {
-      let videos = document.querySelectorAll("._video-yt");
-      for (let i = 0; i < videos.length; i++) {
-        setupVideo(videos[i]);
-      }
-    }
-    findVideos();
-    function setupVideo(video) {
-      let link = video.querySelector("._video-yt-link");
-      let media = video.querySelector("._video-yt-media");
-      let button = video.querySelector("._video-yt-btn");
-      let id = parseMediaURL(media);
-
-      video.addEventListener("click", () => {
-        let iframe = createIframe(id);
-
-        link.style.display = "none";
-        button.style.display = "none";
-        video.appendChild(iframe);
-      });
-
-      link.removeAttribute("href");
-      video.classList.add("video--enabled");
-    }
-
-    function parseMediaURL(media) {
-      let regexp =
-        /https:\/\/i\.ytimg\.com\/vi\/([a-zA-Z0-9_-]+)\/maxresdefault\.jpg/i;
-      let url = media.src;
-      let match = url.match(regexp);
-
-      return match[1];
-    }
-
-    function createIframe(id) {
-      let iframe = document.createElement("iframe");
-
-      iframe.setAttribute("allowfullscreen", "");
-      // iframe.setAttribute('allow', 'autoplay');
-      iframe.setAttribute("id", "youtube-slide");
-
-      iframe.setAttribute("src", generateURL(id));
-      iframe.classList.add("popup-video__media");
-      return iframe;
-    }
-    function generateURL(id) {
-      let query = "?enablejsapi=1&rel=0&showinfo=0&autoplay=1";
-
-      return "https://www.youtube.com/embed/" + id + query;
-    }
-  }
-
-  // function initPopupSlider() {
-  //   const initPopups = new Popup();
-
-  //   const containerSlider = document.querySelector('.submitted__swiper-yt');
-
-  //   if (containerSlider) {
-  //     containerSlider.addEventListener('click', function (event) {
-  //       if (!event.target.closest('.submitted__slide-yt_video')) return;
-
-  //       let slideTargetVideo = event.target.closest('.submitted__slide-yt_video')
-  //         .dataset.slide;
-
-  //       bildSliders();
-
-  //       if (document.querySelector('.popup-video__slider')) {
-  //         const swiper = new Swiper(
-  //           '.popup-video__slider:not(.swiper-initialized)',
-  //           {
-  //             observer: true,
-  //             observeParents: true,
-
-  //             spaceBetween: 30,
-  //             autoHeight: false,
-  //             speed: 500,
-  //             pagination: {
-  //               el: '',
-  //               clickable: true,
-  //             },
-  //             slideToClickedSlide: true,
-  //             navigation: {
-  //               nextEl: '#slider-popup-video_navigation #slider-popup-video_next',
-  //               prevEl: '#slider-popup-video_navigation #slider-popup-video_prev',
-  //             },
-  //             breakpoints: {
-  //               320: {
-  //                 spaceBetween: 15,
-  //                 centeredSlides: true,
-  //                 slidesPerView: '1.3',
-  //               },
-  //               430: {
-  //                 centeredSlides: true,
-  //                 spaceBetween: 15,
-  //                 slidesPerView: '1.2',
-  //                 initialSlide: 0,
-  //               },
-  //               768: {
-  //                 spaceBetween: 25,
-  //                 centeredSlides: false,
-  //                 slidesPerView: '1',
-  //               },
-  //               992: {
-  //                 slidesPerView: '1',
-  //                 spaceBetween: 30,
-  //               },
-  //             },
-
-  //             on: {},
-  //           }
-  //         );
-  //         swiper.on('update', function () {
-  //           swiper.slideTo(slideTargetVideo, 1, false);
-  //         });
-  //         swiper.on('slideChange', function () {
-  //           initPopups.options.on.beforeClose();
-  //         });
-  //
-  //         swiper.update();
-  //       }
-  //     });
-  //   }
-
-  //   function findVideos() {
-  //     let videos = document.querySelectorAll('._video-yt');
-  //     for (let i = 0; i < videos.length; i++) {
-  //       setupVideo(videos[i]);
-  //     }
-  //   }
-  //   findVideos();
-  //   function setupVideo(video) {
-  //     let link = video.querySelector('._video-yt-link');
-  //     let button = video.querySelector('._video-yt-btn');
-  //     let id = parseIdFromUrl(link.href);
-
-  //     video.addEventListener('click', () => {
-  //       let iframe = createIframe(id);
-
-  //       link.style.display = 'none';
-  //       button.style.display = 'none';
-  //       video.appendChild(iframe);
-  //     });
-
-  //     link.removeAttribute('href');
-  //     video.classList.add('video--enabled');
-  //   }
-
-  //   function parseIdFromUrl(url) {
-  //     const regexp = /https:\/\/youtu\.be\/([a-zA-Z0-9_-]+)\?*/i;
-  //     const match = url.match(regexp);
-
-  //     return match ? match[1] : false;
-  //   }
-
-  //   function createIframe(id) {
-  //     let iframe = document.createElement('iframe');
-
-  //     iframe.setAttribute('allowfullscreen', '');
-  //     iframe.setAttribute('allow', 'autoplay');
-  //     iframe.setAttribute('id', 'youtube-slide');
-
-  //     iframe.setAttribute('src', generateURL(id));
-  //     iframe.classList.add('popup-video__media');
-  //     return iframe;
-  //   }
-  //   function generateURL(id) {
-  //     let query = '?enablejsapi=1&rel=0&showinfo=0&autoplay=1';
-
-  //     return 'https://www.youtube.com/embed/' + id + query;
-  //   }
-  // }
-  /* инициализация карты */
-  function initMap() {
-    const cityList = [
-      {
-        city: "москва",
-        center: [55.73, 37.6],
-        zoom: 8,
-        polygon: [
-          [54.80831947994278, 38.18433433925412],
-          [54.87945876925923, 38.52995859405644],
-          [55.122011885673516, 38.67767483903884],
-          [55.37773639221365, 38.95005546337981],
-          [55.69101620830514, 39.06854923170738],
-          [55.962220037403114, 39.09331426601756],
-          [56.118493229997256, 38.83962697728742],
-          [56.38328535103986, 38.538312268742686],
-          [56.72694946754399, 38.84094055277811],
-          [56.54218234666476, 37.45911829335503],
-          [56.484269925944716, 36.55340126947627],
-          [56.082994973012944, 35.26044765213379],
-          [55.528582146509564, 35.79574540554199],
-          [54.886906159423376, 36.2751232506904],
-          [54.80831947994278, 38.18433433925412],
-        ],
-      },
-      {
-        city: "питер",
-        center: [59.93, 30.31],
-        zoom: 7,
-        polygon: [
-          [61.106088074302846, 28.84990729821095],
-          [60.54048161644306, 27.852634950925818],
-          [60.75790210590904, 28.70283621526761],
-          [60.71577485205364, 28.815934690349366],
-          [60.36998777034415, 28.591678325406576],
-          [60.16918067335956, 29.40829044088855],
-          [60.211534546111665, 29.565211415079403],
-          [60.187888023113686, 29.76919931592809],
-          [60.15288724263536, 29.946358034169208],
-          [60.12523238261545, 30.01739461918757],
-          [60.0423242615806, 29.96706282242633],
-          [59.98493140629839, 30.238787111520338],
-          [59.93232002134522, 30.232711129552428],
-          [59.84017052918489, 30.131823462708525],
-          [59.885551817464716, 29.780468838045408],
-          [59.93961408752628, 29.49723475289224],
-          [59.964616467662836, 29.19559571694552],
-          [59.91991225984697, 29.093497700881187],
-          [59.83296746003299, 29.087954398797308],
-          [59.78396907811887, 28.914027896498567],
-          [59.75631501176312, 28.72500164979357],
-          [59.800093425856545, 28.60943866524633],
-          [59.80224973132346, 28.510190763084665],
-          [59.73798583871411, 28.485433522283643],
-          [59.66933873971914, 28.443601343301964],
-          [59.6455402380044, 28.376395134689574],
-          [59.65854803135656, 28.293968754917074],
-          [59.69130561691546, 28.200415788977097],
-          [59.74283516453832, 28.176907105205913],
-          [59.767886802293845, 28.119769460495604],
-          [59.671623961424615, 28.052389391540657],
-          [59.53828823226743, 28.139961089731088],
-          [59.35798953936603, 28.280648261698502],
-          [59.02248117220134, 27.802166784452368],
-          [59.00045046566632, 28.16716353323224],
-          [58.90325564969078, 28.305782371843577],
-          [58.892541977172385, 28.547145432234146],
-          [58.839964234623864, 28.845593925558575],
-          [58.81921766186278, 29.117229752723944],
-          [58.71702324975635, 29.25362211337176],
-          [58.61141214319082, 29.417761707109804],
-          [58.52810610714258, 29.61583387713702],
-          [58.45004102025334, 29.77698972302713],
-          [58.47175326366724, 30.057070714286084],
-          [58.528177693429086, 30.078493270758997],
-          [58.670382603306024, 30.045047415771506],
-          [58.784750929872246, 30.172568775367296],
-          [58.77110172497413, 30.343612119793363],
-          [58.74393741340788, 30.50480117892272],
-          [58.76087846060315, 30.64903410782111],
-          [58.89266306882436, 30.720318055999343],
-          [58.931775319679105, 30.87541133018749],
-          [59.08920426528445, 31.001107474298152],
-          [59.05199909544481, 31.247310598952225],
-          [59.16120182948734, 31.46040108683397],
-          [59.24601344328124, 31.51924861119312],
-          [59.3841107762172, 31.519650608045566],
-          [59.37453535197764, 31.743859355535903],
-          [59.41319939652709, 31.895892426683588],
-          [59.4229337327242, 32.06818148171814],
-          [59.35859553485514, 32.20693837199164],
-          [59.28307118884456, 32.32414465705074],
-          [59.17916450331086, 32.39505501883892],
-          [59.15220746691128, 32.516090367786234],
-          [59.16411241403188, 32.67707713805814],
-          [59.25209559211132, 32.704493920109],
-          [59.34898953782607, 32.772563410771056],
-          [59.396925101876036, 32.86750784159898],
-          [59.44235324548666, 33.07951705642466],
-          [59.413053844884786, 33.23037247596619],
-          [59.42351502348515, 33.46150882912565],
-          [59.3621493877059, 33.71617224039184],
-          [59.28076198027452, 33.85555732820072],
-          [59.18093545333778, 34.07927365350611],
-          [59.218446738264504, 34.31479262566086],
-          [59.18449031867098, 34.46167119790215],
-          [59.15756557610953, 34.569028458632886],
-          [59.134213013591875, 34.74295902207777],
-          [59.19477306563164, 34.801078803116695],
-          [59.2564359565597, 34.97977799727809],
-          [59.2912162694453, 35.12579135405289],
-          [59.32989570283232, 35.26304437874467],
-          [59.394126305198824, 35.282047170349756],
-          [59.44494765499957, 35.336190323574385],
-          [59.527887428452004, 35.279241905261756],
-          [59.55491865313289, 35.38593012930545],
-          [59.56172289354441, 35.45519752319393],
-          [59.63727521994343, 35.448287025471046],
-          [59.65468260646398, 35.555353868864756],
-          [59.686264326387004, 35.562483180192146],
-          [59.703950761999664, 35.42163323598487],
-          [59.76838546078838, 35.34683149778368],
-          [59.85256037133368, 35.3567480923831],
-          [59.92369691755857, 35.406137191942264],
-          [59.9805250889039, 35.28730686193509],
-          [60.017895388841026, 35.10473292452272],
-          [60.08351447005737, 35.16532530607367],
-          [60.18264270143564, 35.12041199589066],
-          [60.25167418889458, 35.135359361852636],
-          [60.33731700421731, 35.225018017333184],
-          [60.599637668599655, 35.24198481129656],
-          [60.66614517771396, 35.19836887519892],
-          [60.73404500750823, 35.14189036348486],
-          [60.860688754947546, 35.23361484311272],
-          [60.88857627351911, 35.38923417605841],
-          [60.93444654114589, 35.52607157330945],
-          [61.02021458655281, 35.63697856871454],
-          [61.1083074214377, 35.66627786728151],
-          [61.15697755043698, 35.65753483388153],
-          [61.138111449137995, 35.513698102849844],
-          [61.12318207774868, 35.36526337298682],
-          [61.1832439172974, 35.335165607609014],
-          [61.23909327326484, 35.34306604636703],
-          [61.228582198408304, 35.19403076257794],
-          [61.22860626645772, 35.028774374516416],
-          [61.26035502030351, 34.80014854115669],
-          [61.228371912248804, 34.62740677860907],
-          [61.16914050333483],
-          34.521057796999315,
-          [61.1381625782991, 34.375724845099],
-          [61.193136211572295, 34.274744102545526],
-          [61.207127022717884, 34.01546202975132],
-          [61.203757474773255, 33.698387119373336],
-          [61.16566629145257, 33.56353423301232],
-          [61.15193178960703, 33.495864964454626],
-          [61.10094639830956, 33.57979779688657],
-          [61.14509680547397, 33.76467751366431],
-          [61.12465903378748, 33.91802782223414],
-          [61.008016691462956, 33.941252627795365],
-          [60.9144170484949, 33.816468775562356],
-          [60.92079313266953, 33.67582168857538],
-          [60.95277608109717, 33.57544502404991],
-          [60.99486230036612, 33.50047914244152],
-          [60.9656518934932, 33.47746318511602],
-          [60.920762010627215, 33.49682021768072],
-          [60.88595190808354, 33.39188123480494],
-          [60.8360574570367, 33.341192219070024],
-          [60.753586881331614, 33.26077873445362],
-          [60.696863877704004, 33.128608162644554],
-          [60.66744942292257, 33.013157521200924],
-          [60.47643160894205, 32.82599005653793],
-          [60.50472927233986, 32.65483755366424],
-          [60.396308853622884, 32.74780061241211],
-          [60.31819019883031, 32.66598898975374],
-          [60.245199187531796, 32.65909996699057],
-          [60.161066458141306, 32.61444214580604],
-          [60.12614806592467, 32.495855101856904],
-          [60.09471699316654, 32.301778825749864],
-          [60.11039252448461, 32.18459263609901],
-          [60.16749132430087, 32.070916239492675],
-          [60.18998264893045, 31.889161919783447],
-          [60.18675966797986, 31.73410743459536],
-          [60.119836209160354, 31.65017367415598],
-          [60.0605217394008, 31.6046419601648],
-          [59.99324259600215, 31.610785530865854],
-          [59.93335651991168, 31.59401443688691],
-          [59.880472446391366, 31.50763516198711],
-          [59.886351135496454, 31.27940617403553],
-          [59.90097354234132, 31.142684758149613],
-          [59.91566408008279, 30.99993686742772],
-          [59.95660389144942, 30.951398418986003],
-          [60.00105689222647, 31.02619414415352],
-          [60.07363677987078, 31.053152954550058],
-          [60.151108957508114, 30.981435482398467],
-          [60.22734836046297, 30.91402784967906],
-          [60.375430876166945, 30.82185987239356],
-          [60.49908511402646, 30.692137455248258],
-          [60.58062586990846, 30.57597504845583],
-          [60.64945709096361, 30.443091178705856],
-          [60.73859746306803, 30.47682683528842],
-          [60.806970681028275, 30.462987825587703],
-          [61.00722789319536, 30.257720710362037],
-          [61.0946869940374, 30.081598200023848],
-          [61.151348903426424, 29.830549834254754],
-          [61.15529478015222, 29.613444318104058],
-          [61.212959857671194, 29.516226783570488],
-          [61.263060270690886, 29.348334364957054],
-          [61.25454458553398, 29.24086735976627],
-          [61.106088074302846, 28.84990729821095],
-        ],
-      },
-    ];
-
-    const tabsMap = document.querySelectorAll("button[data-city-map]");
-    const slectorBtn = document.querySelectorAll(".ya-map__tab");
-
-    var myMap = new ymaps.Map(
-      "map",
-      {
-        center: cityList[0].center,
-        zoom: 8,
-      },
-      {
-        searchControlProvider: "yandex#search",
-      },
-    );
-    if (slectorBtn) {
-      slectorBtn.forEach((element) => {
-        element.addEventListener("click", (e) => {
-          if (element.closest("._active-tab-map")) {
-            return;
-          }
-          slectorBtn.forEach((el) => el.classList.remove("_active-tab-map"));
-          element.classList.add("_active-tab-map");
-        });
-      });
-    }
-    if (tabsMap.length !== 0) {
-      tabsMap.forEach((element) => {
-        const dataCity = element.dataset.cityMap;
-        let objCity = cityList.find((el) => dataCity === el.city);
-
-        let myPolygon = new ymaps.Polygon(
-          [objCity.polygon],
-          {
-            hintContent: "Многоугольник",
-          },
-          {
-            fillColor: "#009CD9",
-            strokeWidth: 1,
-            strokeColor: "#0067A0",
-            strokeOpacity: 1,
-            fillOpacity: 0.2,
-          },
-        );
-        myMap.geoObjects.add(myPolygon);
-        myMap.geoObjects.add(new ymaps.Placemark(objCity.center, {}));
-
-        element.addEventListener("click", (e) => {
-          myMap.setCenter(objCity.center, objCity.zoom);
-        });
-      });
-    } else {
-      myMap.geoObjects.add(new ymaps.Placemark([55.73, 37.6], {}));
-      let myPolygon = new ymaps.Polygon(
-        [
-          [
-            [54.80831947994278, 38.18433433925412],
-            [54.87945876925923, 38.52995859405644],
-            [55.122011885673516, 38.67767483903884],
-            [55.37773639221365, 38.95005546337981],
-            [55.69101620830514, 39.06854923170738],
-            [55.962220037403114, 39.09331426601756],
-            [56.118493229997256, 38.83962697728742],
-            [56.38328535103986, 38.538312268742686],
-            [56.72694946754399, 38.84094055277811],
-            [56.54218234666476, 37.45911829335503],
-            [56.484269925944716, 36.55340126947627],
-            [56.082994973012944, 35.26044765213379],
-            [55.528582146509564, 35.79574540554199],
-            [54.886906159423376, 36.2751232506904],
-            [54.80831947994278, 38.18433433925412],
-          ],
-        ],
-        {
-          hintContent: "Многоугольник",
-        },
-        {
-          fillColor: "#009CD9",
-          strokeWidth: 1,
-          strokeColor: "#0067A0",
-          strokeOpacity: 1,
-          fillOpacity: 0.2,
-        },
-      );
-
-      myMap.geoObjects.add(myPolygon);
-    }
-
-    // myMap.controls.remove('zoomControl'); // удаляем контрол зуммирования
-    myMap.controls.remove("geolocationControl"); // удаляем геолокацию
-    myMap.controls.remove("searchControl"); // удаляем поиск
-    myMap.controls.remove("trafficControl"); // удаляем контроль трафика
-    myMap.controls.remove("typeSelector"); // удаляем тип
-    myMap.controls.remove("fullscreenControl"); // удаляем кнопку перехода в полноэкранный режим
-    myMap.controls.remove("rulerControl"); // удаляем контрол правил
-    myMap.behaviors.disable(["scrollZoom"]); // отключаем скролл карты (опционально)
-  }
-  ymaps.ready(initMap);
-  /* кнопка инфо  Модификации */
-
-  // ===================================================================
-  // function tabModificationModel() {
-  //   const infoModelBtn = document.querySelectorAll('.card-model__info-btn');
-  //   if (infoModelBtn) {
-  //     infoModelBtn.forEach((element, indx) => {
-  //       // полуялоны емодели
-  //       element.addEventListener('click', function (e) {
-  //         element.classList.toggle('_show');
-  //       });
-  //       document.addEventListener('click', (e) => {
-  //         let target = e.target;
-
-  //         if (element.contains(target)) return;
-  //         if (!element.firstChild.contains(target)) {
-  //           element.classList.remove('_show');
-  //         }
-  //       });
-  //     });
-  //   }
-  //   const dataModel = [
-  //     // 1
-  //     {
-  //       oneTopBtn: [
-  //         {
-  //           linkModel: 'septik-akvalos-4',
-  //           id: '1',
-  //           img: '1',
-  //           name: 'Септик Аквалос 4',
-  //           onePointList: '60',
-  //           threePointList: '250',
-  //           price: '106 200 ₽',
-  //           discount: '118 000 ₽',
-  //         },
-  //       ],
-  //       twoTopBtn: [
-  //         {
-  //           linkModel: 'septik-akvalos-4-pr',
-
-  //           id: '1',
-  //           img: '1',
-  //           name: 'Септик Аквалос 4 ПР',
-  //           onePointList: '60',
-  //           threePointList: '230',
-  //           price: '106 200 ₽',
-  //           discount: '118 000 ₽',
-  //         },
-  //       ],
-  //     },
-  //     // 2
-  //     {
-  //       oneTopBtn: [
-  //         {
-  //           linkModel: 'septik-tver-0-35p',
-
-  //           id: '1',
-  //           img: '2-s',
-  //           name: 'Септик Тверь 0,35 П',
-  //           onePointList: '30',
-  //           threePointList: '120',
-  //           price: '108 900 ₽',
-  //           discount: '',
-  //         },
-  //       ],
-  //       twoTopBtn: [
-  //         {
-  //           linkModel: 'septik-tver-0-35-pn',
-  //           id: '1',
-  //           img: '2-p',
-  //           name: 'Септик Тверь 0,35 ПН',
-  //           onePointList: '30',
-  //           threePointList: '110',
-  //           price: '118 800 ₽',
-  //           discount: '',
-  //         },
-  //       ],
-  //     },
-  //     // 3
-  //     {
-  //       oneTopBtn: [
-  //         {
-  //           linkModel: 'septik-tver-0-5-p',
-  //           id: '1',
-  //           img: '3-s',
-  //           name: 'Септик Тверь 0,5 П',
-  //           onePointList: '30',
-  //           threePointList: '120',
-  //           price: '118 800 ₽',
-  //           discount: '',
-  //         },
-  //         {
-  //           linkModel: 'septik-tver-0-5-pm',
-  //           id: '2',
-  //           img: '3-s-pm',
-  //           name: 'Септик Тверь 0,5 ПМ',
-  //           onePointList: '60',
-  //           threePointList: '110',
-  //           price: '136 900 ₽',
-  //           discount: '',
-  //         },
-  //         {
-  //           linkModel: 'septik-tver-0-5-np',
-  //           id: '3',
-  //           img: '3-s',
-  //           name: 'Септик Тверь 0,5 НП',
-  //           onePointList: '60',
-  //           threePointList: '120',
-  //           price: '131 800 ₽',
-  //           discount: '',
-  //         },
-  //         {
-  //           linkModel: 'septik-tver-0-5-npm',
-  //           id: '4',
-  //           img: '3-s-pm',
-  //           name: 'Септик Тверь 0,5 НПМ',
-  //           onePointList: '60',
-  //           threePointList: '120',
-  //           price: '151 600 ₽',
-  //           discount: '',
-  //         },
-  //       ],
-  //       twoTopBtn: [
-  //         {
-  //           linkModel: 'septik-tver-0-5-pn',
-  //           id: '1',
-  //           img: '3-p',
-  //           name: 'Септик Тверь 0,5 ПН',
-  //           onePointList: '30',
-  //           threePointList: '120',
-  //           price: '118 800 ₽',
-  //           discount: '',
-  //         },
-  //         {
-  //           linkModel: 'septik-tver-0-5-pnm',
-  //           id: '2',
-  //           img: '3-p-pm',
-  //           name: 'Септик Тверь 0,5 ПНМ',
-  //           onePointList: '60',
-  //           threePointList: '120',
-  //           price: '151 600 ₽',
-  //           discount: '',
-  //         },
-  //         {
-  //           linkModel: 'septik-tver-0-5-npn',
-  //           id: '3',
-  //           img: '3-p',
-  //           name: 'Септик Тверь 0,5 НПН',
-  //           onePointList: '30',
-  //           threePointList: '120',
-  //           price: '142 700 ₽',
-  //           discount: '',
-  //         },
-  //         {
-  //           linkModel: 'septik-tver-0-5-npnm',
-  //           id: '4',
-  //           img: '3-p-mpn',
-  //           name: 'Септик Тверь 0,8 НПНМ',
-  //           onePointList: '60',
-  //           threePointList: '120',
-  //           price: '164 900 ₽',
-  //           discount: '',
-  //         },
-  //       ],
-  //     },
-  //     // 4
-  //     {
-  //       oneTopBtn: [
-  //         {
-  //           linkModel: 'septik-astra-5',
-  //           id: '1',
-  //           img: '4',
-  //           name: 'Септик Юнилос Астра 5',
-  //           onePointList: '85',
-  //           threePointList: '250',
-  //           price: '123 250 ₽',
-  //           discount: '145 000 ₽',
-  //         },
-  //         {
-  //           linkModel: 'septik-astra-5-midi',
-  //           id: '2',
-  //           img: '4-m',
-  //           name: 'Септик Юнилос Астра 5 Миди',
-  //           onePointList: '100',
-  //           threePointList: '250',
-  //           price: '125 800 ₽',
-  //           discount: '148 000 ₽',
-  //         },
-  //         {
-  //           linkModel: 'septik-astra-5-long',
-  //           id: '3',
-  //           img: '4-l',
-  //           name: 'Септик Юнилос Астра 5 Лонг',
-  //           onePointList: '150',
-  //           threePointList: '250',
-  //           price: '141 950 ₽',
-  //           discount: '167 000 ₽',
-  //         },
-  //       ],
-  //       twoTopBtn: [
-  //         {
-  //           linkModel: 'septik-astra-5-pr',
-  //           id: '1',
-  //           img: '4',
-  //           name: 'Септик Юнилос Астра 5 Пр',
-  //           onePointList: '85',
-  //           threePointList: '250',
-  //           price: '127 500 ₽',
-  //           discount: '150 000 ₽',
-  //         },
-  //         {
-  //           linkModel: 'septik-astra-5-midi-pr',
-  //           id: '2',
-  //           img: '4-m',
-  //           name: 'Септик Юнилос Астра 5 Миди Пр',
-  //           onePointList: '100',
-  //           threePointList: '250',
-  //           price: '130 050 ₽',
-  //           discount: '153 000 ₽',
-  //         },
-  //         {
-  //           linkModel: 'septik-astra-5-long-pr',
-  //           id: '3',
-  //           img: '4-l',
-  //           name: 'Септик Юнилос Астра 5 Лонг Пр',
-  //           onePointList: '150',
-  //           threePointList: '250',
-  //           price: '146 200 ₽',
-  //           discount: '172 000',
-  //         },
-  //       ],
-  //     },
-  //     // 5
-  //     {
-  //       oneTopBtn: [
-  //         {
-  //           linkModel: 'septik-topol-6',
-  //           id: '1',
-  //           img: '5',
-  //           name: 'Септик Тополь 6',
-  //           onePointList: '85',
-  //           threePointList: '270',
-  //           price: '129 420 ₽',
-  //           discount: '143 800 ₽',
-  //         },
-  //         {
-  //           linkModel: 'septik-topol-6-pljus',
-  //           id: '2',
-  //           img: '5-p',
-  //           name: 'Септик Тополь 6 Плюс',
-  //           onePointList: ' 135',
-  //           threePointList: '270',
-  //           price: '145 440 ₽',
-  //           discount: '161 600 ₽',
-  //         },
-  //       ],
-  //       twoTopBtn: [
-  //         {
-  //           linkModel: 'septik-topol-6-pr',
-  //           id: '1',
-  //           img: '5-p',
-  //           name: 'Септик Тополь 6 Пр',
-  //           onePointList: '85',
-  //           threePointList: '270',
-  //           price: '139 500 ₽',
-  //           discount: '155 000 ₽',
-  //         },
-  //         {
-  //           linkModel: 'septik-topol-6-pr-pljus',
-  //           id: '2',
-  //           img: '5-p',
-  //           name: 'Септик Тополь 6 Пр Плюс',
-  //           onePointList: '135',
-  //           threePointList: '270',
-  //           price: '157 320 ₽',
-  //           discount: '174 800 ₽',
-  //         },
-  //       ],
-  //     },
-  //     // 6
-  //     {
-  //       oneTopBtn: [
-  //         {
-  //           linkModel: 'septik-tver-085-p',
-  //           id: '1',
-  //           img: '6-s',
-  //           name: 'Септик Тверь 0,8 П',
-  //           onePointList: '30',
-  //           threePointList: '120',
-  //           price: '135 900 ₽',
-  //           discount: '',
-  //         },
-  //         {
-  //           linkModel: 'septik-tver-085-pm',
-  //           id: '2',
-  //           img: '6-s-pm',
-  //           name: 'Септик Тверь 0,8 ПМ',
-  //           onePointList: '60',
-  //           threePointList: '225',
-  //           price: '159 600 ₽',
-  //           discount: '',
-  //         },
-  //         {
-  //           linkModel: 'septik-tver-085-np',
-  //           id: '3',
-  //           img: '6-s',
-  //           name: 'Септик Тверь 0,8 НП',
-  //           onePointList: '102',
-  //           threePointList: '225',
-  //           price: '150 900 ₽',
-  //           discount: '',
-  //         },
-  //         {
-  //           linkModel: 'septik-tver-085-npm',
-  //           id: '4',
-  //           img: '6-s-pm',
-  //           name: 'Септик Тверь 0,8 НПМ',
-  //           onePointList: '132',
-  //           threePointList: '225',
-  //           price: '178 400 ₽',
-  //           discount: '',
-  //         },
-  //       ],
-  //       twoTopBtn: [
-  //         {
-  //           linkModel: 'septik-tver-085-pn',
-  //           id: '1',
-  //           img: '6-p',
-  //           name: 'Септик Тверь 0,8 ПН',
-  //           onePointList: '30',
-  //           threePointList: '630',
-  //           price: '150 700 ₽',
-  //           discount: '',
-  //         },
-  //         {
-  //           linkModel: 'septik-tver-085-pnm',
-  //           id: '2',
-  //           img: '6-p-pm',
-  //           name: 'Септик Тверь 0,8 ПНМ',
-  //           onePointList: '60',
-  //           threePointList: '225',
-  //           price: '178 400 ₽',
-  //           discount: '',
-  //         },
-  //         {
-  //           linkModel: 'septik-tver-085-npn',
-  //           id: '3',
-  //           img: '6-p',
-  //           name: 'Септик Тверь 0,8 НПН',
-  //           onePointList: '102',
-  //           threePointList: '225',
-  //           price: '163 900 ₽',
-  //           discount: '',
-  //         },
-  //         {
-  //           linkModel: 'septik-tver-085-npnm',
-  //           id: '4',
-  //           img: '6-p-pm',
-  //           name: 'Септик Тверь 0,8 НП',
-  //           onePointList: '132',
-  //           threePointList: '225',
-  //           price: '192 600 ₽',
-  //           discount: '',
-  //         },
-  //       ],
-  //     },
-  //     // 7
-  //     {
-  //       oneTopBtn: [
-  //         {
-  //           linkModel: 'septik-akvalos-8',
-  //           id: '1',
-  //           img: '7',
-  //           name: 'Септик Аквалос 8',
-  //           onePointList: '60',
-  //           threePointList: '700',
-  //           price: '130 050 ₽',
-  //           discount: '165 000 ₽',
-  //         },
-  //         {
-  //           linkModel: 'septik-akvalos-8-mid',
-  //           id: '2',
-  //           img: '7-m',
-  //           name: 'Септик Аквалос 8 Миди',
-  //           onePointList: '85',
-  //           threePointList: '700',
-  //           price: '153 900 ₽',
-  //           discount: '171 000 ₽',
-  //         },
-  //         {
-  //           linkModel: 'septik-akvalos-8-long',
-  //           id: '3',
-  //           img: '7-l',
-  //           name: 'Септик Аквалос 8 Лонг',
-  //           onePointList: '120',
-  //           threePointList: '700',
-  //           price: '167 400 ₽',
-  //           discount: '186 000 ₽',
-  //         },
-  //       ],
-  //       twoTopBtn: [
-  //         {
-  //           linkModel: 'septik-akvalos-8-pr',
-  //           id: '1',
-  //           img: '7',
-  //           name: 'Септик Аквалос 8 Пр',
-  //           onePointList: '60',
-  //           threePointList: '630',
-  //           price: '148 500 ₽',
-  //           discount: '165 000 ₽',
-  //         },
-  //         {
-  //           linkModel: 'septik-akvalos-8-midi-pr',
-  //           id: '2',
-  //           img: '7-m',
-  //           name: 'Септик Аквалос 8 Миди Пр',
-  //           onePointList: '85',
-  //           threePointList: '630',
-  //           price: '153 900 ₽',
-  //           discount: '171 000 ₽',
-  //         },
-  //         {
-  //           linkModel: 'septik-akvalos-8-long-pr',
-  //           id: '3',
-  //           img: '7-l',
-  //           name: 'Септик Аквалос 8 Лонг Пр',
-  //           onePointList: '120',
-  //           threePointList: '700',
-  //           price: '167 400 ₽',
-  //           discount: '186 000',
-  //         },
-  //       ],
-  //     },
-  //     // 8
-  //     {
-  //       oneTopBtn: [
-  //         {
-  //           linkModel: 'septik-astra-8',
-  //           id: '1',
-  //           img: '4',
-  //           name: 'Септик Юнилос Астра 8',
-  //           onePointList: '85',
-  //           threePointList: '350',
-  //           price: '149 600 ₽',
-  //           discount: '176 000 ₽',
-  //         },
-  //         {
-  //           linkModel: 'septik-astra-8-midi',
-  //           id: '2',
-  //           img: '4-m',
-  //           name: 'Септик Юнилос Астра 8 Миди',
-  //           onePointList: '100',
-  //           threePointList: '350',
-  //           price: '152 150 ₽',
-  //           discount: '179 000 ₽',
-  //         },
-  //         {
-  //           linkModel: 'septik-astra-8-long',
-  //           id: '3',
-  //           img: '4-l',
-  //           name: 'Септик Юнилос Астра 8 Лонг',
-  //           onePointList: '150',
-  //           threePointList: '350',
-  //           price: '173 400 ₽',
-  //           discount: '204 000 ₽',
-  //         },
-  //       ],
-  //       twoTopBtn: [
-  //         {
-  //           linkModel: 'septik-astra-8-pr',
-  //           id: '1',
-  //           img: '4',
-  //           name: 'Септик Юнилос Астра 8 Пр',
-  //           onePointList: '85',
-  //           threePointList: '350',
-  //           price: '153 850 ₽',
-  //           discount: '181 850 ₽',
-  //         },
-  //         {
-  //           linkModel: 'septik-astra-8-midi-pr',
-  //           id: '2',
-  //           img: '4-m',
-  //           name: 'Септик Юнилос Астра 8 Миди Пр',
-  //           onePointList: '100',
-  //           threePointList: '350',
-  //           price: '156 400 ₽',
-  //           discount: '184 000 ₽',
-  //         },
-  //         {
-  //           linkModel: 'septik-astra-8-long-pr',
-  //           id: '3',
-  //           img: '4-l',
-  //           name: 'Септик Юнилос Астра 8 Лонг Пр',
-  //           onePointList: '150',
-  //           threePointList: '350',
-  //           price: '167 400 ₽',
-  //           discount: '177 650 ₽',
-  //         },
-  //       ],
-  //     },
-  //     // 9
-  //     {
-  //       oneTopBtn: [
-  //         {
-  //           linkModel: 'septik-tver-1-p',
-  //           id: '1',
-  //           img: '9-s',
-  //           name: 'Септик Тверь 1,1 П',
-  //           onePointList: '30',
-  //           threePointList: '330',
-  //           price: '152 475 ₽',
-  //           discount: '160 500 ₽',
-  //         },
-  //         {
-  //           linkModel: 'septik-tver-1-pm',
-  //           id: '2',
-  //           img: '9-s-pm',
-  //           name: 'Септик Тверь 1,1 ПМ',
-  //           onePointList: ' 60',
-  //           threePointList: '330',
-  //           price: '184 300 ₽',
-  //           discount: '',
-  //         },
-  //         {
-  //           linkModel: 'septik-tver-1-np',
-  //           id: '3',
-  //           img: '9-s',
-  //           name: 'Септик Тверь 1,1 НП',
-  //           onePointList: '102',
-  //           threePointList: '330',
-  //           price: '174 900 ₽',
-  //           discount: '',
-  //         },
-  //         {
-  //           linkModel: 'septik-tver-1-npm',
-  //           id: '4',
-  //           img: '9-s-pm',
-  //           name: 'Септик Тверь 1,1 НПМ',
-  //           onePointList: '132',
-  //           threePointList: '225',
-  //           price: '199 800 ₽',
-  //           discount: '',
-  //         },
-  //       ],
-  //       twoTopBtn: [
-  //         {
-  //           linkModel: 'septik-tver-1-pn',
-  //           id: '1',
-  //           img: '9-p',
-  //           name: 'Септик Тверь 1,1 ПН',
-  //           onePointList: '30',
-  //           threePointList: '330',
-  //           price: '174 900 ₽',
-  //           discount: '',
-  //         },
-  //         {
-  //           linkModel: 'septik-tver-1-pnm',
-  //           id: '2',
-  //           img: '9-p-pm',
-  //           name: 'Септик Тверь 1,1 ПНМ',
-  //           onePointList: '60',
-  //           threePointList: '330',
-  //           price: '199 800 ₽',
-  //           discount: '',
-  //         },
-  //         {
-  //           linkModel: 'septik-tver-1-pnm',
-  //           id: '3',
-  //           img: '9-p',
-  //           name: 'Септик Тверь 1,1 НПН',
-  //           onePointList: '102',
-  //           threePointList: '330',
-  //           price: '189 400 ₽',
-  //           discount: '',
-  //         },
-  //         {
-  //           linkModel: 'septik-tver-1-npnm',
-  //           id: '4',
-  //           img: '9-p-pm',
-  //           name: 'Септик Тверь 1,1 НП',
-  //           onePointList: '132',
-  //           threePointList: '330',
-  //           price: '251 900 ₽',
-  //           discount: '',
-  //         },
-  //       ],
-  //     },
-  //   ];
-  //   const slidesModel = document.querySelector('.popular-models__swiper');
-  //   if (slidesModel) {
-  //     slidesModel.addEventListener('click', function (e) {
-  //       let target = e.target;
-  //       selectTab(target, '.card-model__top-btn');
-  //       selectTab(target, '.card-model__bottom-btn');
-
-  //       let activeBottomBtn = '1';
-  //       let activeTopBtn = '1';
-  //       const slideModel = document.querySelectorAll('.popular-models__slide');
-  //       let findIndxSlide;
-  //       let indxSlide;
-
-  //       if (target.closest('[data-top-id]')) {
-  //         for (let z = 0; z < slideModel.length; z++) {
-  //           const element = slideModel[z];
-  //           if (
-  //             element.dataset.slideId ===
-  //             target.closest('[data-top-id]').dataset.topId
-  //           ) {
-  //             findIndxSlide = slideModel[+element.dataset.slideId];
-  //             indxSlide = element.dataset.slideId;
-  //             activeTopBtn = searchActiveBtn(
-  //               findIndxSlide.querySelector('.card-model__top-btns')
-  //             );
-  //             if (findIndxSlide.querySelector('.card-model__bottom-btns')) {
-  //               activeBottomBtn = searchActiveBtn(
-  //                 findIndxSlide.querySelector('.card-model__bottom-btns')
-  //               );
-  //             }
-  //           }
-  //         }
-  //       }
-
-  //       if (target.closest('[data-bottom-id]')) {
-  //         for (let i = 0; i < slideModel.length; i++) {
-  //           const element = slideModel[i];
-  //           if (
-  //             element.dataset.slideId ===
-  //             target.closest('[data-bottom-id]').dataset.bottomId
-  //           ) {
-  //             findIndxSlide = slideModel[+element.dataset.slideId];
-  //             indxSlide = element.dataset.slideId;
-  //             activeTopBtn = searchActiveBtn(
-  //               findIndxSlide.querySelector('.card-model__top-btns')
-  //             );
-  //             activeBottomBtn = searchActiveBtn(target.parentElement);
-  //             break;
-  //           }
-  //         }
-  //       }
-  //       if (!findIndxSlide) return;
-  //       const topBtn = findIndxSlide.querySelector('.card-model__top-btns');
-  //       const nameModel = findIndxSlide.querySelector('.card-model__name');
-  //       const priceModel = findIndxSlide.querySelector(
-  //         '.card-model__current-price'
-  //       );
-  //       const discountModel = findIndxSlide.querySelector(
-  //         '.card-model__discount-price'
-  //       );
-  //       const imgModel = findIndxSlide.querySelector('.card-model__img img');
-  //       const listModel = findIndxSlide.querySelector('.card-model__list');
-  //       const likeBtn = findIndxSlide.querySelector('.card-model__favorite');
-
-  //       if (target.closest('.card-model__favorite')) {
-  //         likeBtn.classList.toggle('_active');
-  //       }
-  //       activeTopBtn = searchActiveBtn(topBtn);
-
-  //       let findObjModel = dataModel[indxSlide][activeTopBtn].find(
-  //         (it) => it.id == activeBottomBtn
-  //       );
-
-  //       if (findObjModel.name && nameModel) {
-  //         nameModel.innerHTML = '';
-  //         nameModel.innerHTML = findObjModel.name;
-  //         nameModel.setAttribute(
-  //           'href',
-  //           `https://sewera.ru/products/${findObjModel.linkModel}`
-  //         );
-  //       }
-
-  //       if (findObjModel.price && priceModel) {
-  //         priceModel.innerHTML = '';
-  //         priceModel.innerHTML = findObjModel.price;
-  //       }
-
-  //       if (findObjModel.discount && discountModel) {
-  //         discountModel.innerHTML = '';
-  //         discountModel.innerHTML = findObjModel.discount;
-  //       } else {
-  //         if (discountModel) discountModel.innerHTML = '';
-  //       }
-
-  //       if (findObjModel.onePointList && listModel) {
-  //         listModel.children[0].firstElementChild.innerHTML = '';
-  //         listModel.children[0].firstElementChild.innerHTML =
-  //           findObjModel.onePointList;
-  //       }
-
-  //       if (findObjModel.threePointList && listModel) {
-  //         listModel.children[2].firstElementChild.innerHTML = '';
-  //         listModel.children[2].firstElementChild.innerHTML =
-  //           findObjModel.threePointList;
-  //       }
-
-  //       if (findObjModel.img && imgModel) {
-  //         createImgSrc(imgModel, findObjModel.img);
-  //       }
-
-  //       listModel.children[3].firstElementChild.innerHTML = '';
-  //       listModel.children[3].firstElementChild.innerHTML =
-  //         activeTopBtn === 'oneTopBtn' ? 'Самотеком' : 'Принудительный';
-  //     });
-  //   }
-  //   /* добавдляем класс _active-btn */
-  //   function selectTab(target, selectorBtn) {
-  //     if (target.closest(selectorBtn) && !target.closest('._active-btn')) {
-  //       Array.from(target.parentElement.children).forEach((el, i) => {
-  //         el.classList.remove('_active-btn');
-  //       });
-  //       target.classList.add('_active-btn');
-  //     }
-  //   }
-  //   // созадние пути для картнки
-  //   function createImgSrc(img, btn) {
-  //     if (btn) {
-  //       const endIndxSrc = img.src.lastIndexOf('/');
-  //       img.src = img.src.slice(0, endIndxSrc + 1) + btn + '.webp';
-  //     }
-  //   }
-
-  //   /* поиск активного  класса в topBtn */
-  //   function searchActiveBtn(selectorBtn) {
-  //     let activeTopBtn;
-
-  //     Array.from(selectorBtn.children).forEach((el) => {
-  //       if (el.closest('._active-btn')) {
-  //         let keys = Object.keys(el.dataset);
-  //         activeTopBtn = el.dataset[keys[0]];
-  //       }
-  //     });
-
-  //     return activeTopBtn;
-  //   }
-  // }
-  function tabModificationModel() {
-    const infoModelBtn = document.querySelectorAll(".card-model__info-btn");
-    if (infoModelBtn) {
-      //  кнопка "Модификации:" подсказка
-      infoModelBtn.forEach((element) => {
-        // полуялоныe модели
-        element.addEventListener("click", function (e) {
-          element.classList.toggle("_show");
-        });
-        document.addEventListener("click", (e) => {
-          let target = e.target;
-
-          if (element.contains(target)) return;
-          if (!element.firstChild.contains(target)) {
-            element.classList.remove("_show");
-          }
-        });
-      });
-    }
-
-    const slidesModel = document.querySelector(".popular-models__swiper");
-    if (slidesModel) {
-      slidesModel.addEventListener("click", function (e) {
-        let target = e.target;
-        selectTab(target, ".card-model__top-btn");
-        selectTab(target, ".card-model__bottom-btn");
-
-        const slideModel = document.querySelectorAll(".popular-models__slide");
-
-        if (target.closest("[data-slide-id]")) {
-          let actvSlide = target.closest("[data-slide-id]").dataset.slideId;
-
-          const nameModel =
-            slideModel[actvSlide].querySelector(".card-model__name");
-          const listModel = slideModel[actvSlide].querySelectorAll(
-            ".card-model__list li",
-          );
-          const priceModel = slideModel[actvSlide].querySelector(
-            ".card-model__current-price",
-          );
-          const discModel = slideModel[actvSlide].querySelector(
-            ".card-model__discount-price",
-          );
-          const butBtnModel =
-            slideModel[actvSlide].querySelector(".card-model__btn");
-
-          const imgModel = slideModel[actvSlide].querySelector(
-            ".card-model__img img",
-          );
-          const topBtn = slideModel[actvSlide].querySelector(
-            ".card-model__top-btns",
-          );
-          const bottomBtn = slideModel[actvSlide].querySelector(
-            ".card-model__bottom-btns",
-          );
-          // Верхняя кнопка модифкаций "превая"
-          if (target.closest("[data-top-sm]")) {
-            let objPropModif;
-
-            if (target.hasAttribute("data-top-sm")) {
-              objPropModif = Object.assign(
-                target.closest("[data-top-sm]").dataset,
-              );
+      l = (e = 1) => {
+        let t = document.querySelector("body");
+        if (n) {
+          let s = document.querySelectorAll("[data-lp]");
+          setTimeout(() => {
+            for (let e = 0; e < s.length; e++) {
+              s[e].style.paddingRight = "0px";
             }
-
-            if (bottomBtn) {
-              objPropModif = searchActiveBtn(topBtn, bottomBtn);
-            }
-
-            editPropModel(objPropModif);
+            (t.style.paddingRight = "0px"),
+              document.documentElement.classList.remove("lock");
+          }, e),
+            (n = !1),
+            setTimeout(function () {
+              n = !0;
+            }, e);
+        }
+      },
+      r = (e = 1) => {
+        let t = document.querySelector("body");
+        if (n) {
+          let s = document.querySelectorAll("[data-lp]");
+          for (let e = 0; e < s.length; e++) {
+            s[e].style.paddingRight =
+              window.innerWidth -
+              document.querySelector(".wrapper").offsetWidth +
+              "px";
           }
-          // Верхняя кнопка модифкаций "второя"
-          if (target.closest("[data-top-pr]")) {
-            let objPropModif;
-
-            // если нет нижних кнопок модификации срабатывает вот этот код
-            if (target.hasAttribute("data-top-pr")) {
-              objPropModif = Object.assign(
-                target.closest("[data-top-pr]").dataset,
-              );
-            }
-            // если есть нижних кнопок модификации срабатывает вот этот код
-            if (bottomBtn) {
-              objPropModif = searchActiveBtn(topBtn, bottomBtn);
-            }
-
-            editPropModel(objPropModif);
+          (t.style.paddingRight =
+            window.innerWidth -
+            document.querySelector("body").offsetWidth +
+            "px"),
+            document.documentElement.classList.add("lock"),
+            (n = !1),
+            setTimeout(function () {
+              n = !0;
+            }, e);
+        }
+      };
+    function a() {
+      const e = document.querySelectorAll("[data-showmore]");
+      let i, n;
+      function o(e) {
+        e.forEach((e) => {
+          l(e.itemsArray, e.matchMedia);
+        });
+      }
+      function l(e, i) {
+        e.forEach((e) => {
+          !(function (e, i = !1) {
+            e = i ? e.item : e;
+            const n = e.querySelector("[data-showmore-content]"),
+              o = e.querySelector("[data-showmore-button]"),
+              l = r(e, n);
+            (i.matches || !i) &&
+            l <
+              (function (e) {
+                let t = e.offsetHeight;
+                e.style.removeProperty("height");
+                let s = e.offsetHeight;
+                return (e.style.height = `${t}px`), s;
+              })(n)
+              ? (t(n, 0, l), (o.hidden = !1))
+              : (s(n, 0, l), (o.hidden = !0));
+          })(e, i);
+        });
+      }
+      function r(e, t) {
+        let s = 0;
+        if ("items" === (e.dataset.showmore ? e.dataset.showmore : "size")) {
+          const e = t.dataset.showmoreContent ? t.dataset.showmoreContent : 3,
+            i = t.children;
+          for (let t = 1; t < i.length; t++) {
+            if (((s += i[t - 1].offsetHeight), t === e)) break;
           }
-          //нижние кнопеи модифкации
-          if (target.closest("[data-bottom-btn]")) {
-            let objPropModif = searchActiveBtn(topBtn, bottomBtn);
-
-            editPropModel(objPropModif);
+        } else {
+          s = t.dataset.showmoreContent ? t.dataset.showmoreContent : 150;
+        }
+        return s;
+      }
+      function a(e) {
+        const a = e.target,
+          c = e.type;
+        if ("click" === c) {
+          if (a.closest("[data-showmore-button]")) {
+            const e = a
+                .closest("[data-showmore-button]")
+                .closest("[data-showmore]"),
+              i = e.querySelector("[data-showmore-content]"),
+              n = e.dataset.showmoreButton ? e.dataset.showmoreButton : "500",
+              o = r(e, i);
+            i.classList.contains("_slide") ||
+              (e.classList.contains("_showmore-active")
+                ? t(i, n, o)
+                : s(i, n, o),
+              e.classList.toggle("_showmore-active"));
           }
-
-          /* поиск активного  класса в topBtn */
-          function searchActiveBtn(selectorTopBtn, selectorBottomBtn = "") {
-            let objData;
-            let topKey;
-
-            Array.from(selectorTopBtn.children).forEach((el) => {
-              if (el.closest("._active-btn")) {
-                topKey = Object.keys(el.dataset)[0];
-              }
+        } else "resize" === c && (i.length && l(i), n.length && o(n));
+      }
+      e.length &&
+        ((i = Array.from(e).filter(function (e, t, s) {
+          return !e.dataset.showmoreMedia;
+        })),
+        i.length && l(i),
+        document.addEventListener("click", a),
+        window.addEventListener("resize", a),
+        (n = dataMediaQueries(e, "showmoreMedia")),
+        n &&
+          n.length &&
+          (n.forEach((e) => {
+            e.matchMedia.addEventListener("change", function () {
+              l(e.itemsArray, e.matchMedia);
             });
+          }),
+          o(n)));
+    }
+    var c, d;
+    function u(e) {
+      return "object" == typeof e && "function" == typeof e.to;
+    }
+    function p(e) {
+      e.parentElement.removeChild(e);
+    }
+    function m(e) {
+      return null != e;
+    }
+    function h(e) {
+      e.preventDefault();
+    }
+    function f(e) {
+      return "number" == typeof e && !isNaN(e) && isFinite(e);
+    }
+    function v(e, t, s) {
+      s > 0 &&
+        (b(e, t),
+        setTimeout(function () {
+          _(e, t);
+        }, s));
+    }
+    function g(e) {
+      return Math.max(Math.min(e, 100), 0);
+    }
+    function y(e) {
+      return Array.isArray(e) ? e : [e];
+    }
+    function S(e) {
+      var t = (e = String(e)).split(".");
+      return t.length > 1 ? t[1].length : 0;
+    }
+    function b(e, t) {
+      e.classList && !/\s/.test(t)
+        ? e.classList.add(t)
+        : (e.className += " " + t);
+    }
+    function _(e, t) {
+      e.classList && !/\s/.test(t)
+        ? e.classList.remove(t)
+        : (e.className = e.className.replace(
+            new RegExp("(^|\\b)" + t.split(" ").join("|") + "(\\b|$)", "gi"),
+            " ",
+          ));
+    }
+    function w(e) {
+      var t = void 0 !== window.pageXOffset,
+        s = "CSS1Compat" === (e.compatMode || "");
+      return {
+        x: t
+          ? window.pageXOffset
+          : s
+            ? e.documentElement.scrollLeft
+            : e.body.scrollLeft,
+        y: t
+          ? window.pageYOffset
+          : s
+            ? e.documentElement.scrollTop
+            : e.body.scrollTop,
+      };
+    }
+    function k(e, t) {
+      return 100 / (t - e);
+    }
+    function E(e, t, s) {
+      return (100 * t) / (e[s + 1] - e[s]);
+    }
+    function x(e, t) {
+      for (var s = 1; e >= t[s]; ) s += 1;
+      return s;
+    }
+    function V(e, t, s) {
+      if (s >= e.slice(-1)[0]) return 100;
+      var i = x(s, e),
+        n = e[i - 1],
+        o = e[i],
+        l = t[i - 1],
+        r = t[i];
+      return (
+        l +
+        (function (e, t) {
+          return E(e, e[0] < 0 ? t + Math.abs(e[0]) : t - e[0], 0);
+        })([n, o], s) /
+          k(l, r)
+      );
+    }
+    function C(e, t, s, i) {
+      if (100 === i) return i;
+      var n = x(i, e),
+        o = e[n - 1],
+        l = e[n];
+      return s
+        ? i - o > (l - o) / 2
+          ? l
+          : o
+        : t[n - 1]
+          ? e[n - 1] +
+            (function (e, t) {
+              return Math.round(e / t) * t;
+            })(i - e[n - 1], t[n - 1])
+          : i;
+    }
+    !(function (e) {
+      (e.Range = "range"),
+        (e.Steps = "steps"),
+        (e.Positions = "positions"),
+        (e.Count = "count"),
+        (e.Values = "values");
+    })(c || (c = {})),
+      (function (e) {
+        (e[(e.None = -1)] = "None"),
+          (e[(e.NoValue = 0)] = "NoValue"),
+          (e[(e.LargeValue = 1)] = "LargeValue"),
+          (e[(e.SmallValue = 2)] = "SmallValue");
+      })(d || (d = {}));
+    var P = (function () {
+        function e(e, t, s) {
+          var i;
+          (this.xPct = []),
+            (this.xVal = []),
+            (this.xSteps = []),
+            (this.xNumSteps = []),
+            (this.xHighestCompleteStep = []),
+            (this.xSteps = [s || !1]),
+            (this.xNumSteps = [!1]),
+            (this.snap = t);
+          var n = [];
+          for (
+            Object.keys(e).forEach(function (t) {
+              n.push([y(e[t]), t]);
+            }),
+              n.sort(function (e, t) {
+                return e[0][0] - t[0][0];
+              }),
+              i = 0;
+            i < n.length;
+            i++
+          )
+            this.handleEntryPoint(n[i][1], n[i][0]);
+          for (
+            this.xNumSteps = this.xSteps.slice(0), i = 0;
+            i < this.xNumSteps.length;
+            i++
+          )
+            this.handleStepPoint(i, this.xNumSteps[i]);
+        }
+        return (
+          (e.prototype.getDistance = function (e) {
+            for (var t = [], s = 0; s < this.xNumSteps.length - 1; s++)
+              t[s] = E(this.xVal, e, s);
+            return t;
+          }),
+          (e.prototype.getAbsoluteDistance = function (e, t, s) {
+            var i,
+              n = 0;
+            if (e < this.xPct[this.xPct.length - 1])
+              for (; e > this.xPct[n + 1]; ) n++;
+            else
+              e === this.xPct[this.xPct.length - 1] &&
+                (n = this.xPct.length - 2);
+            s || e !== this.xPct[n + 1] || n++, null === t && (t = []);
+            var o = 1,
+              l = t[n],
+              r = 0,
+              a = 0,
+              c = 0,
+              d = 0;
+            for (
+              i = s
+                ? (e - this.xPct[n]) / (this.xPct[n + 1] - this.xPct[n])
+                : (this.xPct[n + 1] - e) / (this.xPct[n + 1] - this.xPct[n]);
+              l > 0;
 
-            if (selectorBottomBtn) {
-              Array.from(selectorBottomBtn.children).forEach((el) => {
-                if (el.closest("._active-btn")) {
-                  objData = el.dataset;
+            )
+              (r = this.xPct[n + 1 + d] - this.xPct[n + d]),
+                t[n + d] * o + 100 - 100 * i > 100
+                  ? ((a = r * i), (o = (l - 100 * i) / t[n + d]), (i = 1))
+                  : ((a = ((t[n + d] * r) / 100) * o), (o = 0)),
+                s
+                  ? ((c -= a), this.xPct.length + d >= 1 && d--)
+                  : ((c += a), this.xPct.length - d >= 1 && d++),
+                (l = t[n + d] * o);
+            return e + c;
+          }),
+          (e.prototype.toStepping = function (e) {
+            return (e = V(this.xVal, this.xPct, e));
+          }),
+          (e.prototype.fromStepping = function (e) {
+            return (function (e, t, s) {
+              if (s >= 100) return e.slice(-1)[0];
+              var i = x(s, t),
+                n = e[i - 1],
+                o = e[i],
+                l = t[i - 1];
+              return (function (e, t) {
+                return (t * (e[1] - e[0])) / 100 + e[0];
+              })([n, o], (s - l) * k(l, t[i]));
+            })(this.xVal, this.xPct, e);
+          }),
+          (e.prototype.getStep = function (e) {
+            return (e = C(this.xPct, this.xSteps, this.snap, e));
+          }),
+          (e.prototype.getDefaultStep = function (e, t, s) {
+            var i = x(e, this.xPct);
+            return (
+              (100 === e || (t && e === this.xPct[i - 1])) &&
+                (i = Math.max(i - 1, 1)),
+              (this.xVal[i] - this.xVal[i - 1]) / s
+            );
+          }),
+          (e.prototype.getNearbySteps = function (e) {
+            var t = x(e, this.xPct);
+            return {
+              stepBefore: {
+                startValue: this.xVal[t - 2],
+                step: this.xNumSteps[t - 2],
+                highestStep: this.xHighestCompleteStep[t - 2],
+              },
+              thisStep: {
+                startValue: this.xVal[t - 1],
+                step: this.xNumSteps[t - 1],
+                highestStep: this.xHighestCompleteStep[t - 1],
+              },
+              stepAfter: {
+                startValue: this.xVal[t],
+                step: this.xNumSteps[t],
+                highestStep: this.xHighestCompleteStep[t],
+              },
+            };
+          }),
+          (e.prototype.countStepDecimals = function () {
+            var e = this.xNumSteps.map(S);
+            return Math.max.apply(null, e);
+          }),
+          (e.prototype.hasNoSize = function () {
+            return this.xVal[0] === this.xVal[this.xVal.length - 1];
+          }),
+          (e.prototype.convert = function (e) {
+            return this.getStep(this.toStepping(e));
+          }),
+          (e.prototype.handleEntryPoint = function (e, t) {
+            var s;
+            if (
+              !f((s = "min" === e ? 0 : "max" === e ? 100 : parseFloat(e))) ||
+              !f(t[0])
+            )
+              throw new Error("noUiSlider: 'range' value isn't numeric.");
+            this.xPct.push(s), this.xVal.push(t[0]);
+            var i = Number(t[1]);
+            s
+              ? this.xSteps.push(!isNaN(i) && i)
+              : isNaN(i) || (this.xSteps[0] = i),
+              this.xHighestCompleteStep.push(0);
+          }),
+          (e.prototype.handleStepPoint = function (e, t) {
+            if (t)
+              if (this.xVal[e] !== this.xVal[e + 1]) {
+                this.xSteps[e] =
+                  E([this.xVal[e], this.xVal[e + 1]], t, 0) /
+                  k(this.xPct[e], this.xPct[e + 1]);
+                var s = (this.xVal[e + 1] - this.xVal[e]) / this.xNumSteps[e],
+                  i = Math.ceil(Number(s.toFixed(3)) - 1),
+                  n = this.xVal[e] + this.xNumSteps[e] * i;
+                this.xHighestCompleteStep[e] = n;
+              } else
+                this.xSteps[e] = this.xHighestCompleteStep[e] = this.xVal[e];
+          }),
+          e
+        );
+      })(),
+      L = {
+        to: function (e) {
+          return void 0 === e ? "" : e.toFixed(2);
+        },
+        from: Number,
+      },
+      q = {
+        target: "target",
+        base: "base",
+        origin: "origin",
+        handle: "handle",
+        handleLower: "handle-lower",
+        handleUpper: "handle-upper",
+        touchArea: "touch-area",
+        horizontal: "horizontal",
+        vertical: "vertical",
+        background: "background",
+        connect: "connect",
+        connects: "connects",
+        ltr: "ltr",
+        rtl: "rtl",
+        textDirectionLtr: "txt-dir-ltr",
+        textDirectionRtl: "txt-dir-rtl",
+        draggable: "draggable",
+        drag: "state-drag",
+        tap: "state-tap",
+        active: "active",
+        tooltip: "tooltip",
+        pips: "pips",
+        pipsHorizontal: "pips-horizontal",
+        pipsVertical: "pips-vertical",
+        marker: "marker",
+        markerHorizontal: "marker-horizontal",
+        markerVertical: "marker-vertical",
+        markerNormal: "marker-normal",
+        markerLarge: "marker-large",
+        markerSub: "marker-sub",
+        value: "value",
+        valueHorizontal: "value-horizontal",
+        valueVertical: "value-vertical",
+        valueNormal: "value-normal",
+        valueLarge: "value-large",
+        valueSub: "value-sub",
+      },
+      A = { tooltips: ".__tooltips", aria: ".__aria" };
+    function O(e, t) {
+      if (!f(t)) throw new Error("noUiSlider: 'step' is not numeric.");
+      e.singleStep = t;
+    }
+    function B(e, t) {
+      if (!f(t))
+        throw new Error("noUiSlider: 'keyboardPageMultiplier' is not numeric.");
+      e.keyboardPageMultiplier = t;
+    }
+    function D(e, t) {
+      if (!f(t))
+        throw new Error("noUiSlider: 'keyboardMultiplier' is not numeric.");
+      e.keyboardMultiplier = t;
+    }
+    function T(e, t) {
+      if (!f(t))
+        throw new Error("noUiSlider: 'keyboardDefaultStep' is not numeric.");
+      e.keyboardDefaultStep = t;
+    }
+    function N(e, t) {
+      if ("object" != typeof t || Array.isArray(t))
+        throw new Error("noUiSlider: 'range' is not an object.");
+      if (void 0 === t.min || void 0 === t.max)
+        throw new Error("noUiSlider: Missing 'min' or 'max' in 'range'.");
+      e.spectrum = new P(t, e.snap || !1, e.singleStep);
+    }
+    function H(e, t) {
+      if (((t = y(t)), !Array.isArray(t) || !t.length))
+        throw new Error("noUiSlider: 'start' option is incorrect.");
+      (e.handles = t.length), (e.start = t);
+    }
+    function M(e, t) {
+      if ("boolean" != typeof t)
+        throw new Error("noUiSlider: 'snap' option must be a boolean.");
+      e.snap = t;
+    }
+    function z(e, t) {
+      if ("boolean" != typeof t)
+        throw new Error("noUiSlider: 'animate' option must be a boolean.");
+      e.animate = t;
+    }
+    function R(e, t) {
+      if ("number" != typeof t)
+        throw new Error(
+          "noUiSlider: 'animationDuration' option must be a number.",
+        );
+      e.animationDuration = t;
+    }
+    function j(e, t) {
+      var s,
+        i = [!1];
+      if (
+        ("lower" === t ? (t = [!0, !1]) : "upper" === t && (t = [!1, !0]),
+        !0 === t || !1 === t)
+      ) {
+        for (s = 1; s < e.handles; s++) i.push(t);
+        i.push(!1);
+      } else {
+        if (!Array.isArray(t) || !t.length || t.length !== e.handles + 1)
+          throw new Error(
+            "noUiSlider: 'connect' option doesn't match handle count.",
+          );
+        i = t;
+      }
+      e.connect = i;
+    }
+    function U(e, t) {
+      switch (t) {
+        case "horizontal":
+          e.ort = 0;
+          break;
+        case "vertical":
+          e.ort = 1;
+          break;
+        default:
+          throw new Error("noUiSlider: 'orientation' option is invalid.");
+      }
+    }
+    function I(e, t) {
+      if (!f(t))
+        throw new Error("noUiSlider: 'margin' option must be numeric.");
+      0 !== t && (e.margin = e.spectrum.getDistance(t));
+    }
+    function F(e, t) {
+      if (!f(t)) throw new Error("noUiSlider: 'limit' option must be numeric.");
+      if (((e.limit = e.spectrum.getDistance(t)), !e.limit || e.handles < 2))
+        throw new Error(
+          "noUiSlider: 'limit' option is only supported on linear sliders with 2 or more handles.",
+        );
+    }
+    function W(e, t) {
+      var s;
+      if (!f(t) && !Array.isArray(t))
+        throw new Error(
+          "noUiSlider: 'padding' option must be numeric or array of exactly 2 numbers.",
+        );
+      if (Array.isArray(t) && 2 !== t.length && !f(t[0]) && !f(t[1]))
+        throw new Error(
+          "noUiSlider: 'padding' option must be numeric or array of exactly 2 numbers.",
+        );
+      if (0 !== t) {
+        for (
+          Array.isArray(t) || (t = [t, t]),
+            e.padding = [
+              e.spectrum.getDistance(t[0]),
+              e.spectrum.getDistance(t[1]),
+            ],
+            s = 0;
+          s < e.spectrum.xNumSteps.length - 1;
+          s++
+        )
+          if (e.padding[0][s] < 0 || e.padding[1][s] < 0)
+            throw new Error(
+              "noUiSlider: 'padding' option must be a positive number(s).",
+            );
+        var i = t[0] + t[1],
+          n = e.spectrum.xVal[0];
+        if (i / (e.spectrum.xVal[e.spectrum.xVal.length - 1] - n) > 1)
+          throw new Error(
+            "noUiSlider: 'padding' option must not exceed 100% of the range.",
+          );
+      }
+    }
+    function X(e, t) {
+      switch (t) {
+        case "ltr":
+          e.dir = 0;
+          break;
+        case "rtl":
+          e.dir = 1;
+          break;
+        default:
+          throw new Error("noUiSlider: 'direction' option was not recognized.");
+      }
+    }
+    function Y(e, t) {
+      if ("string" != typeof t)
+        throw new Error(
+          "noUiSlider: 'behaviour' must be a string containing options.",
+        );
+      var s = t.indexOf("tap") >= 0,
+        i = t.indexOf("drag") >= 0,
+        n = t.indexOf("fixed") >= 0,
+        o = t.indexOf("snap") >= 0,
+        l = t.indexOf("hover") >= 0,
+        r = t.indexOf("unconstrained") >= 0,
+        a = t.indexOf("drag-all") >= 0,
+        c = t.indexOf("smooth-steps") >= 0;
+      if (n) {
+        if (2 !== e.handles)
+          throw new Error(
+            "noUiSlider: 'fixed' behaviour must be used with 2 handles",
+          );
+        I(e, e.start[1] - e.start[0]);
+      }
+      if (r && (e.margin || e.limit))
+        throw new Error(
+          "noUiSlider: 'unconstrained' behaviour cannot be used with margin or limit",
+        );
+      e.events = {
+        tap: s || o,
+        drag: i,
+        dragAll: a,
+        smoothSteps: c,
+        fixed: n,
+        snap: o,
+        hover: l,
+        unconstrained: r,
+      };
+    }
+    function Q(e, t) {
+      if (!1 !== t)
+        if (!0 === t || u(t)) {
+          e.tooltips = [];
+          for (var s = 0; s < e.handles; s++) e.tooltips.push(t);
+        } else {
+          if ((t = y(t)).length !== e.handles)
+            throw new Error(
+              "noUiSlider: must pass a formatter for all handles.",
+            );
+          t.forEach(function (e) {
+            if ("boolean" != typeof e && !u(e))
+              throw new Error(
+                "noUiSlider: 'tooltips' must be passed a formatter or 'false'.",
+              );
+          }),
+            (e.tooltips = t);
+        }
+    }
+    function Z(e, t) {
+      if (t.length !== e.handles)
+        throw new Error("noUiSlider: must pass a attributes for all handles.");
+      e.handleAttributes = t;
+    }
+    function G(e, t) {
+      if (!u(t))
+        throw new Error("noUiSlider: 'ariaFormat' requires 'to' method.");
+      e.ariaFormat = t;
+    }
+    function J(e, t) {
+      if (
+        !(function (e) {
+          return u(e) && "function" == typeof e.from;
+        })(t)
+      )
+        throw new Error(
+          "noUiSlider: 'format' requires 'to' and 'from' methods.",
+        );
+      e.format = t;
+    }
+    function K(e, t) {
+      if ("boolean" != typeof t)
+        throw new Error(
+          "noUiSlider: 'keyboardSupport' option must be a boolean.",
+        );
+      e.keyboardSupport = t;
+    }
+    function ee(e, t) {
+      e.documentElement = t;
+    }
+    function te(e, t) {
+      if ("string" != typeof t && !1 !== t)
+        throw new Error("noUiSlider: 'cssPrefix' must be a string or `false`.");
+      e.cssPrefix = t;
+    }
+    function se(e, t) {
+      if ("object" != typeof t)
+        throw new Error("noUiSlider: 'cssClasses' must be an object.");
+      "string" == typeof e.cssPrefix
+        ? ((e.cssClasses = {}),
+          Object.keys(t).forEach(function (s) {
+            e.cssClasses[s] = e.cssPrefix + t[s];
+          }))
+        : (e.cssClasses = t);
+    }
+    function ie(e) {
+      var t = {
+          margin: null,
+          limit: null,
+          padding: null,
+          animate: !0,
+          animationDuration: 300,
+          ariaFormat: L,
+          format: L,
+        },
+        s = {
+          step: { r: !1, t: O },
+          keyboardPageMultiplier: { r: !1, t: B },
+          keyboardMultiplier: { r: !1, t: D },
+          keyboardDefaultStep: { r: !1, t: T },
+          start: { r: !0, t: H },
+          connect: { r: !0, t: j },
+          direction: { r: !0, t: X },
+          snap: { r: !1, t: M },
+          animate: { r: !1, t: z },
+          animationDuration: { r: !1, t: R },
+          range: { r: !0, t: N },
+          orientation: { r: !1, t: U },
+          margin: { r: !1, t: I },
+          limit: { r: !1, t: F },
+          padding: { r: !1, t: W },
+          behaviour: { r: !0, t: Y },
+          ariaFormat: { r: !1, t: G },
+          format: { r: !1, t: J },
+          tooltips: { r: !1, t: Q },
+          keyboardSupport: { r: !0, t: K },
+          documentElement: { r: !1, t: ee },
+          cssPrefix: { r: !0, t: te },
+          cssClasses: { r: !0, t: se },
+          handleAttributes: { r: !1, t: Z },
+        },
+        i = {
+          connect: !1,
+          direction: "ltr",
+          behaviour: "tap",
+          orientation: "horizontal",
+          keyboardSupport: !0,
+          cssPrefix: "noUi-",
+          cssClasses: q,
+          keyboardPageMultiplier: 5,
+          keyboardMultiplier: 1,
+          keyboardDefaultStep: 10,
+        };
+      e.format && !e.ariaFormat && (e.ariaFormat = e.format),
+        Object.keys(s).forEach(function (n) {
+          if (m(e[n]) || void 0 !== i[n]) s[n].t(t, m(e[n]) ? e[n] : i[n]);
+          else if (s[n].r)
+            throw new Error("noUiSlider: '" + n + "' is required.");
+        }),
+        (t.pips = e.pips);
+      var n = document.createElement("div"),
+        o = void 0 !== n.style.msTransform,
+        l = void 0 !== n.style.transform;
+      t.transformRule = l ? "transform" : o ? "msTransform" : "webkitTransform";
+      return (
+        (t.style = [
+          ["left", "top"],
+          ["right", "bottom"],
+        ][t.dir][t.ort]),
+        t
+      );
+    }
+    function ne(e, t, s) {
+      var i,
+        n,
+        o,
+        l,
+        r,
+        a,
+        u,
+        f = window.navigator.pointerEnabled
+          ? { start: "pointerdown", move: "pointermove", end: "pointerup" }
+          : window.navigator.msPointerEnabled
+            ? {
+                start: "MSPointerDown",
+                move: "MSPointerMove",
+                end: "MSPointerUp",
+              }
+            : {
+                start: "mousedown touchstart",
+                move: "mousemove touchmove",
+                end: "mouseup touchend",
+              },
+        S =
+          window.CSS &&
+          CSS.supports &&
+          CSS.supports("touch-action", "none") &&
+          (function () {
+            var e = !1;
+            try {
+              var t = Object.defineProperty({}, "passive", {
+                get: function () {
+                  e = !0;
+                },
+              });
+              window.addEventListener("test", null, t);
+            } catch (e) {}
+            return e;
+          })(),
+        k = e,
+        E = t.spectrum,
+        x = [],
+        V = [],
+        C = [],
+        P = 0,
+        L = {},
+        q = e.ownerDocument,
+        O = t.documentElement || q.documentElement,
+        B = q.body,
+        D = "rtl" === q.dir || 1 === t.ort ? 0 : 100;
+      function $(e, t) {
+        var s = q.createElement("div");
+        return t && b(s, t), e.appendChild(s), s;
+      }
+      function T(e, s) {
+        var i = $(e, t.cssClasses.origin),
+          n = $(i, t.cssClasses.handle);
+        if (
+          ($(n, t.cssClasses.touchArea),
+          n.setAttribute("data-handle", String(s)),
+          t.keyboardSupport &&
+            (n.setAttribute("tabindex", "0"),
+            n.addEventListener("keydown", function (e) {
+              return (function (e, s) {
+                if (M() || z(s)) return !1;
+                var i = ["Left", "Right"],
+                  n = ["Down", "Up"],
+                  o = ["PageDown", "PageUp"],
+                  l = ["Home", "End"];
+                t.dir && !t.ort
+                  ? i.reverse()
+                  : t.ort && !t.dir && (n.reverse(), o.reverse());
+                var r,
+                  a = e.key.replace("Arrow", ""),
+                  c = a === o[0],
+                  d = a === o[1],
+                  u = a === n[0] || a === i[0] || c,
+                  p = a === n[1] || a === i[1] || d,
+                  m = a === l[0],
+                  h = a === l[1];
+                if (!(u || p || m || h)) return !0;
+                if ((e.preventDefault(), p || u)) {
+                  var f = u ? 0 : 1,
+                    v = ge(s)[f];
+                  if (null === v) return !1;
+                  !1 === v &&
+                    (v = E.getDefaultStep(V[s], u, t.keyboardDefaultStep)),
+                    (v *=
+                      d || c ? t.keyboardPageMultiplier : t.keyboardMultiplier),
+                    (v = Math.max(v, 1e-7)),
+                    (v *= u ? -1 : 1),
+                    (r = x[s] + v);
+                } else
+                  r = h
+                    ? t.spectrum.xVal[t.spectrum.xVal.length - 1]
+                    : t.spectrum.xVal[0];
+                return (
+                  pe(s, E.toStepping(r), !0, !0),
+                  le("slide", s),
+                  le("update", s),
+                  le("change", s),
+                  le("set", s),
+                  !1
+                );
+              })(e, s);
+            })),
+          void 0 !== t.handleAttributes)
+        ) {
+          var o = t.handleAttributes[s];
+          Object.keys(o).forEach(function (e) {
+            n.setAttribute(e, o[e]);
+          });
+        }
+        return (
+          n.setAttribute("role", "slider"),
+          n.setAttribute("aria-orientation", t.ort ? "vertical" : "horizontal"),
+          0 === s
+            ? b(n, t.cssClasses.handleLower)
+            : s === t.handles - 1 && b(n, t.cssClasses.handleUpper),
+          (i.handle = n),
+          i
+        );
+      }
+      function N(e, s) {
+        return !!s && $(e, t.cssClasses.connect);
+      }
+      function H(e, s) {
+        return (
+          !(!t.tooltips || !t.tooltips[s]) &&
+          $(e.firstChild, t.cssClasses.tooltip)
+        );
+      }
+      function M() {
+        return k.hasAttribute("disabled");
+      }
+      function z(e) {
+        return n[e].hasAttribute("disabled");
+      }
+      function R() {
+        r &&
+          (oe("update" + A.tooltips),
+          r.forEach(function (e) {
+            e && p(e);
+          }),
+          (r = null));
+      }
+      function j() {
+        R(),
+          (r = n.map(H)),
+          ne("update" + A.tooltips, function (e, s, i) {
+            if (r && t.tooltips && !1 !== r[s]) {
+              var n = e[s];
+              !0 !== t.tooltips[s] && (n = t.tooltips[s].to(i[s])),
+                (r[s].innerHTML = n);
+            }
+          });
+      }
+      function U(e, t) {
+        return e.map(function (e) {
+          return E.fromStepping(t ? E.getStep(e) : e);
+        });
+      }
+      function I(e) {
+        var t,
+          s = (function (e) {
+            if (e.mode === c.Range || e.mode === c.Steps) return E.xVal;
+            if (e.mode === c.Count) {
+              if (e.values < 2)
+                throw new Error(
+                  "noUiSlider: 'values' (>= 2) required for mode 'count'.",
+                );
+              for (var t = e.values - 1, s = 100 / t, i = []; t--; )
+                i[t] = t * s;
+              return i.push(100), U(i, e.stepped);
+            }
+            return e.mode === c.Positions
+              ? U(e.values, e.stepped)
+              : e.mode === c.Values
+                ? e.stepped
+                  ? e.values.map(function (e) {
+                      return E.fromStepping(E.getStep(E.toStepping(e)));
+                    })
+                  : e.values
+                : [];
+          })(e),
+          i = {},
+          n = E.xVal[0],
+          o = E.xVal[E.xVal.length - 1],
+          l = !1,
+          r = !1,
+          a = 0;
+        return (
+          (t = s.slice().sort(function (e, t) {
+            return e - t;
+          })),
+          (s = t.filter(function (e) {
+            return !this[e] && (this[e] = !0);
+          }, {}))[0] !== n && (s.unshift(n), (l = !0)),
+          s[s.length - 1] !== o && (s.push(o), (r = !0)),
+          s.forEach(function (t, n) {
+            var o,
+              u,
+              p,
+              m,
+              h,
+              f,
+              v,
+              g,
+              y,
+              S,
+              b = t,
+              _ = s[n + 1],
+              w = e.mode === c.Steps;
+            for (
+              w && (o = E.xNumSteps[n]),
+                o || (o = _ - b),
+                void 0 === _ && (_ = b),
+                o = Math.max(o, 1e-7),
+                u = b;
+              u <= _;
+              u = Number((u + o).toFixed(7))
+            ) {
+              for (
+                g = (h = (m = E.toStepping(u)) - a) / (e.density || 1),
+                  S = h / (y = Math.round(g)),
+                  p = 1;
+                p <= y;
+                p += 1
+              )
+                i[(f = a + p * S).toFixed(5)] = [E.fromStepping(f), 0];
+              (v =
+                s.indexOf(u) > -1
+                  ? d.LargeValue
+                  : w
+                    ? d.SmallValue
+                    : d.NoValue),
+                !n && l && u !== _ && (v = 0),
+                (u === _ && r) || (i[m.toFixed(5)] = [u, v]),
+                (a = m);
+            }
+          }),
+          i
+        );
+      }
+      function F(e, s, i) {
+        var n,
+          o,
+          l = q.createElement("div"),
+          r =
+            (((n = {})[d.None] = ""),
+            (n[d.NoValue] = t.cssClasses.valueNormal),
+            (n[d.LargeValue] = t.cssClasses.valueLarge),
+            (n[d.SmallValue] = t.cssClasses.valueSub),
+            n),
+          a =
+            (((o = {})[d.None] = ""),
+            (o[d.NoValue] = t.cssClasses.markerNormal),
+            (o[d.LargeValue] = t.cssClasses.markerLarge),
+            (o[d.SmallValue] = t.cssClasses.markerSub),
+            o),
+          c = [t.cssClasses.valueHorizontal, t.cssClasses.valueVertical],
+          u = [t.cssClasses.markerHorizontal, t.cssClasses.markerVertical];
+        function p(e, s) {
+          var i = s === t.cssClasses.value,
+            n = i ? r : a;
+          return s + " " + (i ? c : u)[t.ort] + " " + n[e];
+        }
+        return (
+          b(l, t.cssClasses.pips),
+          b(
+            l,
+            0 === t.ort
+              ? t.cssClasses.pipsHorizontal
+              : t.cssClasses.pipsVertical,
+          ),
+          Object.keys(e).forEach(function (n) {
+            !(function (e, n, o) {
+              if ((o = s ? s(n, o) : o) !== d.None) {
+                var r = $(l, !1);
+                (r.className = p(o, t.cssClasses.marker)),
+                  (r.style[t.style] = e + "%"),
+                  o > d.NoValue &&
+                    (((r = $(l, !1)).className = p(o, t.cssClasses.value)),
+                    r.setAttribute("data-value", String(n)),
+                    (r.style[t.style] = e + "%"),
+                    (r.innerHTML = String(i.to(n))));
+              }
+            })(n, e[n][0], e[n][1]);
+          }),
+          l
+        );
+      }
+      function W() {
+        l && (p(l), (l = null));
+      }
+      function X(e) {
+        W();
+        var t = I(e),
+          s = e.filter,
+          i = e.format || {
+            to: function (e) {
+              return String(Math.round(e));
+            },
+          };
+        return (l = k.appendChild(F(t, s, i)));
+      }
+      function Y() {
+        var e = i.getBoundingClientRect(),
+          s = "offset" + ["Width", "Height"][t.ort];
+        return 0 === t.ort ? e.width || i[s] : e.height || i[s];
+      }
+      function Q(e, s, i, n) {
+        var o = function (o) {
+            var l,
+              r,
+              a = (function (e, t, s) {
+                var i = 0 === e.type.indexOf("touch"),
+                  n = 0 === e.type.indexOf("mouse"),
+                  o = 0 === e.type.indexOf("pointer"),
+                  l = 0,
+                  r = 0;
+                0 === e.type.indexOf("MSPointer") && (o = !0);
+                if ("mousedown" === e.type && !e.buttons && !e.touches)
+                  return !1;
+                if (i) {
+                  var a = function (t) {
+                    var i = t.target;
+                    return (
+                      i === s ||
+                      s.contains(i) ||
+                      (e.composed && e.composedPath().shift() === s)
+                    );
+                  };
+                  if ("touchstart" === e.type) {
+                    var c = Array.prototype.filter.call(e.touches, a);
+                    if (c.length > 1) return !1;
+                    (l = c[0].pageX), (r = c[0].pageY);
+                  } else {
+                    var d = Array.prototype.find.call(e.changedTouches, a);
+                    if (!d) return !1;
+                    (l = d.pageX), (r = d.pageY);
+                  }
+                }
+                (t = t || w(q)),
+                  (n || o) && ((l = e.clientX + t.x), (r = e.clientY + t.y));
+                return (
+                  (e.pageOffset = t),
+                  (e.points = [l, r]),
+                  (e.cursor = n || o),
+                  e
+                );
+              })(o, n.pageOffset, n.target || s);
+            return (
+              !!a &&
+              !(M() && !n.doNotReject) &&
+              ((l = k),
+              (r = t.cssClasses.tap),
+              !(
+                (l.classList
+                  ? l.classList.contains(r)
+                  : new RegExp("\\b" + r + "\\b").test(l.className)) &&
+                !n.doNotReject
+              ) &&
+                !(e === f.start && void 0 !== a.buttons && a.buttons > 1) &&
+                (!n.hover || !a.buttons) &&
+                (S || a.preventDefault(),
+                (a.calcPoint = a.points[t.ort]),
+                void i(a, n)))
+            );
+          },
+          l = [];
+        return (
+          e.split(" ").forEach(function (e) {
+            s.addEventListener(e, o, !!S && { passive: !0 }), l.push([e, o]);
+          }),
+          l
+        );
+      }
+      function Z(e) {
+        var s,
+          n,
+          o,
+          l,
+          r,
+          a,
+          c =
+            (100 *
+              (e -
+                ((s = i),
+                (n = t.ort),
+                (o = s.getBoundingClientRect()),
+                (l = s.ownerDocument),
+                (r = l.documentElement),
+                (a = w(l)),
+                /webkit.*Chrome.*Mobile/i.test(navigator.userAgent) &&
+                  (a.x = 0),
+                n ? o.top + a.y - r.clientTop : o.left + a.x - r.clientLeft))) /
+            Y();
+        return (c = g(c)), t.dir ? 100 - c : c;
+      }
+      function G(e, t) {
+        "mouseout" === e.type &&
+          "HTML" === e.target.nodeName &&
+          null === e.relatedTarget &&
+          K(e, t);
+      }
+      function J(e, s) {
+        if (
+          -1 === navigator.appVersion.indexOf("MSIE 9") &&
+          0 === e.buttons &&
+          0 !== s.buttonsProperty
+        )
+          return K(e, s);
+        var i = (t.dir ? -1 : 1) * (e.calcPoint - s.startCalcPoint);
+        ce(
+          i > 0,
+          (100 * i) / s.baseSize,
+          s.locations,
+          s.handleNumbers,
+          s.connect,
+        );
+      }
+      function K(e, s) {
+        s.handle && (_(s.handle, t.cssClasses.active), (P -= 1)),
+          s.listeners.forEach(function (e) {
+            O.removeEventListener(e[0], e[1]);
+          }),
+          0 === P &&
+            (_(k, t.cssClasses.drag),
+            ue(),
+            e.cursor &&
+              ((B.style.cursor = ""), B.removeEventListener("selectstart", h))),
+          t.events.smoothSteps &&
+            (s.handleNumbers.forEach(function (e) {
+              pe(e, V[e], !0, !0, !1, !1);
+            }),
+            s.handleNumbers.forEach(function (e) {
+              le("update", e);
+            })),
+          s.handleNumbers.forEach(function (e) {
+            le("change", e), le("set", e), le("end", e);
+          });
+      }
+      function ee(e, s) {
+        if (!s.handleNumbers.some(z)) {
+          var i;
+          if (1 === s.handleNumbers.length)
+            (i = n[s.handleNumbers[0]].children[0]),
+              (P += 1),
+              b(i, t.cssClasses.active);
+          e.stopPropagation();
+          var o = [],
+            l = Q(f.move, O, J, {
+              target: e.target,
+              handle: i,
+              connect: s.connect,
+              listeners: o,
+              startCalcPoint: e.calcPoint,
+              baseSize: Y(),
+              pageOffset: e.pageOffset,
+              handleNumbers: s.handleNumbers,
+              buttonsProperty: e.buttons,
+              locations: V.slice(),
+            }),
+            r = Q(f.end, O, K, {
+              target: e.target,
+              handle: i,
+              listeners: o,
+              doNotReject: !0,
+              handleNumbers: s.handleNumbers,
+            }),
+            a = Q("mouseout", O, G, {
+              target: e.target,
+              handle: i,
+              listeners: o,
+              doNotReject: !0,
+              handleNumbers: s.handleNumbers,
+            });
+          o.push.apply(o, l.concat(r, a)),
+            e.cursor &&
+              ((B.style.cursor = getComputedStyle(e.target).cursor),
+              n.length > 1 && b(k, t.cssClasses.drag),
+              B.addEventListener("selectstart", h, !1)),
+            s.handleNumbers.forEach(function (e) {
+              le("start", e);
+            });
+        }
+      }
+      function te(e) {
+        e.stopPropagation();
+        var s = Z(e.calcPoint),
+          i = (function (e) {
+            var t = 100,
+              s = !1;
+            return (
+              n.forEach(function (i, n) {
+                if (!z(n)) {
+                  var o = V[n],
+                    l = Math.abs(o - e);
+                  (l < t || (l <= t && e > o) || (100 === l && 100 === t)) &&
+                    ((s = n), (t = l));
+                }
+              }),
+              s
+            );
+          })(s);
+        !1 !== i &&
+          (t.events.snap || v(k, t.cssClasses.tap, t.animationDuration),
+          pe(i, s, !0, !0),
+          ue(),
+          le("slide", i, !0),
+          le("update", i, !0),
+          t.events.snap
+            ? ee(e, { handleNumbers: [i] })
+            : (le("change", i, !0), le("set", i, !0)));
+      }
+      function se(e) {
+        var t = Z(e.calcPoint),
+          s = E.getStep(t),
+          i = E.fromStepping(s);
+        Object.keys(L).forEach(function (e) {
+          "hover" === e.split(".")[0] &&
+            L[e].forEach(function (e) {
+              e.call(ye, i);
+            });
+        });
+      }
+      function ne(e, t) {
+        (L[e] = L[e] || []),
+          L[e].push(t),
+          "update" === e.split(".")[0] &&
+            n.forEach(function (e, t) {
+              le("update", t);
+            });
+      }
+      function oe(e) {
+        var t = e && e.split(".")[0],
+          s = t ? e.substring(t.length) : e;
+        Object.keys(L).forEach(function (e) {
+          var i = e.split(".")[0],
+            n = e.substring(i.length);
+          (t && t !== i) ||
+            (s && s !== n) ||
+            ((function (e) {
+              return e === A.aria || e === A.tooltips;
+            })(n) &&
+              s !== n) ||
+            delete L[e];
+        });
+      }
+      function le(e, s, i) {
+        Object.keys(L).forEach(function (n) {
+          var o = n.split(".")[0];
+          e === o &&
+            L[n].forEach(function (e) {
+              e.call(
+                ye,
+                x.map(t.format.to),
+                s,
+                x.slice(),
+                i || !1,
+                V.slice(),
+                ye,
+              );
+            });
+        });
+      }
+      function re(e, s, i, o, l, r, a) {
+        var c;
+        return (
+          n.length > 1 &&
+            !t.events.unconstrained &&
+            (o &&
+              s > 0 &&
+              ((c = E.getAbsoluteDistance(e[s - 1], t.margin, !1)),
+              (i = Math.max(i, c))),
+            l &&
+              s < n.length - 1 &&
+              ((c = E.getAbsoluteDistance(e[s + 1], t.margin, !0)),
+              (i = Math.min(i, c)))),
+          n.length > 1 &&
+            t.limit &&
+            (o &&
+              s > 0 &&
+              ((c = E.getAbsoluteDistance(e[s - 1], t.limit, !1)),
+              (i = Math.min(i, c))),
+            l &&
+              s < n.length - 1 &&
+              ((c = E.getAbsoluteDistance(e[s + 1], t.limit, !0)),
+              (i = Math.max(i, c)))),
+          t.padding &&
+            (0 === s &&
+              ((c = E.getAbsoluteDistance(0, t.padding[0], !1)),
+              (i = Math.max(i, c))),
+            s === n.length - 1 &&
+              ((c = E.getAbsoluteDistance(100, t.padding[1], !0)),
+              (i = Math.min(i, c)))),
+          a || (i = E.getStep(i)),
+          !((i = g(i)) === e[s] && !r) && i
+        );
+      }
+      function ae(e, s) {
+        var i = t.ort;
+        return (i ? s : e) + ", " + (i ? e : s);
+      }
+      function ce(e, s, i, n, o) {
+        var l = i.slice(),
+          r = n[0],
+          a = t.events.smoothSteps,
+          c = [!e, e],
+          d = [e, !e];
+        (n = n.slice()),
+          e && n.reverse(),
+          n.length > 1
+            ? n.forEach(function (e, t) {
+                var i = re(l, e, l[e] + s, c[t], d[t], !1, a);
+                !1 === i ? (s = 0) : ((s = i - l[e]), (l[e] = i));
+              })
+            : (c = d = [!0]);
+        var u = !1;
+        n.forEach(function (e, t) {
+          u = pe(e, i[e] + s, c[t], d[t], !1, a) || u;
+        }),
+          u &&
+            (n.forEach(function (e) {
+              le("update", e), le("slide", e);
+            }),
+            null != o && le("drag", r));
+      }
+      function de(e, s) {
+        return t.dir ? 100 - e - s : e;
+      }
+      function ue() {
+        C.forEach(function (e) {
+          var t = V[e] > 50 ? -1 : 1,
+            s = 3 + (n.length + t * e);
+          n[e].style.zIndex = String(s);
+        });
+      }
+      function pe(e, s, i, o, l, r) {
+        return (
+          l || (s = re(V, e, s, i, o, !1, r)),
+          !1 !== s &&
+            ((function (e, s) {
+              (V[e] = s), (x[e] = E.fromStepping(s));
+              var i = "translate(" + ae(de(s, 0) - D + "%", "0") + ")";
+              (n[e].style[t.transformRule] = i), me(e), me(e + 1);
+            })(e, s),
+            !0)
+        );
+      }
+      function me(e) {
+        if (o[e]) {
+          var s = 0,
+            i = 100;
+          0 !== e && (s = V[e - 1]), e !== o.length - 1 && (i = V[e]);
+          var n = i - s,
+            l = "translate(" + ae(de(s, n) + "%", "0") + ")",
+            r = "scale(" + ae(n / 100, "1") + ")";
+          o[e].style[t.transformRule] = l + " " + r;
+        }
+      }
+      function he(e, s) {
+        return null === e || !1 === e || void 0 === e
+          ? V[s]
+          : ("number" == typeof e && (e = String(e)),
+            !1 !== (e = t.format.from(e)) && (e = E.toStepping(e)),
+            !1 === e || isNaN(e) ? V[s] : e);
+      }
+      function fe(e, s, i) {
+        var n = y(e),
+          o = void 0 === V[0];
+        (s = void 0 === s || s),
+          t.animate && !o && v(k, t.cssClasses.tap, t.animationDuration),
+          C.forEach(function (e) {
+            pe(e, he(n[e], e), !0, !1, i);
+          });
+        var l = 1 === C.length ? 0 : 1;
+        if (o && E.hasNoSize() && ((i = !0), (V[0] = 0), C.length > 1)) {
+          var r = 100 / (C.length - 1);
+          C.forEach(function (e) {
+            V[e] = e * r;
+          });
+        }
+        for (; l < C.length; ++l)
+          C.forEach(function (e) {
+            pe(e, V[e], !0, !0, i);
+          });
+        ue(),
+          C.forEach(function (e) {
+            le("update", e), null !== n[e] && s && le("set", e);
+          });
+      }
+      function ve(e) {
+        if ((void 0 === e && (e = !1), e))
+          return 1 === x.length ? x[0] : x.slice(0);
+        var s = x.map(t.format.to);
+        return 1 === s.length ? s[0] : s;
+      }
+      function ge(e) {
+        var s = V[e],
+          i = E.getNearbySteps(s),
+          n = x[e],
+          o = i.thisStep.step,
+          l = null;
+        if (t.snap)
+          return [
+            n - i.stepBefore.startValue || null,
+            i.stepAfter.startValue - n || null,
+          ];
+        !1 !== o &&
+          n + o > i.stepAfter.startValue &&
+          (o = i.stepAfter.startValue - n),
+          (l =
+            n > i.thisStep.startValue
+              ? i.thisStep.step
+              : !1 !== i.stepBefore.step && n - i.stepBefore.highestStep),
+          100 === s ? (o = null) : 0 === s && (l = null);
+        var r = E.countStepDecimals();
+        return (
+          null !== o && !1 !== o && (o = Number(o.toFixed(r))),
+          null !== l && !1 !== l && (l = Number(l.toFixed(r))),
+          [l, o]
+        );
+      }
+      b((a = k), t.cssClasses.target),
+        0 === t.dir ? b(a, t.cssClasses.ltr) : b(a, t.cssClasses.rtl),
+        0 === t.ort
+          ? b(a, t.cssClasses.horizontal)
+          : b(a, t.cssClasses.vertical),
+        b(
+          a,
+          "rtl" === getComputedStyle(a).direction
+            ? t.cssClasses.textDirectionRtl
+            : t.cssClasses.textDirectionLtr,
+        ),
+        (i = $(a, t.cssClasses.base)),
+        (function (e, s) {
+          var i = $(s, t.cssClasses.connects);
+          (n = []), (o = []).push(N(i, e[0]));
+          for (var l = 0; l < t.handles; l++)
+            n.push(T(s, l)), (C[l] = l), o.push(N(i, e[l + 1]));
+        })(t.connect, i),
+        (u = t.events).fixed ||
+          n.forEach(function (e, t) {
+            Q(f.start, e.children[0], ee, { handleNumbers: [t] });
+          }),
+        u.tap && Q(f.start, i, te, {}),
+        u.hover && Q(f.move, i, se, { hover: !0 }),
+        u.drag &&
+          o.forEach(function (e, s) {
+            if (!1 !== e && 0 !== s && s !== o.length - 1) {
+              var i = n[s - 1],
+                l = n[s],
+                r = [e],
+                a = [i, l],
+                c = [s - 1, s];
+              b(e, t.cssClasses.draggable),
+                u.fixed && (r.push(i.children[0]), r.push(l.children[0])),
+                u.dragAll && ((a = n), (c = C)),
+                r.forEach(function (t) {
+                  Q(f.start, t, ee, {
+                    handles: a,
+                    handleNumbers: c,
+                    connect: e,
+                  });
+                });
+            }
+          }),
+        fe(t.start),
+        t.pips && X(t.pips),
+        t.tooltips && j(),
+        oe("update" + A.aria),
+        ne("update" + A.aria, function (e, s, i, o, l) {
+          C.forEach(function (e) {
+            var s = n[e],
+              o = re(V, e, 0, !0, !0, !0),
+              r = re(V, e, 100, !0, !0, !0),
+              a = l[e],
+              c = String(t.ariaFormat.to(i[e]));
+            (o = E.fromStepping(o).toFixed(1)),
+              (r = E.fromStepping(r).toFixed(1)),
+              (a = E.fromStepping(a).toFixed(1)),
+              s.children[0].setAttribute("aria-valuemin", o),
+              s.children[0].setAttribute("aria-valuemax", r),
+              s.children[0].setAttribute("aria-valuenow", a),
+              s.children[0].setAttribute("aria-valuetext", c);
+          });
+        });
+      var ye = {
+        destroy: function () {
+          for (
+            oe(A.aria),
+              oe(A.tooltips),
+              Object.keys(t.cssClasses).forEach(function (e) {
+                _(k, t.cssClasses[e]);
+              });
+            k.firstChild;
+
+          )
+            k.removeChild(k.firstChild);
+          delete k.noUiSlider;
+        },
+        steps: function () {
+          return C.map(ge);
+        },
+        on: ne,
+        off: oe,
+        get: ve,
+        set: fe,
+        setHandle: function (e, t, s, i) {
+          if (!((e = Number(e)) >= 0 && e < C.length))
+            throw new Error("noUiSlider: invalid handle number, got: " + e);
+          pe(e, he(t, e), !0, !0, i), le("update", e), s && le("set", e);
+        },
+        reset: function (e) {
+          fe(t.start, e);
+        },
+        disable: function (e) {
+          null != e
+            ? (n[e].setAttribute("disabled", ""),
+              n[e].handle.removeAttribute("tabindex"))
+            : (k.setAttribute("disabled", ""),
+              n.forEach(function (e) {
+                e.handle.removeAttribute("tabindex");
+              }));
+        },
+        enable: function (e) {
+          null != e
+            ? (n[e].removeAttribute("disabled"),
+              n[e].handle.setAttribute("tabindex", "0"))
+            : (k.removeAttribute("disabled"),
+              n.forEach(function (e) {
+                e.removeAttribute("disabled"),
+                  e.handle.setAttribute("tabindex", "0");
+              }));
+        },
+        __moveHandles: function (e, t, s) {
+          ce(e, t, V, s);
+        },
+        options: s,
+        updateOptions: function (e, i) {
+          var n = ve(),
+            o = [
+              "margin",
+              "limit",
+              "padding",
+              "range",
+              "animate",
+              "snap",
+              "step",
+              "format",
+              "pips",
+              "tooltips",
+            ];
+          o.forEach(function (t) {
+            void 0 !== e[t] && (s[t] = e[t]);
+          });
+          var l = ie(s);
+          o.forEach(function (s) {
+            void 0 !== e[s] && (t[s] = l[s]);
+          }),
+            (E = l.spectrum),
+            (t.margin = l.margin),
+            (t.limit = l.limit),
+            (t.padding = l.padding),
+            t.pips ? X(t.pips) : W(),
+            t.tooltips ? j() : R(),
+            (V = []),
+            fe(m(e.start) ? e.start : n, i);
+        },
+        target: k,
+        removePips: W,
+        removeTooltips: R,
+        getPositions: function () {
+          return V.slice();
+        },
+        getTooltips: function () {
+          return r;
+        },
+        getOrigins: function () {
+          return n;
+        },
+        pips: X,
+      };
+      return ye;
+    }
+    function oe(e, t) {
+      if (!e || !e.nodeName)
+        throw new Error(
+          "noUiSlider: create requires a single element, got: " + e,
+        );
+      if (e.noUiSlider)
+        throw new Error("noUiSlider: Slider was already initialized.");
+      var s = ne(e, ie(t), t);
+      return (e.noUiSlider = s), s;
+    }
+    function le(e) {
+      let t = !1;
+      return (
+        e.forEach((e) => {
+          e.checked && (t = !0);
+        }),
+        t
+      );
+    }
+    document.addEventListener("DOMContentLoaded", () => {
+      !(function () {
+        if (
+          ((function () {
+            let e = document.querySelectorAll(
+              '[class*="__swiper"]:not(.swiper-wrapper):not(.swiper)',
+            );
+            e &&
+              e.forEach((e) => {
+                if (
+                  !e.querySelector(".swiper-wrapper") &&
+                  !e.querySelector(".swiper")
+                ) {
+                  e.parentElement.classList.add("swiper"),
+                    e.classList.add("swiper-wrapper");
+                  for (const t of e.children) t.classList.add("swiper-slide");
                 }
               });
-            }
-
-            return getDataBottomProp(topKey, objData);
-          }
-          // собираем обьект из data атрибутов
-          function getDataBottomProp(keyValue, obj) {
-            let newObj = {};
-
-            for (const key in obj) {
-              if (Object.hasOwnProperty.call(obj, key)) {
-                const element = obj[key];
-                if (element) {
-                  let propData = element.split(",");
-                  // если свойства одиноковое до обоих моделий
-                  if (propData.length == 1) {
-                    newObj[key] = propData[0];
-                    continue;
-                  }
-                  propData = keyValue === "topSm" ? propData[0] : propData[1];
-
-                  newObj[key] = propData;
-                }
-              }
-            }
-
-            return newObj;
-          }
-          function editPropModel(objPropModif) {
-            // меняем ссылку на Название модели
-
-            nameModel.setAttribute(
-              "href",
-              `https://sewera.ru/products/${objPropModif.link}`,
-            );
-            // меняем ссылку на блок с картинкой link
-            slideModel[actvSlide]
-              .querySelector(".card-model__top")
-              .setAttribute(
-                "href",
-                `https://sewera.ru/products/${objPropModif.link}`,
+          })(),
+          document.querySelector(".slider-type-service__slider") &&
+            new Swiper(".slider-type-service__slider", {
+              slidesPerView: 1,
+              spaceBetween: 30,
+              speed: 300,
+              observer: !0,
+              watchSlidesProgress: !0,
+              observeParents: !0,
+              autoHeight: !0,
+              navigation: {
+                nextEl: ".slider-type-service__nav .slider-type-service__next",
+                prevEl: ".slider-type-service__nav .slider-type-service__prev",
+              },
+              breakpoints: {
+                319.98: {
+                  slidesPerView: 1.15,
+                  spaceBetween: 15,
+                  autoHeight: !1,
+                },
+                767.98: {
+                  slidesPerView: 1.1,
+                  spaceBetween: 15,
+                  autoHeight: !1,
+                },
+                1023.98: { slidesPerView: 1, spaceBetween: 30, autoHeight: !0 },
+              },
+              on: {},
+            }),
+          document.querySelector(".carousel-gallery__slider") &&
+            new Swiper(".carousel-gallery__slider", {
+              slidesPerView: 4.5,
+              spaceBetween: 15,
+              speed: 300,
+              autoHeight: !1,
+              observer: !0,
+              watchSlidesProgress: !0,
+              observeParents: !0,
+              navigation: {
+                nextEl: ".carousel-gallery__nav .carousel-gallery__next",
+                prevEl: ".carousel-gallery__nav .carousel-gallery__prev",
+              },
+              breakpoints: {
+                319.98: { slidesPerView: 1.3, spaceBetween: 10 },
+                429.98: { slidesPerView: 1.5, spaceBetween: 10 },
+                529.98: { slidesPerView: 2.5, spaceBetween: 10 },
+                767.98: { slidesPerView: 3.2, spaceBetween: 10 },
+                1023.98: { slidesPerView: 3.5, spaceBetween: 15 },
+                1279.98: { slidesPerView: 4.5, spaceBetween: 15 },
+              },
+              on: {},
+            }),
+          document.querySelector(".inside-slider__slider_1"))
+        ) {
+          const e = new Swiper(".inside-slider__slider_1", {
+            slidesPerView: 1,
+            spaceBetween: 20,
+            speed: 300,
+            autoHeight: !1,
+            effect: "fade",
+            observer: !0,
+            observeParents: !0,
+            pagination: { el: ".inside-slider__pagination ", clickable: !0 },
+            breakpoints: {
+              319.98: { loop: !0 },
+              429.98: { spaceBetween: 0 },
+              1023.98: { loop: !1 },
+            },
+            on: {},
+          });
+          document.querySelectorAll('[data-indx="1"] span').forEach((t, s) => {
+            t.addEventListener("mouseover", (t) => {
+              e.slideTo(s, 300, !0);
+            });
+          });
+        }
+        if (document.querySelector(".inside-slider__slider_2")) {
+          const t = new Swiper(".inside-slider__slider_2", {
+            slidesPerView: 1,
+            spaceBetween: 20,
+            speed: 300,
+            autoHeight: !1,
+            effect: "fade",
+            observer: !0,
+            observeParents: !0,
+            pagination: { el: ".inside-slider__pagination ", clickable: !0 },
+            breakpoints: {
+              319.98: { loop: !0 },
+              429.98: { spaceBetween: 0 },
+              1023.98: { loop: !1 },
+            },
+            on: {},
+          });
+          document.querySelectorAll('[data-indx="2"] span').forEach((e, s) => {
+            e.addEventListener("mouseover", (e) => {
+              t.slideTo(s, 300, !0);
+            });
+          });
+        }
+        if (document.querySelector(".inside-slider__slider_3")) {
+          const s = new Swiper(".inside-slider__slider_3", {
+            slidesPerView: 1,
+            spaceBetween: 20,
+            speed: 300,
+            autoHeight: !1,
+            effect: "fade",
+            observer: !0,
+            observeParents: !0,
+            pagination: { el: ".inside-slider__pagination ", clickable: !0 },
+            breakpoints: {
+              319.98: { loop: !0 },
+              429.98: { spaceBetween: 0 },
+              1023.98: { loop: !1 },
+            },
+            on: {},
+          });
+          document.querySelectorAll('[data-indx="3"] span').forEach((e, t) => {
+            e.addEventListener("mouseover", (e) => {
+              s.slideTo(t, 300, !0);
+            });
+          });
+        }
+        if (document.querySelector(".inside-slider__slider_4")) {
+          const i = new Swiper(".inside-slider__slider_4", {
+            slidesPerView: 1,
+            spaceBetween: 20,
+            speed: 300,
+            autoHeight: !1,
+            effect: "fade",
+            observer: !0,
+            observeParents: !0,
+            pagination: { el: ".inside-slider__pagination ", clickable: !0 },
+            breakpoints: {
+              319.98: { loop: !0 },
+              429.98: { spaceBetween: 0 },
+              1023.98: { loop: !1 },
+            },
+            on: {},
+          });
+          document.querySelectorAll('[data-indx="4"] span').forEach((e, t) => {
+            e.addEventListener("mouseover", (e) => {
+              i.slideTo(t, 300, !0);
+            });
+          });
+        }
+        if (document.querySelector(".inside-slider__slider_5")) {
+          const n = new Swiper(".inside-slider__slider_5", {
+            slidesPerView: 1,
+            spaceBetween: 20,
+            speed: 300,
+            autoHeight: !1,
+            effect: "fade",
+            observer: !0,
+            observeParents: !0,
+            pagination: { el: ".inside-slider__pagination ", clickable: !0 },
+            breakpoints: {
+              319.98: { loop: !0 },
+              429.98: { spaceBetween: 0 },
+              1023.98: { loop: !1 },
+            },
+            on: {},
+          });
+          document.querySelectorAll('[data-indx="5"] span').forEach((e, t) => {
+            e.addEventListener("mouseover", (e) => {
+              n.slideTo(t, 300, !0);
+            });
+          });
+        }
+        if (
+          (document.querySelector(".popolar-services__slider") &&
+            new Swiper(".popolar-services__slider", {
+              slidesPerView: 3,
+              spaceBetween: 30,
+              speed: 300,
+              autoHeight: !1,
+              observer: !0,
+              watchSlidesProgress: !0,
+              observeParents: !0,
+              navigation: {
+                nextEl: ".popolar-services__nav .popolar-services__next",
+                prevEl: ".popolar-services__nav .popolar-services__prev",
+              },
+              breakpoints: {
+                319.98: { slidesPerView: 1.15, spaceBetween: 15 },
+                767.98: { slidesPerView: 1.7, spaceBetween: 15 },
+                1023.98: { slidesPerView: 3, spaceBetween: 30 },
+              },
+              on: {},
+            }),
+          document.querySelector(".stories__wrapper"))
+        ) {
+          function o() {
+            const e = document.querySelectorAll(".stories__link"),
+              t = document.querySelector(".video-modal"),
+              s = document.querySelector(".video-modal__close"),
+              i = document.querySelector(".video-block__player"),
+              n = document.querySelector(".video-modal__sound"),
+              o = document.querySelector(".video-modal__icon-muted"),
+              l = document.querySelector(".video-modal__icon-loud"),
+              r = document.querySelector(".video-block__button"),
+              a = document.querySelector(
+                ".video-modal__navigation-line-progress",
               );
-
-            // Меняем картинку в модели img
-            if (objPropModif.img) {
-              createImgSrc(imgModel, objPropModif.img);
+            function c() {
+              t.classList.toggle("open");
             }
-
-            // Название модели name
-            nameModel.firstElementChild.innerHTML = objPropModif.name
-              ? objPropModif.name
-              : "";
-
-            // Глубина подводящей трубы до нижнего края (см) –  prop1
-            listModel[0].firstElementChild.innerHTML = objPropModif.prop1
-              ? objPropModif.prop1
-              : listModel[1].firstElementChild.innerHTML;
-
-            // Кол-во пользователей (до) –  prop2
-            listModel[1].firstElementChild.innerHTML = objPropModif.prop2
-              ? objPropModif.prop2
-              : listModel[1].firstElementChild.innerHTML;
-            // Объем залпового сброса (л) prop3
-            listModel[2].firstElementChild.innerHTML = objPropModif.prop3
-              ? objPropModif.prop3
-              : listModel[2].firstElementChild.innerHTML;
-
-            // Способ водоотведения – prop4
-            listModel[3].firstElementChild.innerHTML = objPropModif.prop4
-              ? objPropModif.prop4
-              : listModel[3].firstElementChild.innerHTML;
-
-            // Цена priceCrnt
-            priceModel.firstElementChild.innerHTML = objPropModif.priceCrnt
-              ? objPropModif.priceCrnt
-              : priceModel.firstElementChild.innerHTML;
-
-            // Цена priceDisc
-            if (discModel) {
-              if (!objPropModif.priceDisc) {
-                discModel.style.display = "none";
-                slideModel[actvSlide].querySelector(
-                  ".card-model__dicount",
-                ).style.display = "none";
-              } else {
-                discModel.style.display = "inline";
-                slideModel[actvSlide].querySelector(
-                  ".card-model__dicount",
-                ).style.display = "inline";
+            function d() {
+              i.play();
+            }
+            function u() {
+              i.pause();
+            }
+            function p() {
+              let e = this.dataset.video;
+              c(),
+                (function (e) {
+                  i.src = e;
+                })(e),
+                d();
+            }
+            function m() {
+              u(),
+                (i.muted = !0),
+                (o.style.display = "block"),
+                (l.style.display = "none"),
+                (i.currentTime = 0),
+                (a.style.flexBasis = "0%"),
+                c();
+            }
+            e.forEach((e) => e.addEventListener("click", p)),
+              i.addEventListener("timeupdate", function () {
+                const e = (i.currentTime / i.duration) * 100;
+                a.style.flexBasis = `${e}%`;
+              }),
+              s.addEventListener("click", m),
+              n.addEventListener("click", function () {
+                !0 === i.muted
+                  ? ((i.muted = !1),
+                    (o.style.display = "none"),
+                    (l.style.display = "block"))
+                  : ((i.muted = !0),
+                    (o.style.display = "block"),
+                    (l.style.display = "none"));
+              }),
+              i.addEventListener("ended", m),
+              r.addEventListener("mousedown", u),
+              r.addEventListener("touchstart", u),
+              r.addEventListener("mouseup", d),
+              r.addEventListener("touchend", d),
+              document.addEventListener("keydown", (e) => {
+                "Space" == e.code &&
+                  t.classList.contains("open") &&
+                  (!0 !== i.paused ? u() : d());
+              }),
+              document.addEventListener("keydown", (e) => {
+                "Escape" == e.code && t.classList.contains("open") && m();
+              });
+          }
+          document.querySelectorAll(".stories__wrapper").forEach((e) => {
+            new Swiper(e.querySelector(".swiper:not(.swiper-initialized)"), {
+              loop: !1,
+              allowTouchMove: !1,
+              breakpoints: {
+                319.98: { allowTouchMove: !0, slidesPerView: 1.2 },
+                429.98: { slidesPerView: 1.2, allowTouchMove: !1 },
+                1023.98: { slidesPerView: 1 },
+                320: {},
+                577: {},
+              },
+              pagination: {
+                el: ".swiper-pagination",
+                type: "fraction",
+                renderFraction: function (e, t) {
+                  return `<span class="${e}"></span> из <span class="${t}"></span>`;
+                },
+              },
+              navigation: {
+                nextEl: e.querySelector(".stories__nav-btn.next"),
+                prevEl: e.querySelector(".stories__nav-btn.prev"),
+              },
+            });
+          }),
+            o();
+        }
+        if (document.querySelector("#slider-stories")) {
+          new Swiper("#slider-stories", {
+            slidesPerView: 1,
+            spaceBetween: 15,
+            speed: 300,
+            autoHeight: !1,
+            navigation: {
+              nextEl: ".stories__nav .stories__next",
+              prevEl: ".stories__nav .stories__prev",
+            },
+            breakpoints: {
+              319.98: { slidesPerView: 1.2 },
+              429.98: { slidesPerView: 1.2 },
+              1023.98: { slidesPerView: 1 },
+            },
+            on: {},
+          }).on("slideChange", function () {
+            isShowOneCard(66, ".stories__sh-content");
+          });
+        }
+        if (
+          (document.querySelector(".offer-services__slider") &&
+            new Swiper(".offer-services__slider", {
+              slidesPerView: 3,
+              spaceBetween: 15,
+              speed: 300,
+              autoHeight: !1,
+              breakpoints: {
+                319.98: { slidesPerView: 1.15 },
+                429.98: { slidesPerView: 1.17, spaceBetween: 15 },
+              },
+              on: {},
+            }),
+          document.querySelector(".stages-work__slider"))
+        ) {
+          new Swiper(".stages-work__slider", {
+            slidesPerView: 3,
+            spaceBetween: 30,
+            speed: 300,
+            autoHeight: !1,
+            navigation: {
+              nextEl: ".stages-work__nav .stages-work__next",
+              prevEl: ".stages-work__nav .stages-work__prev",
+            },
+            breakpoints: {
+              319.98: { slidesPerView: 1.3 },
+              429.98: { slidesPerView: 1.3, spaceBetween: 15 },
+              767.98: { autoplay: !1, slidesPerView: 2.2, spaceBetween: 15 },
+              1023.98: { slidesPerView: 3, spaceBetween: 20, autoplay: !1 },
+            },
+            on: {},
+          }).on("slideChange", function () {
+            isShowOneCard(70, ".stages-work__content");
+          });
+        }
+        if (
+          (document.querySelector("#types-wells__slider-one") &&
+            new Swiper("#types-wells__slider-one", {
+              observer: !0,
+              watchSlidesProgress: !0,
+              observeParents: !0,
+              slidesPerView: 3,
+              spaceBetween: 20,
+              speed: 300,
+              autoHeight: !1,
+              breakpoints: {
+                319.98: { slidesPerView: 1.3, spaceBetween: 15 },
+                429.98: { slidesPerView: 1.3, spaceBetween: 10 },
+                767.98: { autoplay: !1, slidesPerView: 1.6 },
+                1023.98: { slidesPerView: 2, spaceBetween: 20, autoplay: !1 },
+                1279.98: { slidesPerView: 3, spaceBetween: 20, autoplay: !1 },
+              },
+              on: {},
+            }),
+          document.querySelector("#types-wells__slider") &&
+            new Swiper("#types-wells__slider", {
+              slidesPerView: 2,
+              spaceBetween: 20,
+              speed: 300,
+              autoHeight: !1,
+              breakpoints: {
+                319.98: { slidesPerView: 1.3, spaceBetween: 15 },
+                429.98: { slidesPerView: 1.3, spaceBetween: 10 },
+                767.98: { autoplay: !1, slidesPerView: 1.4 },
+                1023.98: { slidesPerView: 2, spaceBetween: 20, autoplay: !1 },
+              },
+              on: {},
+            }),
+          document.querySelector(".popular-models-obsrtv__slider") &&
+            new Swiper(".popular-models-obsrtv__slider", {
+              slidesPerView: 1,
+              spaceBetween: 0,
+              speed: 300,
+              loop: !1,
+              navigation: {
+                nextEl: ".popular-models__nav .popular-models__next",
+                prevEl: ".popular-models__nav .popular-models__prev",
+              },
+              breakpoints: {
+                320: { slidesPerView: 1.2, centeredSlides: !1 },
+                374.98: { slidesPerView: 1.4 },
+                768: { centeredSlides: !1, slidesPerView: 2.5 },
+                1024: { slidesPerView: 3 },
+                1280: { slidesPerView: 4, initialSlide: 0 },
+              },
+              on: {},
+            }),
+          document.querySelector(".types-arrangement__slider") &&
+            new Swiper(".types-arrangement__slider", {
+              observer: !0,
+              watchSlidesProgress: !0,
+              observeParents: !0,
+              slidesPerView: 2,
+              spaceBetween: 20,
+              speed: 300,
+              autoHeight: !1,
+              breakpoints: {
+                319.98: { slidesPerView: 1.2, spaceBetween: 15 },
+                429.98: { slidesPerView: 1.2, spaceBetween: 10 },
+                529.98: { slidesPerView: 1.6, spaceBetween: 10 },
+                767.98: { autoplay: !1, slidesPerView: 2.1 },
+                1023.98: { slidesPerView: 3, spaceBetween: 20, autoplay: !1 },
+                1279.98: { slidesPerView: 3, spaceBetween: 20, autoplay: !1 },
+              },
+              on: {},
+            }),
+          document.querySelector(".completed-work__slider") &&
+            new Swiper(".completed-work__slider", {
+              observer: !0,
+              observeParents: !0,
+              slidesPerView: 2,
+              spaceBetween: 30,
+              speed: 300,
+              navigation: {
+                nextEl: ".completed-work__nav .completed-work__next",
+                prevEl: ".completed-work__nav .completed-work__prev",
+              },
+              breakpoints: {
+                320: { slidesPerView: 1.2, spaceBetween: 15 },
+                430: { slidesPerView: 1.3, spaceBetween: 15 },
+                768: { slidesPerView: 1, spaceBetween: 30 },
+                1023.98: { slidesPerView: 1 },
+                1279.98: { slidesPerView: 2 },
+              },
+              on: {},
+            }),
+          document.querySelector(".brand-carusel__slider") &&
+            new Swiper(".brand-carusel__slider", {
+              observer: !0,
+              watchSlidesProgress: !0,
+              observeParents: !0,
+              slidesPerView: 3,
+              spaceBetween: 30,
+              speed: 300,
+              autoHeight: !1,
+              navigation: {
+                nextEl: ".brand-carusel__nav .brand-carusel__next",
+                prevEl: ".brand-carusel__nav .brand-carusel__prev",
+              },
+              breakpoints: {
+                319.98: { slidesPerView: 1.3, spaceBetween: 15 },
+                767.98: { autoplay: !1, slidesPerView: 2.2 },
+                1023.98: { slidesPerView: 3, spaceBetween: 20, autoplay: !1 },
+                1279.98: { slidesPerView: 3, spaceBetween: 20, autoplay: !1 },
+              },
+              on: {},
+            }),
+          document.querySelector(".popular-models__slider"))
+        ) {
+          new Swiper(".popular-models__slider", {
+            watchSlidesProgress: !0,
+            slidesPerView: 4,
+            spaceBetween: 0,
+            speed: 300,
+            loop: !1,
+            navigation: {
+              nextEl: ".popular-models__nav .popular-models__next",
+              prevEl: ".popular-models__nav .popular-models__prev",
+            },
+            breakpoints: {
+              320: { slidesPerView: 1.2 },
+              374.98: { slidesPerView: 1.4 },
+              768: { slidesPerView: 2.5 },
+              1024: { slidesPerView: 3 },
+              1280: { slidesPerView: 4, initialSlide: 0 },
+            },
+            on: {},
+          });
+        }
+        document.querySelector(".submitted__slider-post") &&
+          new Swiper(".submitted__slider-post", {
+            observer: !0,
+            observeParents: !0,
+            slidesPerView: 3,
+            spaceBetween: 30,
+            autoHeight: !1,
+            speed: 300,
+            navigation: {
+              nextEl: ".submitted__nav .submitted__next",
+              prevEl: ".submitted__nav .submitted__prev",
+            },
+            breakpoints: {
+              320: { slidesPerView: 1.4, spaceBetween: 15 },
+              430: { slidesPerView: 1.4, spaceBetween: 15 },
+              768: { slidesPerView: "2.5" },
+              1023.98: { spaceBetween: 30, slidesPerView: "3" },
+            },
+            on: {},
+          }),
+          document.querySelector("#slider-video") &&
+            new Swiper("#slider-video", {
+              observer: !0,
+              observeParents: !0,
+              slidesPerView: "2",
+              spaceBetween: 30,
+              autoHeight: !1,
+              speed: 300,
+              navigation: {
+                nextEl: ".submitted__youtube-nav .submitted__youtube-next",
+                prevEl: ".submitted__youtube-nav .submitted__youtube-prev",
+              },
+              breakpoints: {
+                320: { slidesPerView: 1.5, spaceBetween: 15 },
+                430: {
+                  centeredSlides: !1,
+                  slidesPerView: 1.6,
+                  spaceBetween: 15,
+                },
+                768: { centeredSlides: !1, spaceBetween: 20 },
+                1024: { slidesPerView: 2, spaceBetween: 30 },
+              },
+              on: {},
+            }),
+          document.querySelector("#magazine-slide") &&
+            new Swiper("#magazine-slide", {
+              observer: !0,
+              observeParents: !0,
+              slidesPerView: 3,
+              speed: 300,
+              navigation: {
+                nextEl: ".submitted__magazine-nav .submitted__magazine-next",
+                prevEl: ".submitted__magazine-nav .submitted__magazine-prev",
+              },
+              breakpoints: {
+                320: { slidesPerView: 1.3, spaceBetween: 15 },
+                430: {
+                  centeredSlides: !1,
+                  slidesPerView: 1.6,
+                  spaceBetween: 20,
+                },
+                768: { slidesPerView: 2.5, spaceBetween: 20 },
+                1024: { slidesPerView: 3, spaceBetween: 30 },
+              },
+              on: {},
+            }),
+          document.querySelector(".water-analysis__slider") &&
+            new Swiper(".water-analysis__slider", {
+              observer: !0,
+              observeParents: !0,
+              slidesPerView: 3,
+              spaceBetween: 30,
+              autoHeight: !1,
+              speed: 300,
+              breakpoints: {
+                319.98: { slidesPerView: 1.2, spaceBetween: 20 },
+                767.98: { slidesPerView: 1.2, spaceBetween: 30 },
+                1023.98: { slidesPerView: 2 },
+              },
+              on: {},
+            }),
+          document.querySelector("#we-doing") &&
+            new Swiper("#we-doing", {
+              observer: !0,
+              observeParents: !0,
+              slidesPerView: 4,
+              spaceBetween: 25,
+              autoHeight: !1,
+              speed: 300,
+              loop: !0,
+              autoplay: { delay: 3e3 },
+              navigation: {
+                nextEl: ".we-doing__nav .we-doing__next",
+                prevEl: ".we-doing__nav .we-doing__prev",
+              },
+              breakpoints: {
+                319.98: {
+                  slidesPerView: 1.1,
+                  spaceBetween: 15,
+                  loop: !0,
+                  autoplay: { delay: 3e3 },
+                  centeredSlides: !0,
+                },
+                429.98: { slidesPerView: 1.1 },
+                767.98: { slidesPerView: 2.3, spaceBetween: 15 },
+                1023.98: { slidesPerView: 3, spaceBetween: 20 },
+                1439.98: { spaceBetween: 24 },
+              },
+              on: {},
+            }),
+          document.querySelector("#work-examples") &&
+            new Swiper("#work-examples", {
+              observer: !0,
+              observeParents: !0,
+              slidesPerView: 4,
+              spaceBetween: 25,
+              autoHeight: !1,
+              speed: 300,
+              loop: !0,
+              autoplay: { delay: 4e3 },
+              navigation: {
+                nextEl: ".work-examples__nav .work-examples__next",
+                prevEl: ".work-examples__nav .work-examples__prev",
+              },
+              breakpoints: {
+                319.98: {
+                  slidesPerView: 1.1,
+                  spaceBetween: 15,
+                  loop: !0,
+                  autoplay: { delay: 3e3 },
+                  centeredSlides: !0,
+                },
+                429.98: { slidesPerView: 1.2 },
+                529.98: { slidesPerView: 1.8 },
+                767.98: { slidesPerView: 2.3, spaceBetween: 15 },
+                1023.98: { slidesPerView: 3, spaceBetween: 20 },
+                1439.98: { spaceBetween: 24 },
+              },
+              on: {},
+            }),
+          document.querySelector(".lawn-options__slider") &&
+            new Swiper(".lawn-options__slider", {
+              observer: !0,
+              observeParents: !0,
+              slidesPerView: 3,
+              spaceBetween: 30,
+              autoHeight: !1,
+              speed: 300,
+              pagination: { el: ".so-discount__pagging", clickable: !0 },
+              breakpoints: {
+                319.98: { slidesPerView: 1.1, spaceBetween: 30 },
+                429.98: { slidesPerView: 1.28 },
+                767.98: { slidesPerView: 2.25, spaceBetween: 30 },
+                1023.98: { slidesPerView: 3 },
+              },
+              on: {},
+            }),
+          document.querySelector(".so-discount__slider") &&
+            new Swiper(".so-discount__slider", {
+              observer: !0,
+              observeParents: !0,
+              slidesPerView: 3,
+              spaceBetween: 30,
+              autoHeight: !1,
+              speed: 300,
+              pagination: { el: ".so-discount__pagging", clickable: !0 },
+              breakpoints: {
+                319.98: { slidesPerView: 1.1, spaceBetween: 30 },
+                429.98: { slidesPerView: 1.28 },
+                767.98: { slidesPerView: 2.25, spaceBetween: 30 },
+                1023.98: { slidesPerView: 3 },
+              },
+              on: {},
+            }),
+          document.querySelector(
+            ".banner-gallery__slider:not(.swiper-initialized)",
+          ) &&
+            new Swiper(".banner-gallery__slider:not(.swiper-initialized)", {
+              observer: !0,
+              observeParents: !0,
+              slidesPerView: 1,
+              spaceBetween: 0,
+              autoHeight: !1,
+              speed: 300,
+              autoplay: { delay: 3e3 },
+              loop: !0,
+              navigation: {
+                prevEl: ".banner-gallery__navigation .banner-gallery__btn_prev",
+                nextEl: ".banner-gallery__navigation .banner-gallery__btn_next",
+              },
+              pagination: { el: ".banner-gallery__pagination", clickable: !0 },
+              breakpoints: {},
+              on: {},
+            }),
+          document.querySelector(".drilling-price__slider") &&
+            new Swiper(".drilling-price__slider", {
+              observer: !0,
+              observeParents: !0,
+              slidesPerView: 2,
+              spaceBetween: 30,
+              autoHeight: !1,
+              speed: 300,
+              breakpoints: {
+                319.98: { slidesPerView: 1.1, spaceBetween: 15 },
+                429.98: { slidesPerView: 1.3 },
+                767.98: { slidesPerView: 1.5, spaceBetween: 15 },
+                1023.98: { slidesPerView: 2 },
+              },
+              on: {},
+            });
+      })(),
+        (function () {
+          const e = document.querySelectorAll(".inside-slider__pagination");
+          0 !== e.length &&
+            e.forEach((e) => {
+              if (1 === e.children.length) return void (e.hidden = !0);
+              let t = 100 / +e.children.length;
+              Array.from(e.children).forEach((e) => {
+                e.style.flex = `0 1 ${t}%`;
+              });
+            });
+        })();
+    }),
+      ymaps.ready(function () {
+        const e = [
+            {
+              city: "москва",
+              center: [55.73, 37.6],
+              zoom: 8,
+              polygon: [
+                [54.80831947994278, 38.18433433925412],
+                [54.87945876925923, 38.52995859405644],
+                [55.122011885673516, 38.67767483903884],
+                [55.37773639221365, 38.95005546337981],
+                [55.69101620830514, 39.06854923170738],
+                [55.962220037403114, 39.09331426601756],
+                [56.118493229997256, 38.83962697728742],
+                [56.38328535103986, 38.538312268742686],
+                [56.72694946754399, 38.84094055277811],
+                [56.54218234666476, 37.45911829335503],
+                [56.484269925944716, 36.55340126947627],
+                [56.082994973012944, 35.26044765213379],
+                [55.528582146509564, 35.79574540554199],
+                [54.886906159423376, 36.2751232506904],
+                [54.80831947994278, 38.18433433925412],
+              ],
+            },
+            {
+              city: "питер",
+              center: [59.93, 30.31],
+              zoom: 7,
+              polygon: [
+                [61.106088074302846, 28.84990729821095],
+                [60.54048161644306, 27.852634950925818],
+                [60.75790210590904, 28.70283621526761],
+                [60.71577485205364, 28.815934690349366],
+                [60.36998777034415, 28.591678325406576],
+                [60.16918067335956, 29.40829044088855],
+                [60.211534546111665, 29.565211415079403],
+                [60.187888023113686, 29.76919931592809],
+                [60.15288724263536, 29.946358034169208],
+                [60.12523238261545, 30.01739461918757],
+                [60.0423242615806, 29.96706282242633],
+                [59.98493140629839, 30.238787111520338],
+                [59.93232002134522, 30.232711129552428],
+                [59.84017052918489, 30.131823462708525],
+                [59.885551817464716, 29.780468838045408],
+                [59.93961408752628, 29.49723475289224],
+                [59.964616467662836, 29.19559571694552],
+                [59.91991225984697, 29.093497700881187],
+                [59.83296746003299, 29.087954398797308],
+                [59.78396907811887, 28.914027896498567],
+                [59.75631501176312, 28.72500164979357],
+                [59.800093425856545, 28.60943866524633],
+                [59.80224973132346, 28.510190763084665],
+                [59.73798583871411, 28.485433522283643],
+                [59.66933873971914, 28.443601343301964],
+                [59.6455402380044, 28.376395134689574],
+                [59.65854803135656, 28.293968754917074],
+                [59.69130561691546, 28.200415788977097],
+                [59.74283516453832, 28.176907105205913],
+                [59.767886802293845, 28.119769460495604],
+                [59.671623961424615, 28.052389391540657],
+                [59.53828823226743, 28.139961089731088],
+                [59.35798953936603, 28.280648261698502],
+                [59.02248117220134, 27.802166784452368],
+                [59.00045046566632, 28.16716353323224],
+                [58.90325564969078, 28.305782371843577],
+                [58.892541977172385, 28.547145432234146],
+                [58.839964234623864, 28.845593925558575],
+                [58.81921766186278, 29.117229752723944],
+                [58.71702324975635, 29.25362211337176],
+                [58.61141214319082, 29.417761707109804],
+                [58.52810610714258, 29.61583387713702],
+                [58.45004102025334, 29.77698972302713],
+                [58.47175326366724, 30.057070714286084],
+                [58.528177693429086, 30.078493270758997],
+                [58.670382603306024, 30.045047415771506],
+                [58.784750929872246, 30.172568775367296],
+                [58.77110172497413, 30.343612119793363],
+                [58.74393741340788, 30.50480117892272],
+                [58.76087846060315, 30.64903410782111],
+                [58.89266306882436, 30.720318055999343],
+                [58.931775319679105, 30.87541133018749],
+                [59.08920426528445, 31.001107474298152],
+                [59.05199909544481, 31.247310598952225],
+                [59.16120182948734, 31.46040108683397],
+                [59.24601344328124, 31.51924861119312],
+                [59.3841107762172, 31.519650608045566],
+                [59.37453535197764, 31.743859355535903],
+                [59.41319939652709, 31.895892426683588],
+                [59.4229337327242, 32.06818148171814],
+                [59.35859553485514, 32.20693837199164],
+                [59.28307118884456, 32.32414465705074],
+                [59.17916450331086, 32.39505501883892],
+                [59.15220746691128, 32.516090367786234],
+                [59.16411241403188, 32.67707713805814],
+                [59.25209559211132, 32.704493920109],
+                [59.34898953782607, 32.772563410771056],
+                [59.396925101876036, 32.86750784159898],
+                [59.44235324548666, 33.07951705642466],
+                [59.413053844884786, 33.23037247596619],
+                [59.42351502348515, 33.46150882912565],
+                [59.3621493877059, 33.71617224039184],
+                [59.28076198027452, 33.85555732820072],
+                [59.18093545333778, 34.07927365350611],
+                [59.218446738264504, 34.31479262566086],
+                [59.18449031867098, 34.46167119790215],
+                [59.15756557610953, 34.569028458632886],
+                [59.134213013591875, 34.74295902207777],
+                [59.19477306563164, 34.801078803116695],
+                [59.2564359565597, 34.97977799727809],
+                [59.2912162694453, 35.12579135405289],
+                [59.32989570283232, 35.26304437874467],
+                [59.394126305198824, 35.282047170349756],
+                [59.44494765499957, 35.336190323574385],
+                [59.527887428452004, 35.279241905261756],
+                [59.55491865313289, 35.38593012930545],
+                [59.56172289354441, 35.45519752319393],
+                [59.63727521994343, 35.448287025471046],
+                [59.65468260646398, 35.555353868864756],
+                [59.686264326387004, 35.562483180192146],
+                [59.703950761999664, 35.42163323598487],
+                [59.76838546078838, 35.34683149778368],
+                [59.85256037133368, 35.3567480923831],
+                [59.92369691755857, 35.406137191942264],
+                [59.9805250889039, 35.28730686193509],
+                [60.017895388841026, 35.10473292452272],
+                [60.08351447005737, 35.16532530607367],
+                [60.18264270143564, 35.12041199589066],
+                [60.25167418889458, 35.135359361852636],
+                [60.33731700421731, 35.225018017333184],
+                [60.599637668599655, 35.24198481129656],
+                [60.66614517771396, 35.19836887519892],
+                [60.73404500750823, 35.14189036348486],
+                [60.860688754947546, 35.23361484311272],
+                [60.88857627351911, 35.38923417605841],
+                [60.93444654114589, 35.52607157330945],
+                [61.02021458655281, 35.63697856871454],
+                [61.1083074214377, 35.66627786728151],
+                [61.15697755043698, 35.65753483388153],
+                [61.138111449137995, 35.513698102849844],
+                [61.12318207774868, 35.36526337298682],
+                [61.1832439172974, 35.335165607609014],
+                [61.23909327326484, 35.34306604636703],
+                [61.228582198408304, 35.19403076257794],
+                [61.22860626645772, 35.028774374516416],
+                [61.26035502030351, 34.80014854115669],
+                [61.228371912248804, 34.62740677860907],
+                [61.16914050333483],
+                34.521057796999315,
+                [61.1381625782991, 34.375724845099],
+                [61.193136211572295, 34.274744102545526],
+                [61.207127022717884, 34.01546202975132],
+                [61.203757474773255, 33.698387119373336],
+                [61.16566629145257, 33.56353423301232],
+                [61.15193178960703, 33.495864964454626],
+                [61.10094639830956, 33.57979779688657],
+                [61.14509680547397, 33.76467751366431],
+                [61.12465903378748, 33.91802782223414],
+                [61.008016691462956, 33.941252627795365],
+                [60.9144170484949, 33.816468775562356],
+                [60.92079313266953, 33.67582168857538],
+                [60.95277608109717, 33.57544502404991],
+                [60.99486230036612, 33.50047914244152],
+                [60.9656518934932, 33.47746318511602],
+                [60.920762010627215, 33.49682021768072],
+                [60.88595190808354, 33.39188123480494],
+                [60.8360574570367, 33.341192219070024],
+                [60.753586881331614, 33.26077873445362],
+                [60.696863877704004, 33.128608162644554],
+                [60.66744942292257, 33.013157521200924],
+                [60.47643160894205, 32.82599005653793],
+                [60.50472927233986, 32.65483755366424],
+                [60.396308853622884, 32.74780061241211],
+                [60.31819019883031, 32.66598898975374],
+                [60.245199187531796, 32.65909996699057],
+                [60.161066458141306, 32.61444214580604],
+                [60.12614806592467, 32.495855101856904],
+                [60.09471699316654, 32.301778825749864],
+                [60.11039252448461, 32.18459263609901],
+                [60.16749132430087, 32.070916239492675],
+                [60.18998264893045, 31.889161919783447],
+                [60.18675966797986, 31.73410743459536],
+                [60.119836209160354, 31.65017367415598],
+                [60.0605217394008, 31.6046419601648],
+                [59.99324259600215, 31.610785530865854],
+                [59.93335651991168, 31.59401443688691],
+                [59.880472446391366, 31.50763516198711],
+                [59.886351135496454, 31.27940617403553],
+                [59.90097354234132, 31.142684758149613],
+                [59.91566408008279, 30.99993686742772],
+                [59.95660389144942, 30.951398418986003],
+                [60.00105689222647, 31.02619414415352],
+                [60.07363677987078, 31.053152954550058],
+                [60.151108957508114, 30.981435482398467],
+                [60.22734836046297, 30.91402784967906],
+                [60.375430876166945, 30.82185987239356],
+                [60.49908511402646, 30.692137455248258],
+                [60.58062586990846, 30.57597504845583],
+                [60.64945709096361, 30.443091178705856],
+                [60.73859746306803, 30.47682683528842],
+                [60.806970681028275, 30.462987825587703],
+                [61.00722789319536, 30.257720710362037],
+                [61.0946869940374, 30.081598200023848],
+                [61.151348903426424, 29.830549834254754],
+                [61.15529478015222, 29.613444318104058],
+                [61.212959857671194, 29.516226783570488],
+                [61.263060270690886, 29.348334364957054],
+                [61.25454458553398, 29.24086735976627],
+                [61.106088074302846, 28.84990729821095],
+              ],
+            },
+          ],
+          t = document.querySelectorAll("button[data-city-map]"),
+          s = document.querySelector(
+            "nav[data-tabs-titles].ya-map__navigation",
+          );
+        if (
+          ((function () {
+            const e = document.querySelectorAll(".ya-map__tab");
+            e &&
+              e.forEach((t) => {
+                t.addEventListener("click", (s) => {
+                  t.closest("._active-tab-map") ||
+                    (e.forEach((e) => e.classList.remove("_active-tab-map")),
+                    t.classList.add("_active-tab-map"));
+                });
+              });
+          })(),
+          document.getElementById("map"))
+        ) {
+          var i = new ymaps.Map(
+            "map",
+            { center: e[0].center, zoom: 8 },
+            { searchControlProvider: "yandex#search" },
+          );
+          if (
+            (0 !== t.length &&
+              t.forEach((t) => {
+                const s = t.dataset.cityMap;
+                let n = e.find((e) => s === e.city),
+                  o = new ymaps.Polygon(
+                    [n.polygon],
+                    { hintContent: "Многоугольник" },
+                    {
+                      fillColor: "#009CD9",
+                      strokeWidth: 1,
+                      strokeColor: "#0067A0",
+                      strokeOpacity: 1,
+                      fillOpacity: 0.2,
+                    },
+                  );
+                i.geoObjects.add(o),
+                  i.geoObjects.add(new ymaps.Placemark(n.center, {})),
+                  t.addEventListener("click", (e) => {
+                    i.setCenter(n.center, n.zoom);
+                  });
+              }),
+            !s && 0 === t.length)
+          ) {
+            i.geoObjects.add(new ymaps.Placemark([55.73, 37.6], {}));
+            let e = new ymaps.Polygon(
+              [
+                [
+                  [54.80831947994278, 38.18433433925412],
+                  [54.87945876925923, 38.52995859405644],
+                  [55.122011885673516, 38.67767483903884],
+                  [55.37773639221365, 38.95005546337981],
+                  [55.69101620830514, 39.06854923170738],
+                  [55.962220037403114, 39.09331426601756],
+                  [56.118493229997256, 38.83962697728742],
+                  [56.38328535103986, 38.538312268742686],
+                  [56.72694946754399, 38.84094055277811],
+                  [56.54218234666476, 37.45911829335503],
+                  [56.484269925944716, 36.55340126947627],
+                  [56.082994973012944, 35.26044765213379],
+                  [55.528582146509564, 35.79574540554199],
+                  [54.886906159423376, 36.2751232506904],
+                  [54.80831947994278, 38.18433433925412],
+                ],
+              ],
+              { hintContent: "Многоугольник" },
+              {
+                fillColor: "#009CD9",
+                strokeWidth: 1,
+                strokeColor: "#0067A0",
+                strokeOpacity: 1,
+                fillOpacity: 0.2,
+              },
+            );
+            i.geoObjects.add(e);
+          }
+          i.controls.remove("geolocationControl"),
+            i.controls.remove("searchControl"),
+            i.controls.remove("trafficControl"),
+            i.controls.remove("typeSelector"),
+            i.controls.remove("fullscreenControl"),
+            i.controls.remove("rulerControl"),
+            i.behaviors.disable(["scrollZoom"]);
+        }
+      }),
+      (function () {
+        const e = document.querySelectorAll(".card-model__info-btn");
+        e &&
+          e.forEach((e) => {
+            e.addEventListener("click", function (t) {
+              e.classList.toggle("_show");
+            }),
+              document.addEventListener("click", (t) => {
+                let s = t.target;
+                e.contains(s) ||
+                  e.firstChild.contains(s) ||
+                  e.classList.remove("_show");
+              });
+          });
+        const t = document.querySelector(".popular-models__swiper");
+        function s(e, t) {
+          e.closest(t) &&
+            !e.closest("._active-btn") &&
+            (Array.from(e.parentElement.children).forEach((e, t) => {
+              e.classList.remove("_active-btn");
+            }),
+            e.classList.add("_active-btn"));
+        }
+        t &&
+          t.addEventListener("click", function (e) {
+            let t = e.target;
+            s(t, ".card-model__top-btn"), s(t, ".card-model__bottom-btn");
+            const i = document.querySelectorAll(".popular-models__slide");
+            if (t.closest("[data-slide-id]")) {
+              let n = t.closest("[data-slide-id]").dataset.slideId;
+              const o = i[n].querySelector(".card-model__name"),
+                l = i[n].querySelectorAll(".card-model__list li"),
+                r = i[n].querySelector(".card-model__current-price"),
+                a = i[n].querySelector(".card-model__discount-price"),
+                c = i[n].querySelector(".card-model__btn"),
+                d = i[n].querySelector(".card-model__img img"),
+                u = i[n].querySelector(".card-model__top-btns"),
+                p = i[n].querySelector(".card-model__bottom-btns");
+              if (t.closest("[data-top-sm]")) {
+                let v;
+                t.hasAttribute("data-top-sm") &&
+                  (v = Object.assign(t.closest("[data-top-sm]").dataset)),
+                  p && (v = m(u, p)),
+                  f(v);
               }
-              discModel.firstElementChild.innerHTML = "";
-              discModel.firstElementChild.innerHTML = objPropModif.priceDisc;
+              if (t.closest("[data-top-pr]")) {
+                let g;
+                t.hasAttribute("data-top-pr") &&
+                  (g = Object.assign(t.closest("[data-top-pr]").dataset)),
+                  p && (g = m(u, p)),
+                  f(g);
+              }
+              if (t.closest("[data-bottom-btn]")) {
+                f(m(u, p));
+              }
+              function m(e, t = "") {
+                let s, i;
+                return (
+                  Array.from(e.children).forEach((e) => {
+                    e.closest("._active-btn") &&
+                      (i = Object.keys(e.dataset)[0]);
+                  }),
+                  t &&
+                    Array.from(t.children).forEach((e) => {
+                      e.closest("._active-btn") && (s = e.dataset);
+                    }),
+                  h(i, s)
+                );
+              }
+              function h(e, t) {
+                let s = {};
+                for (const i in t)
+                  if (Object.hasOwnProperty.call(t, i)) {
+                    const n = t[i];
+                    if (n) {
+                      let t = n.split("|");
+                      if (1 == t.length) {
+                        s[i] = t[0];
+                        continue;
+                      }
+                      (t = "topSm" === e ? t[0] : t[1]), (s[i] = t);
+                    }
+                  }
+                return s;
+              }
+              function f(e) {
+                o.setAttribute("href", `https://sewera.ru/products/${e.link}`),
+                  i[n]
+                    .querySelector(".card-model__top")
+                    .setAttribute(
+                      "href",
+                      `https://sewera.ru/products/${e.link}`,
+                    ),
+                  e.img &&
+                    (function (e, t) {
+                      if (t) {
+                        const s = e.src.lastIndexOf("/");
+                        e.src = e.src.slice(0, s + 1) + t + ".webp";
+                      }
+                    })(d, e.img),
+                  (o.innerHTML = e.name ? e.name : ""),
+                  (l[0].firstElementChild.innerHTML = e.prop1
+                    ? e.prop1
+                    : l[1].firstElementChild.innerHTML),
+                  (l[1].firstElementChild.innerHTML = e.prop2
+                    ? e.prop2
+                    : l[1].firstElementChild.innerHTML),
+                  (l[2].firstElementChild.innerHTML = e.prop3
+                    ? e.prop3
+                    : l[2].firstElementChild.innerHTML),
+                  (l[3].firstElementChild.innerHTML = e.prop4
+                    ? e.prop4
+                    : l[3].firstElementChild.innerHTML),
+                  (r.firstElementChild.innerHTML = e.priceCrnt
+                    ? e.priceCrnt
+                    : r.firstElementChild.innerHTML),
+                  a &&
+                    (e.priceDisc
+                      ? ((a.style.display = "inline"),
+                        (i[n].querySelector(
+                          ".card-model__dicount",
+                        ).style.display = "inline"))
+                      : ((a.style.display = "none"),
+                        (i[n].querySelector(
+                          ".card-model__dicount",
+                        ).style.display = "none")),
+                    (a.firstElementChild.innerHTML = ""),
+                    (a.firstElementChild.innerHTML = e.priceDisc)),
+                  (c.dataset.form = o.innerText),
+                  (c.dataset.price = `${r.firstElementChild.innerText} руб.`);
+              }
             }
-
-            // data-form
-            butBtnModel.dataset.form = nameModel.innerText;
-
-            // data-price
-            butBtnModel.dataset.price = `${priceModel.firstElementChild.innerText} руб.`;
+          });
+      })(),
+      (function () {
+        const e = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "10+"];
+        var t = {
+          to: function (t) {
+            return e[Math.round(t)];
+          },
+          from: function (t) {
+            return e.indexOf(t);
+          },
+        };
+        const s = document.querySelector("#range");
+        s &&
+          (oe(s, {
+            start: 3,
+            step: 1,
+            range: { min: [0], max: [e.length - 1] },
+            tooltips: !0,
+            format: t,
+            connect: [!0, !1],
+            pips: { mode: "count", stepped: !0, values: 11, format: t },
+          }),
+          s.noUiSlider.on("change", function () {
+            const e = document.querySelector(".noUi-handle"),
+              t = document.querySelector(".form-qwiz__input-number");
+            "10+" === e.ariaValueText
+              ? (t.classList.add("_show"),
+                document
+                  .querySelector(".qwiz-section__next-btn")
+                  .classList.add("_disabled"),
+                (document.querySelector(".qwiz-section__next-btn").disabled =
+                  !0))
+              : (t.classList.remove("_show"),
+                document
+                  .querySelector(".qwiz-section__next-btn")
+                  .classList.remove("_disabled"),
+                (document.querySelector(".qwiz-section__next-btn").disabled =
+                  !1));
+            const s = document.getElementById("range_input");
+            s && ((s.value = this.get()), "10+" == s.value && (s.value = ""));
+          }));
+      })(),
+      (function () {
+        const e = document.querySelector("#services_quiz_form"),
+          t = document.querySelector("#calc-septik");
+        if (e) {
+          const s = document.querySelector(".form-qwiz"),
+            i = document.querySelectorAll(".form-qwiz__input"),
+            n = document.querySelectorAll(".form-qwiz__step"),
+            o = document.querySelector(".qwiz-section__prev-btn"),
+            l = document.querySelector(".qwiz-section__next-btn"),
+            r = document.querySelector(".qwiz-section__bottom"),
+            a = document.querySelector(".qwiz-section__current-step"),
+            c = document.querySelector(".form-qwiz__restart-btn"),
+            d = document.querySelector(".qwiz-section__finish-step");
+          let u = 0,
+            p = !1;
+          function m(e) {
+            e.target.classList.contains("form-qwiz__input") &&
+              (v(),
+              p ||
+                u !== n.length - 3 ||
+                (l.classList.add("_disabled"), (l.disabled = !0)),
+              p && (l.classList.remove("_disabled"), (l.disabled = !1)));
           }
+          function h(e) {
+            ++u,
+              v(),
+              console.log(u),
+              p && u === n.length - 2 && a.parentNode.classList.add("_ready"),
+              p ||
+                u !== n.length - 3 ||
+                (l.classList.add("_disabled"), (l.disabled = !0)),
+              n.length - 1 === u && (a.parentNode.style.display = "none"),
+              n.length - 2 === u && (r.style.display = "none"),
+              n.length !== u
+                ? ((a.innerHTML = u + 1),
+                  o.classList.remove("_disabled"),
+                  (o.disabled = !1),
+                  n[u - 1].classList.remove("_current"),
+                  n[u].classList.add("_current"))
+                : (n[u - 1].style.display = "none");
+          }
+          function f(e) {
+            u === n.length - 2 && a.parentNode.classList.remove("_ready"),
+              u === n.length - 3 && l.classList.remove("_disabled"),
+              o.classList.contains("_disabled") ||
+                (u--,
+                (a.innerHTML = u + 1),
+                0 === u && (o.classList.add("_disabled"), (o.disabled = !0)),
+                (l.disabled = !1),
+                n[u + 1].classList.remove("_current"),
+                n[u].classList.add("_current"));
+          }
+          function v() {
+            for (let e = 0; e < i.length; e++) {
+              if (i[e].checked) return void (p = !0);
+            }
+            p = !1;
+          }
+          l.addEventListener("click", h),
+            o.addEventListener("click", f),
+            s.addEventListener("click", m),
+            d && (d.innerHTML = "/" + (n.length - 1)),
+            c &&
+              c.addEventListener("click", function (e) {
+                (u = 0),
+                  (p = !1),
+                  (a.innerHTML = 1),
+                  o.classList.add("_disabled"),
+                  (o.disabled = !0),
+                  n[0].classList.add("_current"),
+                  n[n.length - 1].classList.remove("_current"),
+                  (r.style.display = "flex"),
+                  (a.parentNode.style.display = "flex"),
+                  a.parentNode.classList.remove("_ready"),
+                  i.forEach((e) => (e.checked = !1));
+              }),
+            e.addEventListener("submit", function (e) {
+              e.preventDefault();
+              var t = $("#services_quiz_form");
+              return (
+                $(".load__preloader").fadeIn("", function () {
+                  $.ajax({
+                    type: "POST",
+                    url: "/index.php?route=common/footer/quiz_submit",
+                    data: t.serialize(),
+                    dataType: "json",
+                  }).done(function (e) {
+                    e.success && ($(".load__preloader").fadeOut("slow"), h());
+                  });
+                }),
+                !1
+              );
+            });
         }
-      });
-    }
-    /* добавдляем класс _active-btn */
-    function selectTab(target, selectorBtn) {
-      if (target.closest(selectorBtn) && !target.closest("._active-btn")) {
-        Array.from(target.parentElement.children).forEach((el, i) => {
-          el.classList.remove("_active-btn");
-        });
-        target.classList.add("_active-btn");
+        if (t) {
+          const g = document.querySelector(".form-qwiz"),
+            y = document.querySelectorAll(".form-qwiz__input"),
+            S = document.querySelectorAll(".form-qwiz__step"),
+            b = document.querySelector(".qwiz-section__prev-btn"),
+            _ = document.querySelector(".qwiz-section__next-btn"),
+            w = document.querySelector(".qwiz-section__bottom"),
+            k = document.querySelector(".qwiz-section__navigate"),
+            E = document.querySelector(".qwiz-section__progress-text"),
+            x = document.querySelector(".qwiz-section__current-step"),
+            V = document.querySelector(".form-qwiz__btn-finish"),
+            C = document.querySelector(".form-qwiz__restart-btn");
+          let P = 0,
+            L = !1,
+            q = "";
+          function A(e) {
+            e.target.classList.contains("form-qwiz__input") &&
+              (j(),
+              L ||
+                P !== S.length - 3 ||
+                (_.classList.add("_disabled"), (_.disabled = !0)),
+              L && (_.classList.remove("_disabled"), (_.disabled = !1)));
+          }
+          V.addEventListener("click", function (e) {
+            z();
+          }),
+            _.addEventListener("click", z),
+            b.addEventListener("click", R),
+            g.addEventListener("click", A),
+            document.querySelector(".qwiz-section__finish-step") &&
+              (document.querySelector(".qwiz-section__finish-step").innerHTML =
+                "/" + (S.length - 1));
+          const O = document.querySelectorAll(
+              'input[name="Место отвода воды из септика"]',
+            ),
+            B = document.querySelectorAll(
+              'input[name="Глубина залегания трубы"]',
+            ),
+            D = document.querySelectorAll(
+              'input[name="Место отвода воды из септика"]',
+            ),
+            T = document.querySelectorAll('input[name="Количество колец"]');
+          function N(e) {
+            e.forEach((e) => {
+              e.checked = !1;
+            });
+          }
+          function H(e) {
+            e &&
+              e.forEach((t) => {
+                t.addEventListener("click", () => M(e));
+              });
+          }
+          function M(e) {
+            le(e), _.classList.remove("_disabled");
+          }
+          function z() {
+            let e = le(B),
+              t = le(D),
+              s = le(T);
+            if (
+              (2 == P && q && _.classList.add("_disabled"),
+              2 === P && s && q && _.classList.add("_disabled"),
+              (3 !== P || s) &&
+                (1 !== P || t || _.classList.add("_disabled"),
+                (2 !== P || t) &&
+                  (0 !== P || e || _.classList.add("_disabled"), 1 !== P || e)))
+            ) {
+              if (
+                (++P,
+                E && (E.style.display = "flex"),
+                j(),
+                1 === P &&
+                  ((b.style.display = "flex"),
+                  (k.style.justifyContent = "space-between")),
+                L && P === S.length - 2 && x.parentNode.classList.add("_ready"),
+                L ||
+                  P !== S.length - 3 ||
+                  (_.classList.add("_disabled"), (_.disabled = !0)),
+                S.length - 3 === P && (k.style.display = "none"),
+                S.length - 2 === P &&
+                  (document.querySelector(
+                    ".qwiz-section__progress-step ",
+                  ).style.display = "none"),
+                w && S.length - 2 === P && (w.style.display = "none"),
+                S[P].closest("._additional-question") && !q)
+              )
+                return I(P - 1, P + 1), (P += 1), void U(`${P}`);
+              if (
+                (b.classList.remove("_disabled"),
+                (b.disabled = !1),
+                U(q ? P : P + 1),
+                S.length === P + 3 &&
+                  (!(function () {
+                    const e = [
+                        {
+                          linkSeptik: "septik-akvalos-2",
+                          nameSeptik: "Септик Аквалос 2",
+                          pipeDepth: "30",
+                          userValue: "2",
+                          salvoReleaseVolume: "120",
+                          energyConsumption: "1,37",
+                          productivity: "0.4",
+                          price: "82 800",
+                          mounting: "27 000",
+                        },
+                        {
+                          linkSeptik: "septik-akvalos-3",
+                          nameSeptik: "Аквалос 3",
+                          pipeDepth: "50",
+                          userValue: "2",
+                          salvoReleaseVolume: "220",
+                          energyConsumption: "1,37",
+                          productivity: "0.6",
+                          price: "93 150",
+                          mounting: "27 000",
+                        },
+                        {
+                          linkSeptik: "septik-akvalos-4",
+                          nameSeptik: "Аквалос 4",
+                          pipeDepth: "60",
+                          userValue: "4",
+                          salvoReleaseVolume: "250",
+                          energyConsumption: "1,37",
+                          productivity: "0.8",
+                          price: "106 200",
+                          mounting: "27 000",
+                        },
+                        {
+                          linkSeptik: "septik-akvalos-4-gorizontalnij",
+                          nameSeptik: "Аквалос 4 Гориз.",
+                          pipeDepth: "30",
+                          userValue: "4",
+                          salvoReleaseVolume: "250",
+                          energyConsumption: "0,9",
+                          productivity: "0.8",
+                          price: "120 600",
+                          mounting: "32 000",
+                        },
+                        {
+                          linkSeptik: "septik-akvalos-5",
+                          nameSeptik: "Аквалос 5",
+                          pipeDepth: "60",
+                          userValue: "5",
+                          salvoReleaseVolume: "390",
+                          energyConsumption: "1,37",
+                          productivity: "0.9",
+                          price: "116 100",
+                          mounting: "34 000",
+                        },
+                        {
+                          linkSeptik: "septik-akvalos-5-gorizontalnij",
+                          nameSeptik: "Аквалос 5 Гориз.",
+                          pipeDepth: "30",
+                          userValue: "5",
+                          salvoReleaseVolume: "300",
+                          energyConsumption: "0,9",
+                          productivity: "0.9",
+                          price: "130 050",
+                        },
+                        {
+                          linkSeptik: "septik-akvalos-7",
+                          nameSeptik: "Аквалос 7",
+                          pipeDepth: "60",
+                          userValue: "7",
+                          salvoReleaseVolume: "550",
+                          energyConsumption: "1,37",
+                          productivity: "1.2",
+                          price: "140 400",
+                          mounting: "38 000",
+                        },
+                        {
+                          linkSeptik: "septik-akvalos-7-gorizontalnij",
+                          nameSeptik: "Аквалос 7 Гориз.",
+                          pipeDepth: "30",
+                          userValue: "7",
+                          salvoReleaseVolume: "550",
+                          energyConsumption: "0,9",
+                          productivity: "1.2",
+                          price: "158 400",
+                          mounting: "40 000",
+                        },
+                        {
+                          linkSeptik: "septik-akvalos-8",
+                          nameSeptik: "Аквалос 8",
+                          pipeDepth: "60",
+                          userValue: "8",
+                          salvoReleaseVolume: "700",
+                          energyConsumption: "1,57",
+                          productivity: "1.6",
+                          price: "148 500",
+                          mounting: "40 000",
+                        },
+                        {
+                          linkSeptik: "septik-akvalos-10",
+                          nameSeptik: "Аквалос 10",
+                          pipeDepth: "60",
+                          userValue: "10",
+                          salvoReleaseVolume: "900",
+                          energyConsumption: "2,57",
+                          productivity: "2.0",
+                          price: "194 400",
+                          mounting: "49 000",
+                        },
+                        {
+                          linkSeptik: "septik-akvalos-10-gorizontalnij",
+                          nameSeptik: "Аквалос 10 Гориз.",
+                          pipeDepth: "30",
+                          userValue: "10",
+                          salvoReleaseVolume: "800",
+                          energyConsumption: "0,9",
+                          productivity: "2.0",
+                          price: "201 600",
+                          mounting: "51 000",
+                        },
+                        {
+                          linkSeptik: "septik-akvalos-15",
+                          nameSeptik: "Аквалос 15",
+                          pipeDepth: "60",
+                          userValue: "15",
+                          salvoReleaseVolume: "1125",
+                          energyConsumption: "2,57",
+                          productivity: "3.0",
+                          price: "253 800",
+                          mounting: "55 000",
+                        },
+                        {
+                          linkSeptik: "septik-akvalos-20",
+                          nameSeptik: "Аквалос 20",
+                          pipeDepth: "60",
+                          userValue: "20",
+                          salvoReleaseVolume: "1350",
+                          energyConsumption: "1,5",
+                          productivity: "4.0",
+                          price: "323 100",
+                          mounting: "60 000",
+                        },
+                        {
+                          linkSeptik: "septik-topas-4",
+                          nameSeptik: "Топас 4",
+                          pipeDepth: "60",
+                          userValue: "4",
+                          salvoReleaseVolume: "175",
+                          energyConsumption: "1",
+                          productivity: "0.8",
+                          price: "122 310",
+                          mounting: "27 000",
+                        },
+                        {
+                          linkSeptik: "septik-topas-5",
+                          nameSeptik: "Топас 5",
+                          pipeDepth: "60",
+                          userValue: "5",
+                          salvoReleaseVolume: "220",
+                          energyConsumption: "1",
+                          productivity: "1",
+                          price: "143 550",
+                          mounting: "34 000",
+                        },
+                        {
+                          linkSeptik: "septik-topas-6",
+                          nameSeptik: "Топас 6",
+                          pipeDepth: "60",
+                          userValue: "6",
+                          salvoReleaseVolume: "250",
+                          energyConsumption: "1",
+                          productivity: "1.15",
+                          price: "144 810",
+                          mounting: "34 000",
+                        },
+                        {
+                          linkSeptik: "septik-topas-8",
+                          nameSeptik: "Топас 8",
+                          pipeDepth: "60",
+                          userValue: "8",
+                          salvoReleaseVolume: "440",
+                          energyConsumption: "1",
+                          productivity: "1.5",
+                          price: "166 410",
+                          mounting: "40 000",
+                        },
+                        {
+                          linkSeptik: "septik-topas-9",
+                          nameSeptik: "Топас 9",
+                          pipeDepth: "60",
+                          userValue: "9",
+                          salvoReleaseVolume: "510",
+                          energyConsumption: "1",
+                          productivity: "1.7",
+                          price: "168 390",
+                          mounting: "40 000",
+                        },
+                        {
+                          linkSeptik: "septik-topas-10",
+                          nameSeptik: "Топас 10",
+                          pipeDepth: "60",
+                          userValue: "10",
+                          salvoReleaseVolume: "760",
+                          energyConsumption: "2",
+                          productivity: "2",
+                          price: "226 710",
+                          mounting: "49 000",
+                        },
+                        {
+                          linkSeptik: "septik-topas-12",
+                          nameSeptik: "Топас 12",
+                          pipeDepth: "60",
+                          userValue: "12",
+                          salvoReleaseVolume: "830",
+                          energyConsumption: "2",
+                          productivity: "2.2",
+                          price: "228 870",
+                          mounting: "55 000",
+                        },
+                        {
+                          linkSeptik: "septik-astra-3",
+                          nameSeptik: "Астра 3",
+                          pipeDepth: "60",
+                          userValue: "3",
+                          salvoReleaseVolume: "130",
+                          energyConsumption: "1",
+                          productivity: "0.6",
+                          price: "102 000",
+                          mounting: "27 000",
+                        },
+                        {
+                          linkSeptik: "septik-astra-4",
+                          nameSeptik: "Астра 4",
+                          pipeDepth: "60",
+                          userValue: "4",
+                          salvoReleaseVolume: "150",
+                          energyConsumption: "1",
+                          productivity: "0.8",
+                          price: "106 250",
+                          mounting: "27 000",
+                        },
+                        {
+                          linkSeptik: "septik-astra-5",
+                          nameSeptik: "Астра 5",
+                          pipeDepth: "60",
+                          userValue: "5",
+                          salvoReleaseVolume: "250",
+                          energyConsumption: "1.5",
+                          productivity: "1",
+                          price: "123 250",
+                          mounting: "34 000",
+                        },
+                        {
+                          linkSeptik: "septik-astra-6",
+                          nameSeptik: "Астра 6",
+                          pipeDepth: "60",
+                          userValue: "6",
+                          salvoReleaseVolume: "280",
+                          energyConsumption: "1.5",
+                          productivity: "1.2",
+                          price: "130 050",
+                          mounting: "34 000",
+                        },
+                        {
+                          linkSeptik: "septik-astra-7",
+                          nameSeptik: "Астра 7",
+                          pipeDepth: "60",
+                          userValue: "8",
+                          salvoReleaseVolume: "300",
+                          energyConsumption: "1.5",
+                          productivity: "1.4",
+                          price: "136 850",
+                          mounting: "38 000",
+                        },
+                        {
+                          linkSeptik: "septik-astra-8",
+                          nameSeptik: "Астра 8",
+                          pipeDepth: "60",
+                          userValue: "8",
+                          salvoReleaseVolume: "350",
+                          energyConsumption: "1.5",
+                          productivity: "1.6",
+                          price: "148 699",
+                          mounting: "40 000",
+                        },
+                        {
+                          linkSeptik: "septik-astra-9",
+                          nameSeptik: "Астра 9",
+                          pipeDepth: "60",
+                          userValue: "9",
+                          salvoReleaseVolume: "450",
+                          energyConsumption: "1.5",
+                          productivity: "1.8",
+                          price: "169 150",
+                          mounting: "40 000",
+                        },
+                        {
+                          linkSeptik: "septik-astra-10",
+                          nameSeptik: "Астра 10",
+                          pipeDepth: "60",
+                          userValue: "10",
+                          salvoReleaseVolume: "550",
+                          energyConsumption: "1.5",
+                          productivity: "2",
+                          price: "196 350",
+                          mounting: "49 000",
+                        },
+                        {
+                          linkSeptik: "septik-astra-15",
+                          nameSeptik: "Астра 15",
+                          pipeDepth: "60",
+                          userValue: "15",
+                          salvoReleaseVolume: "600",
+                          energyConsumption: "2.4",
+                          productivity: "3",
+                          price: "255 000",
+                          mounting: "55 000",
+                        },
+                        {
+                          linkSeptik: "septik-malahit-4",
+                          nameSeptik: "Малахит 4",
+                          pipeDepth: "60",
+                          userValue: "4",
+                          salvoReleaseVolume: "220",
+                          energyConsumption: "1.2",
+                          productivity: "0.9",
+                          price: "116 494",
+                          mounting: "27 000",
+                        },
+                        {
+                          linkSeptik: "septik-malahit-5",
+                          nameSeptik: "Малахит 5",
+                          pipeDepth: "60",
+                          userValue: "5",
+                          salvoReleaseVolume: "263",
+                          energyConsumption: "1.5",
+                          productivity: "1",
+                          price: "137 694",
+                          mounting: "34 000",
+                        },
+                        {
+                          linkSeptik: "septik-malahit-6",
+                          nameSeptik: "Малахит 6",
+                          pipeDepth: "60",
+                          userValue: "6",
+                          salvoReleaseVolume: "290",
+                          energyConsumption: "1.5",
+                          productivity: "1.2",
+                          price: "153 594",
+                          mounting: "34 000",
+                        },
+                        {
+                          linkSeptik: "septik-malahit-8",
+                          nameSeptik: "Малахит 8",
+                          pipeDepth: "60",
+                          userValue: "8",
+                          salvoReleaseVolume: "420",
+                          energyConsumption: "1.7",
+                          productivity: "1.6",
+                          price: "185 394",
+                          mounting: "40 000",
+                        },
+                        {
+                          linkSeptik: "septik-malahit-10",
+                          nameSeptik: "Малахит 10",
+                          pipeDepth: "60",
+                          userValue: "10",
+                          salvoReleaseVolume: "500",
+                          energyConsumption: "1.7",
+                          productivity: "2",
+                          price: "222 494",
+                          mounting: "49 000",
+                        },
+                        {
+                          linkSeptik: "septik-malahit-12",
+                          nameSeptik: "Малахит 12",
+                          pipeDepth: "60",
+                          userValue: "12",
+                          salvoReleaseVolume: "645",
+                          energyConsumption: "1.7",
+                          productivity: "2.5",
+                          price: "243 694",
+                          mounting: "55 000",
+                        },
+                        {
+                          linkSeptik: "septik-evrolos-bio-3",
+                          nameSeptik: "Евролос БИО 3",
+                          pipeDepth: "60",
+                          userValue: "3",
+                          salvoReleaseVolume: "150",
+                          energyConsumption: "1",
+                          productivity: "0.6",
+                          price: "116 900",
+                          mounting: "27 000",
+                        },
+                        {
+                          linkSeptik: "septik-evrolos-bio-4",
+                          nameSeptik: "Евролос БИО 4",
+                          pipeDepth: "60",
+                          userValue: "4",
+                          salvoReleaseVolume: "180",
+                          energyConsumption: "1.2",
+                          productivity: "0.8",
+                          price: "122 300",
+                          mounting: "27 000",
+                        },
+                        {
+                          linkSeptik: "septik-evrolos-bio-5",
+                          nameSeptik: "Евролос БИО 5",
+                          pipeDepth: "60",
+                          userValue: "5",
+                          salvoReleaseVolume: "210",
+                          energyConsumption: "1.5",
+                          productivity: "1",
+                          price: "129 400",
+                          mounting: "34 000",
+                        },
+                        {
+                          linkSeptik: "septik-evrolos-bio-6",
+                          nameSeptik: "Евролос БИО 6",
+                          pipeDepth: "60",
+                          userValue: "6",
+                          salvoReleaseVolume: "270",
+                          energyConsumption: "1.5",
+                          productivity: "1.3",
+                          price: "142 500",
+                          mounting: "34 000",
+                        },
+                        {
+                          linkSeptik: "septik-evrolos-bio-8",
+                          nameSeptik: "Евролос БИО 8",
+                          pipeDepth: "60",
+                          userValue: "8",
+                          salvoReleaseVolume: "370",
+                          energyConsumption: "1.5",
+                          productivity: "1.6",
+                          price: "166 800",
+                          mounting: "40 000",
+                        },
+                        {
+                          linkSeptik: "septik-evrolos-bio-10",
+                          nameSeptik: "Евролос БИО 10",
+                          pipeDepth: "60",
+                          userValue: "10",
+                          salvoReleaseVolume: "550",
+                          energyConsumption: "1.7",
+                          productivity: "2",
+                          price: "208 700",
+                          mounting: "49 000",
+                        },
+                        {
+                          linkSeptik: "septik-malahit-12",
+                          nameSeptik: "Евролос БИО 12",
+                          pipeDepth: "60",
+                          userValue: "12",
+                          salvoReleaseVolume: "680",
+                          energyConsumption: "1.7",
+                          productivity: "2.4",
+                          price: "228 600",
+                          mounting: "55 000",
+                        },
+                      ],
+                      t = document.querySelector(
+                        ".form-qwiz__input-number  input",
+                      );
+                    function s() {
+                      let e = (150 * Number(i()) * 1.2) / 1e3;
+                      return e <= 0.4 && (e = 0.4), e;
+                    }
+                    function i() {
+                      const e = document.querySelector(".noUi-handle");
+                      return "10+" === e.ariaValueText
+                        ? t.value
+                        : e.ariaValueText;
+                    }
+                    function n() {
+                      const e = document.querySelectorAll(
+                        ".form-qwiz__count-plumbing",
+                      );
+                      let t = 0,
+                        s = 0;
+                      return (
+                        e.forEach((e) => {
+                          let i = e.dataset.plumbingValue;
+                          (s = i * e.value), (t += s);
+                        }),
+                        t
+                      );
+                    }
+                    function o() {
+                      let t = (s() + n() / 1e3 / 2).toFixed(1);
+                      t >= 4 && (t = 4);
+                      r(l(e, +t, +t, []).slice(0, 3));
+                    }
+                    function l(e, t, s, i) {
+                      for (let n = 0; n < e.length; n++)
+                        t <= e[n].productivity &&
+                          e[n].productivity <= s &&
+                          (i.push(e[n]), e.splice(n, 1));
+                      return s >= 4 ? i : l(e, t, s + 0.1, i);
+                    }
+                    function r(e) {
+                      const t = document.querySelectorAll(
+                          ".form-qwiz__content-finish",
+                        ),
+                        s = document.querySelector(".form-qwiz__sum-finish");
+                      let i = a(e);
+                      const [n, o] = i;
+                      s.innerHTML = o;
+                      const l = document.getElementById("finish-sum_input");
+                      if ((l && (l.value = o), i))
+                        for (let s = 0; s < t.length; s++) {
+                          const i = t[s];
+                          0 !== s
+                            ? (i.innerHTML =
+                                n[s] +
+                                '<input type="hidden" name="' +
+                                i.previousElementSibling.innerText +
+                                '" value="' +
+                                n[s] +
+                                '">')
+                            : c(i, e);
+                        }
+                    }
+                    function a(e) {
+                      if (0 === e.length) return;
+                      const t = { link: "" };
+                      (t.userValue = i()),
+                        (t.plannedSalvoRelease = `${n()} л`),
+                        (t.salvoReleaseVolume = `${e[0].salvoReleaseVolume} л`),
+                        (t.price = `~${e[0].price} р.`),
+                        (t.pipeDepth = `от ${e[0].pipeDepth} см`),
+                        (t.deliveryPrice = "9100 р."),
+                        (t.productivity = `${e[0].productivity} м3`),
+                        (t.mounting = `${e[0].mounting} р.`),
+                        (t.energyConsumption = `${e[0].energyConsumption} кВт/сутки`);
+                      const s = document.querySelectorAll(
+                        'input[name="Количество колец"]',
+                      );
+                      let o = 0,
+                        l = document.querySelector(
+                          'input[name="Количество колец"]:checked',
+                        );
+                      l && (o = l.dataset.price);
+                      let r = new Intl.NumberFormat("ru", {}).format(
+                        Number(e[0].price.replace(/\s+/g, "")) +
+                          Number(e[0].mounting.replace(/\s+/g, "")) +
+                          9100 +
+                          Number(o),
+                      );
+                      return (
+                        console.log(
+                          (function (e) {
+                            let t = 0;
+                            return (
+                              e.forEach((e) => {
+                                e.checked && (t = e.value);
+                              }),
+                              Number(t)
+                            );
+                          })(s),
+                        ),
+                        [Object.values(t), `${r} р.`]
+                      );
+                    }
+                    function c(e, t) {
+                      let s = "",
+                        i = e.previousElementSibling.innerText,
+                        n = e.firstChild;
+                      for (let i = 0; i < 3; i++) {
+                        let o = document.createElement("a");
+                        t[i] &&
+                          (o.setAttribute(
+                            "href",
+                            `https://sewera.ru/products/${t[i].linkSeptik}`,
+                          ),
+                          o.setAttribute("target", "_blank"),
+                          i < 2
+                            ? ((s += `${t[i].nameSeptik}, `),
+                              (o.innerHTML = `${t[i].nameSeptik}, `))
+                            : ((s += `${t[i].nameSeptik}`),
+                              (o.innerHTML = `${t[i].nameSeptik}`)),
+                          e.insertBefore(o, n));
+                      }
+                      e.insertAdjacentHTML(
+                        "beforeend",
+                        '<input type="hidden" name="' +
+                          i +
+                          '" value="' +
+                          s +
+                          '">',
+                      );
+                    }
+                    o();
+                  })(),
+                  (E.style.display = "none"),
+                  U("Итоги")),
+                S[P].closest("._additional-question") && q)
+              )
+                return (
+                  (E.style.display = "none"),
+                  U("Дополнительный вопрос"),
+                  void I(P - 1, P)
+                );
+              I(P - 1, P);
+            }
+          }
+          function R() {
+            let e = le(D);
+            return (
+              3 == P && e && _.classList.remove("_disabled"),
+              1 == P && _.classList.remove("_disabled"),
+              E && (E.style.display = "flex"),
+              P === S.length - 2 && x.parentNode.classList.remove("_ready"),
+              P === S.length - 3 && _.classList.remove("_disabled"),
+              P--,
+              S[P].closest("._additional-question") && !q
+                ? (I(P + 1, P - 1), (P = 2), void U(` ${P + 1}`))
+                : S[P].closest("._additional-question") && q
+                  ? ((E.style.display = "none"),
+                    U("Дополнительный вопрос"),
+                    void I(P + 1, P))
+                  : (U(P + 1),
+                    0 === P &&
+                      ((b.style.display = "none"),
+                      (k.style.justifyContent = "flex-end"),
+                      b.classList.add("_disabled"),
+                      (b.disabled = !0)),
+                    (_.disabled = !1),
+                    void I(P + 1, P))
+            );
+          }
+          function j() {
+            for (let e = 0; e < y.length; e++) {
+              if (y[e].checked) return void (L = !0);
+            }
+            L = !1;
+          }
+          function U(e) {
+            x.innerHTML = e;
+          }
+          function I(e, t) {
+            S[e].classList.remove("_current"), S[t].classList.add("_current");
+          }
+          O.forEach((e) => {
+            e.addEventListener("change", () => {
+              q = "Дренажный колодец" === e.value;
+            });
+          }),
+            H(B),
+            H(D),
+            H(T),
+            C &&
+              C.addEventListener("click", function (e) {
+                (P = 0),
+                  (x.innerHTML = "Шаг 1"),
+                  b.classList.add("_disabled"),
+                  S[0].classList.add("_current"),
+                  S[S.length - 1].classList.remove("_current"),
+                  (k.style.display = "flex"),
+                  (b.style.display = "none"),
+                  (document.querySelector(
+                    ".qwiz-section__progress-step",
+                  ).style.display = "flex"),
+                  (k.style.justifyContent = "flex-end"),
+                  N(B),
+                  N(D),
+                  N(T);
+              }),
+            t &&
+              t.addEventListener("submit", function (e) {
+                e.preventDefault();
+                var s = $(t);
+                return (
+                  $(".load__preloader").fadeIn("", function () {
+                    $.ajax({
+                      type: "POST",
+                      url: "/index.php?route=common/footer/quiz_submit",
+                      data: s.serialize(),
+                      dataType: "json",
+                    }).done(function (e) {
+                      e.success && ($(".load__preloader").fadeOut("slow"), z());
+                    });
+                  }),
+                  !1
+                );
+              });
+        }
+      })(),
+      (function () {
+        const e = document.querySelector(".form-qwiz__input-number  input");
+        e &&
+          (e.addEventListener("keydown", (e) => {
+            "Enter" === e.key && e.preventDefault();
+          }),
+          e.addEventListener("input", (t) => {
+            const s = document.querySelector(".qwiz-section__next-btn");
+            t.target.value > 50 && ((t.target.value = 50), (t.target.max = 50)),
+              (e.value = e.value.replace(/[^0-9]/g, "")),
+              0 !== e.value.length
+                ? (s.classList.remove("_disabled"), (s.disabled = !1))
+                : (s.classList.add("_disabled"), (s.disabled = !0));
+          }));
+      })(),
+      (function (e) {
+        const t = document.querySelectorAll(".form-qwiz__btns-plumbing");
+        t &&
+          t.forEach((e) => {
+            e.addEventListener("click", function (t) {
+              let s = t.target;
+              if (s.closest("._plus-plumbing")) {
+                if (e.children[1].value >= 5) return;
+                e.children[1].value++;
+              }
+              if (s.closest("._minus-plumbing")) {
+                if (e.children[1].value <= 0) return;
+                e.children[1].value--;
+              }
+            });
+          });
+      })();
+    new (class {
+      constructor(e, t = null) {
+        if (
+          ((this.config = Object.assign({ init: !0, logging: !0 }, e)),
+          (this.selectClasses = {
+            classSelect: "select",
+            classSelectBody: "select__body",
+            classSelectTitle: "select__title",
+            classSelectValue: "select__value",
+            classSelectLabel: "select__label",
+            classSelectInput: "select__input",
+            classSelectText: "select__text",
+            classSelectLink: "select__link",
+            classSelectOptions: "select__options",
+            classSelectOptionsScroll: "select__scroll",
+            classSelectOption: "select__option",
+            classSelectContent: "select__content",
+            classSelectRow: "select__row",
+            classSelectData: "select__asset",
+            classSelectDisabled: "_select-disabled",
+            classSelectTag: "_select-tag",
+            classSelectOpen: "_select-open",
+            classSelectActive: "_select-active",
+            classSelectFocus: "_select-focus",
+            classSelectMultiple: "_select-multiple",
+            classSelectCheckBox: "_select-checkbox",
+            classSelectOptionSelected: "_select-selected",
+          }),
+          (this._this = this),
+          this.config.init)
+        ) {
+          const e = t
+            ? document.querySelectorAll(t)
+            : document.querySelectorAll("select");
+          e.length && this.selectsInit(e);
+        }
       }
-    }
-    // созадние пути для картнки
-    function createImgSrc(img, btn) {
-      if (btn) {
-        const endIndxSrc = img.src.lastIndexOf("/");
-        img.src = img.src.slice(0, endIndxSrc + 1) + btn + ".webp";
+      getSelectClass(e) {
+        return `.${e}`;
       }
+      getSelectElement(e, t) {
+        return {
+          originalSelect: e.querySelector("select"),
+          selectElement: e.querySelector(this.getSelectClass(t)),
+        };
+      }
+      selectsInit(e) {
+        e.forEach((e, t) => {
+          this.selectInit(e, t + 1);
+        }),
+          document.addEventListener(
+            "click",
+            function (e) {
+              this.selectsActions(e);
+            }.bind(this),
+          ),
+          document.addEventListener(
+            "keydown",
+            function (e) {
+              this.selectsActions(e);
+            }.bind(this),
+          ),
+          document.addEventListener(
+            "focusin",
+            function (e) {
+              this.selectsActions(e);
+            }.bind(this),
+          ),
+          document.addEventListener(
+            "focusout",
+            function (e) {
+              this.selectsActions(e);
+            }.bind(this),
+          ),
+          document.addEventListener(
+            "input",
+            function (e) {
+              this.selectsActions(e);
+            }.bind(this),
+          );
+      }
+      selectInit(e, t) {
+        const s = this;
+        let i = document.createElement("div");
+        if (
+          (i.classList.add(this.selectClasses.classSelect),
+          e.parentNode.insertBefore(i, e),
+          i.appendChild(e),
+          (e.hidden = !0),
+          t && (e.dataset.id = t),
+          i.insertAdjacentHTML(
+            "beforeend",
+            `<div class="${this.selectClasses.classSelectBody}"><div hidden class="${this.selectClasses.classSelectOptions}"></div></div>`,
+          ),
+          this.selectBuild(e),
+          this.getSelectPlaceholder(e) &&
+            ((e.dataset.placeholder = this.getSelectPlaceholder(e).value),
+            this.getSelectPlaceholder(e).label.show))
+        ) {
+          this.getSelectElement(
+            i,
+            this.selectClasses.classSelectTitle,
+          ).selectElement.insertAdjacentHTML(
+            "afterbegin",
+            `<span class="${this.selectClasses.classSelectLabel}">${this.getSelectPlaceholder(e).label.text ? this.getSelectPlaceholder(e).label.text : this.getSelectPlaceholder(e).value}</span>`,
+          );
+        }
+        (e.dataset.speed = e.dataset.speed ? e.dataset.speed : "150"),
+          e.addEventListener("change", function (e) {
+            s.selectChange(e);
+          });
+      }
+      selectBuild(e) {
+        const t = e.parentElement;
+        (t.dataset.id = e.dataset.id),
+          t.classList.add(
+            e.getAttribute("class") ? `select_${e.getAttribute("class")}` : "",
+          ),
+          e.multiple
+            ? t.classList.add(this.selectClasses.classSelectMultiple)
+            : t.classList.remove(this.selectClasses.classSelectMultiple),
+          e.hasAttribute("data-checkbox") && e.multiple
+            ? t.classList.add(this.selectClasses.classSelectCheckBox)
+            : t.classList.remove(this.selectClasses.classSelectCheckBox),
+          this.setSelectTitleValue(t, e),
+          this.setOptions(t, e),
+          e.hasAttribute("data-search") && this.searchActions(t),
+          e.hasAttribute("data-open") && this.selectAction(t),
+          this.selectDisabled(t, e);
+      }
+      selectsActions(e) {
+        const t = e.target,
+          s = e.type;
+        if (
+          t.closest(this.getSelectClass(this.selectClasses.classSelect)) ||
+          t.closest(this.getSelectClass(this.selectClasses.classSelectTag))
+        ) {
+          const i = t.closest(".select")
+              ? t.closest(".select")
+              : document.querySelector(
+                  `.${this.selectClasses.classSelect}[data-id="${t.closest(this.getSelectClass(this.selectClasses.classSelectTag)).dataset.selectId}"]`,
+                ),
+            n = this.getSelectElement(i).originalSelect;
+          if ("click" === s) {
+            if (!n.disabled)
+              if (
+                t.closest(
+                  this.getSelectClass(this.selectClasses.classSelectTag),
+                )
+              ) {
+                const e = t.closest(
+                    this.getSelectClass(this.selectClasses.classSelectTag),
+                  ),
+                  s = document.querySelector(
+                    `.${this.selectClasses.classSelect}[data-id="${e.dataset.selectId}"] .select__option[data-value="${e.dataset.value}"]`,
+                  );
+                this.optionAction(i, n, s);
+              } else if (
+                t.closest(
+                  this.getSelectClass(this.selectClasses.classSelectTitle),
+                )
+              )
+                this.selectAction(i);
+              else if (
+                t.closest(
+                  this.getSelectClass(this.selectClasses.classSelectOption),
+                )
+              ) {
+                const e = t.closest(
+                  this.getSelectClass(this.selectClasses.classSelectOption),
+                );
+                this.optionAction(i, n, e);
+              }
+          } else if ("focusin" === s) {
+            if (
+              t.closest(this.getSelectClass(this.selectClasses.classSelect))
+            ) {
+              this.getSelectElement(
+                i,
+                this.selectClasses.classSelectOptions,
+              ).selectElement.querySelectorAll(
+                `.${this.selectClasses.classSelectOption}`,
+              );
+              i.classList.add(this.selectClasses.classSelectFocus);
+            }
+          } else
+            "focusout" === s
+              ? t.closest(
+                  this.getSelectClass(this.selectClasses.classSelect),
+                ) && i.classList.remove(this.selectClasses.classSelectFocus)
+              : "keydown" === s && "Escape" === e.code
+                ? this.selectsСlose()
+                : "input" === s && this.searchActions(i);
+        } else this.selectsСlose();
+      }
+      selectsСlose() {
+        const e = document.querySelectorAll(
+          `${this.getSelectClass(this.selectClasses.classSelect)}${this.getSelectClass(this.selectClasses.classSelectOpen)}`,
+        );
+        e.length &&
+          e.forEach((e) => {
+            this.selectAction(e);
+          });
+      }
+      selectAction(e) {
+        const t = this.getSelectElement(e).originalSelect,
+          s = this.getSelectElement(
+            e,
+            this.selectClasses.classSelectOptions,
+          ).selectElement;
+        s.classList.contains("_slide") ||
+          (e.classList.toggle(this.selectClasses.classSelectOpen),
+          i(s, t.dataset.speed));
+      }
+      setSelectTitleValue(e, t) {
+        const s = this.getSelectElement(
+            e,
+            this.selectClasses.classSelectBody,
+          ).selectElement,
+          i = this.getSelectElement(
+            e,
+            this.selectClasses.classSelectTitle,
+          ).selectElement;
+        i && i.remove(),
+          s.insertAdjacentHTML("afterbegin", this.getSelectTitleValue(e, t));
+      }
+      getSelectTitleValue(e, t) {
+        let s = this.getSelectedOptionsData(t, 2).html;
+        if (
+          (t.multiple &&
+            t.hasAttribute("data-tags") &&
+            ((s = this.getSelectedOptionsData(t)
+              .elements.map(
+                (t) =>
+                  `<span role="button" data-select-id="${e.dataset.id}" data-value="${t.value}" class="_select-tag">${this.getSelectElementContent(t)}</span>`,
+              )
+              .join("")),
+            t.dataset.tags &&
+              document.querySelector(t.dataset.tags) &&
+              ((document.querySelector(t.dataset.tags).innerHTML = s),
+              t.hasAttribute("data-search") && (s = !1))),
+          (s = s.length ? s : t.dataset.placeholder),
+          this.getSelectedOptionsData(t).values.length
+            ? e.classList.add(this.selectClasses.classSelectActive)
+            : e.classList.remove(this.selectClasses.classSelectActive),
+          t.hasAttribute("data-search"))
+        )
+          return `<div class="${this.selectClasses.classSelectTitle}"><span class="${this.selectClasses.classSelectValue}"><input  autocomplete="off" type="text" placeholder="${s}"  data-placeholder="${s}" class="${this.selectClasses.classSelectInput}"></span></div>`;
+        {
+          const e =
+            this.getSelectedOptionsData(t).elements.length &&
+            this.getSelectedOptionsData(t).elements[0].dataset.class
+              ? ` ${this.getSelectedOptionsData(t).elements[0].dataset.class}`
+              : "";
+          return `<button type="button" class="${this.selectClasses.classSelectTitle}"><span class="${this.selectClasses.classSelectValue}"><span class="${this.selectClasses.classSelectContent}${e}">${s}</span></span></button>`;
+        }
+      }
+      getSelectElementContent(e) {
+        const t = e.dataset.asset ? `${e.dataset.asset}` : "",
+          s = t.indexOf("img") >= 0 ? `<img src="${t}" alt="">` : t;
+        let i = "";
+        return (
+          (i += t ? `<span class="${this.selectClasses.classSelectRow}">` : ""),
+          (i += t
+            ? `<span class="${this.selectClasses.classSelectData}">`
+            : ""),
+          (i += t ? s : ""),
+          (i += t ? "</span>" : ""),
+          (i += t
+            ? `<span class="${this.selectClasses.classSelectText}">`
+            : ""),
+          (i += e.textContent),
+          (i += t ? "</span>" : ""),
+          (i += t ? "</span>" : ""),
+          i
+        );
+      }
+      getSelectPlaceholder(e) {
+        const t = Array.from(e.options).find((e) => !e.value);
+        if (t)
+          return {
+            value: t.textContent,
+            show: t.hasAttribute("data-show"),
+            label: {
+              show: t.hasAttribute("data-label"),
+              text: t.dataset.label,
+            },
+          };
+      }
+      getSelectedOptionsData(e, t) {
+        let s = [];
+        return (
+          e.multiple
+            ? (s = Array.from(e.options)
+                .filter((e) => e.value)
+                .filter((e) => e.selected))
+            : s.push(e.options[e.selectedIndex]),
+          {
+            elements: s.map((e) => e),
+            values: s.filter((e) => e.value).map((e) => e.value),
+            html: s.map((e) => this.getSelectElementContent(e)),
+          }
+        );
+      }
+      getOptions(e) {
+        let t = e.hasAttribute("data-scroll") ? "data-simplebar" : "",
+          s = e.dataset.scroll
+            ? `style="max-height:${e.dataset.scroll}px"`
+            : "",
+          i = Array.from(e.options);
+        if (i.length > 0) {
+          let n = "";
+          return (
+            ((this.getSelectPlaceholder(e) &&
+              !this.getSelectPlaceholder(e).show) ||
+              e.multiple) &&
+              (i = i.filter((e) => e.value)),
+            (n += t
+              ? `<div ${t} ${s} class="${this.selectClasses.classSelectOptionsScroll}">`
+              : ""),
+            i.forEach((t) => {
+              n += this.getOption(t, e);
+            }),
+            (n += t ? "</div>" : ""),
+            n
+          );
+        }
+      }
+      getOption(e, t) {
+        const s =
+            e.selected && t.multiple
+              ? ` ${this.selectClasses.classSelectOptionSelected}`
+              : "",
+          i =
+            e.selected && !t.hasAttribute("data-show-selected") ? "hidden" : "",
+          n = e.dataset.class ? ` ${e.dataset.class}` : "",
+          o = !!e.dataset.href && e.dataset.href,
+          l = e.hasAttribute("data-href-blank") ? 'target="_blank"' : "";
+        let r = "";
+        return (
+          (r += o
+            ? `<a ${l} ${i} href="${o}" data-value="${e.value}" class="${this.selectClasses.classSelectOption}${n}${s}">`
+            : `<button ${i} class="${this.selectClasses.classSelectOption}${n}${s}" data-value="${e.value}" type="button">`),
+          (r += this.getSelectElementContent(e)),
+          (r += o ? "</a>" : "</button>"),
+          r
+        );
+      }
+      setOptions(e, t) {
+        this.getSelectElement(
+          e,
+          this.selectClasses.classSelectOptions,
+        ).selectElement.innerHTML = this.getOptions(t);
+      }
+      optionAction(e, t, s) {
+        if (t.multiple) {
+          s.classList.toggle(this.selectClasses.classSelectOptionSelected);
+          this.getSelectedOptionsData(t).elements.forEach((e) => {
+            e.removeAttribute("selected");
+          });
+          e.querySelectorAll(
+            this.getSelectClass(this.selectClasses.classSelectOptionSelected),
+          ).forEach((e) => {
+            t.querySelector(`option[value="${e.dataset.value}"]`).setAttribute(
+              "selected",
+              "selected",
+            );
+          });
+        } else
+          t.hasAttribute("data-show-selected") ||
+            (e.querySelector(
+              `${this.getSelectClass(this.selectClasses.classSelectOption)}[hidden]`,
+            ) &&
+              (e.querySelector(
+                `${this.getSelectClass(this.selectClasses.classSelectOption)}[hidden]`,
+              ).hidden = !1),
+            (s.hidden = !0)),
+            (t.value = s.hasAttribute("data-value")
+              ? s.dataset.value
+              : s.textContent),
+            this.selectAction(e);
+        this.setSelectTitleValue(e, t), this.setSelectChange(t);
+      }
+      selectChange(e) {
+        const t = e.target;
+        this.selectBuild(t), this.setSelectChange(t);
+      }
+      setSelectChange(e) {
+        const t = document.querySelector(".calc-wells__btn"),
+          s = document.querySelector('select[data-id="1"]'),
+          i = document.getElementById("obustroystva-calc");
+        let n;
+        if (
+          (document.querySelector(".select__input") &&
+            document.querySelector(".calc-wells__inpt") &&
+            (n =
+              document.querySelector(".calc-wells__inpt").value ||
+              document.querySelector(".select__input").dataset.placeholder),
+          !i &&
+            1 == e.dataset.id &&
+            s.value &&
+            n &&
+            (t.classList.remove("_disable"), (t.disabled = !1)),
+          i &&
+            2 == e.dataset.id &&
+            t &&
+            document.querySelector(".calc-wells__inpt").value &&
+            (t.classList.remove("_disable"), (t.disabled = !1)),
+          !i &&
+            3 == e.dataset.id &&
+            t &&
+            document.querySelector(".select__input").dataset.placeholder &&
+            s.value &&
+            (t.classList.remove("_disable"), (t.disabled = !1)),
+          e.hasAttribute("data-validate"),
+          e.hasAttribute("data-submit") && e.value)
+        ) {
+          let t = document.createElement("button");
+          (t.type = "submit"),
+            e.closest("form").append(t),
+            t.click(),
+            t.remove();
+        }
+        const o = e.parentElement;
+        this.selectCallback(o, e);
+      }
+      selectDisabled(e, t) {
+        t.disabled
+          ? (e.classList.add(this.selectClasses.classSelectDisabled),
+            (this.getSelectElement(
+              e,
+              this.selectClasses.classSelectTitle,
+            ).selectElement.disabled = !0))
+          : (e.classList.remove(this.selectClasses.classSelectDisabled),
+            (this.getSelectElement(
+              e,
+              this.selectClasses.classSelectTitle,
+            ).selectElement.disabled = !1));
+      }
+      searchActions(e) {
+        this.getSelectElement(e).originalSelect;
+        const t = this.getSelectElement(
+            e,
+            this.selectClasses.classSelectInput,
+          ).selectElement,
+          s = this.getSelectElement(
+            e,
+            this.selectClasses.classSelectOptions,
+          ).selectElement;
+        s
+          .querySelectorAll(`.${this.selectClasses.classSelectOption}`)
+          .forEach((e) => {
+            e.textContent.toUpperCase().indexOf(t.value.toUpperCase()) >= 0
+              ? (e.hidden = !1)
+              : (e.hidden = !0);
+          }),
+          !0 === s.hidden && this.selectAction(e);
+      }
+      selectCallback(e, t) {
+        document.dispatchEvent(
+          new CustomEvent("selectCallback", { detail: { select: t } }),
+        );
+      }
+    })();
+    function re() {
+      return (
+        !!window.matchMedia("(min-width: 1023.98px)").matches ||
+        ((function () {
+          function e(e) {
+            if ("click" === e.type) {
+              const t = e.target;
+              if (t.closest("[data-goto]")) {
+                const s = t.closest("[data-goto]"),
+                  i = s.dataset.goto ? s.dataset.goto : "",
+                  n = !!s.hasAttribute("data-goto-header"),
+                  o = s.dataset.gotoSpeed ? s.dataset.gotoSpeed : "500";
+                ae(i, n, o), e.preventDefault();
+              }
+            } else if ("watcherCallback" === e.type && e.detail) {
+              const t = e.detail.entry,
+                s = t.target;
+              if ("navigator" === s.dataset.watch) {
+                const e = s.id,
+                  i =
+                    (document.querySelector("[data-goto]._navigator-active"),
+                    document.querySelector(`[data-goto="${e}"]`));
+                t.isIntersecting
+                  ? i && i.classList.add("_navigator-active")
+                  : i && i.classList.remove("_navigator-active");
+              }
+            }
+          }
+          document.addEventListener("click", e),
+            document.addEventListener("watcherCallback", e);
+        })(),
+        !1)
+      );
     }
-  }
-  tabModificationModel();
-  function rangeInit() {
-    const arbitraryValuesForSlider = [
-      "1",
-      "2",
-      "3",
-      "4",
-      "5",
-      "6",
-      "7",
-      "8",
-      "9",
-      "10",
-      "10+",
-    ];
-
-    var format = {
-      to: function (value) {
-        return arbitraryValuesForSlider[Math.round(value)];
-      },
-      from: function (value) {
-        return arbitraryValuesForSlider.indexOf(value);
-      },
+    window.addEventListener("resize", re),
+      (function () {
+        if (document.querySelector(".calc-wells")) {
+          const e = document.querySelector('select[data-id="1"]'),
+            t = document.querySelector('select[name="Вид обустройства"]'),
+            s = document.querySelector('select[name="Район бурения"]'),
+            i = document.querySelector(".calc-wells__inpt"),
+            n = document.querySelector(".calc-wells__select"),
+            o = document.querySelector("#int"),
+            l = document.querySelector("#calc"),
+            r = document.querySelector(".calc-wells__btn"),
+            a = document.querySelector(".calc-wells__bg-img"),
+            c = document.querySelector(".calc-wells__finish"),
+            d = document.getElementById("obustroystva-calc"),
+            u = document.getElementById("mgbu"),
+            p = document.querySelector(".calc-wells__sum");
+          let m = !0,
+            h = 0;
+          function f() {
+            function e(e, t, s, n, o) {
+              e.classList.remove("_active"),
+                t.classList.add("_active"),
+                (n.hidden = !0),
+                (s.hidden = !1),
+                (m = o),
+                (i.value = ""),
+                r.classList.add("_disable"),
+                (r.disabled = !0),
+                document.querySelector(".select__input") &&
+                  ((document.querySelector(".select__input").placeholder =
+                    "Район бурения"),
+                  (document.querySelector(
+                    ".select__input",
+                  ).dataset.placeholder = ""));
+            }
+            o && o.addEventListener("click", (t) => e(l, o, i, n, !0)),
+              l && l.addEventListener("click", (t) => e(o, l, n, i, !1));
+          }
+          function v(e) {
+            let t = m ? i.value : g(s),
+              n = u ? 4e3 : 3650;
+            if ((t < 40 && (t = 40), d)) {
+              let e = 570,
+                s = document.querySelector(
+                  'select[name="Вид обустройства"] option:checked',
+                ),
+                i = 0;
+              s && (i = s.dataset.price),
+                (t = +t / 2),
+                t > 70 && (e = 740),
+                (h = String(+t * +e + +i));
+            } else {
+              let e = document.querySelector(
+                  'select[name="Вид обустройства"] option:checked',
+                ),
+                s = e.dataset.price ? e.dataset.price : 0;
+              t > 80 && (n += 100), (h = String(+n * +t + +s));
+            }
+            const o = h
+              .split("")
+              .reverse()
+              .map((e, t) => (0 == t ? e : t % 3 == 0 ? `${e} ` : e))
+              .reverse()
+              .join("");
+            o &&
+              (re() ? y() : c.classList.add("_animat-mob"),
+              (c.hidden = !1),
+              (p.innerHTML = `${o} р.`),
+              (document.getElementById("calc-wells__sum").value = o));
+          }
+          function g(e) {
+            return e.querySelector(`option[value="${e.value}"]`).dataset
+              .valueDepth;
+          }
+          function y() {
+            a.classList.add("_animat"), c.classList.add("_animat");
+          }
+          document.querySelector(".select__input") &&
+            (document.querySelector(".select__input").dataset.placeholder = ""),
+            f(),
+            r.addEventListener("click", v),
+            i.addEventListener("input", (s) => {
+              const n = u ? 150 : 250;
+              if (
+                (s.target.value > n &&
+                  ((s.target.value = n), (s.target.max = n)),
+                d &&
+                  t.value &&
+                  ((r.disabled = 0 === i.value.trim().length),
+                  r.classList.remove("_disable")),
+                "" !== i.value && e.value)
+              )
+                return (r.disabled = !1), void r.classList.remove("_disable");
+              "" === i.value &&
+                ((r.disabled = !0), r.classList.add("_disable"));
+            });
+          const S = document.getElementById("calc-wells__finish");
+          S &&
+            S.addEventListener("submit", function (e) {
+              e.preventDefault();
+              var t = $(S);
+              return (
+                $(".load__preloader").fadeIn("", function () {
+                  $.ajax({
+                    type: "POST",
+                    url: "/index.php?route=common/footer/quiz_submit",
+                    data: t.serialize(),
+                    dataType: "json",
+                  }).done(function (e) {
+                    e.success &&
+                      ((window.location.href = "https://sewera.ru/sent/"),
+                      $(".load__preloader").fadeOut("slow"));
+                  });
+                }),
+                !1
+              );
+            });
+        }
+      })();
+    let ae = (e, t = !1, s = 500, i = 0) => {
+      const n = document.querySelector(e);
+      if (n) {
+        let e = "",
+          o = 0;
+        t &&
+          ((e = "header.header"), (o = document.querySelector(e).offsetHeight));
+        let l = {
+          speedAsDuration: !0,
+          speed: s,
+          header: e,
+          offset: i,
+          easing: "easeOutQuad",
+        };
+        if (
+          (document.documentElement.classList.contains("menu-open") &&
+            menuClose(),
+          "undefined" != typeof SmoothScroll)
+        )
+          new SmoothScroll().animateScroll(n, "", l);
+        else {
+          let e = n.getBoundingClientRect().top + scrollY;
+          window.scrollTo({ top: o ? e - o : e, behavior: "smooth" });
+        }
+      }
     };
-    const priceSlider = document.querySelector("#range");
-    if (priceSlider) {
-      let textFrom = priceSlider.getAttribute("data-from");
-      let textTo = priceSlider.getAttribute("data-to");
-
-      initialize(priceSlider, {
-        start: 3,
-        step: 1,
-        range: {
-          min: [0],
-          max: [arbitraryValuesForSlider.length - 1],
-        },
-        tooltips: true,
-        format: format,
-        connect: [true, false],
-        pips: {
-          mode: "count",
-          stepped: true,
-          values: 11,
-
-          format: format,
-        },
-      });
-    }
-  }
-  rangeInit();
-
-  function initQwiz() {
-    const qwizFrom = document.querySelector("#services_quiz_form");
-    const qwizCalc = document.querySelector("#calc-septik");
-    if (qwizFrom) {
-      const checkBlock = document.querySelector(".form-qwiz");
-      const inputChecks = document.querySelectorAll(".form-qwiz__input");
-      const steps = document.querySelectorAll(".form-qwiz__step");
-      const prevBtn = document.querySelector(".qwiz-section__prev-btn");
-      const nextBtn = document.querySelector(".qwiz-section__next-btn");
-      const panelNavigate = document.querySelector(".qwiz-section__bottom");
-      const stepCurrentNumber = document.querySelector(
-        ".qwiz-section__current-step",
-      );
-      const restartBtn = document.querySelector(".form-qwiz__restart-btn");
-      const finishStep = document.querySelector(".qwiz-section__finish-step");
-      let currentStep = 0;
-      let isCheck = false;
-
-      nextBtn.addEventListener("click", nextStep);
-      prevBtn.addEventListener("click", prevStep);
-      checkBlock.addEventListener("click", isClickCheck);
-      if (finishStep) finishStep.innerHTML = `/${steps.length - 1}`;
-      // кнопка заказать занова
-      if (restartBtn)
-        restartBtn.addEventListener("click", function (e) {
-          currentStep = 0;
-          isCheck = false;
-          stepCurrentNumber.innerHTML = 1;
-          prevBtn.classList.add("_disabled");
-          prevBtn.disabled = true;
-          steps[0].classList.add("_current");
-          steps[steps.length - 1].classList.remove("_current");
-          panelNavigate.style.display = "flex";
-          stepCurrentNumber.parentNode.style.display = "flex";
-          stepCurrentNumber.parentNode.classList.remove("_ready");
-          inputChecks.forEach((inpt) => (inpt.checked = false));
-        });
-
-      function isClickCheck(e) {
-        let target = e.target;
-        if (target.classList.contains("form-qwiz__input")) {
-          isValidateFormService();
-
-          if (!isCheck && currentStep === steps.length - 3) {
-            nextBtn.classList.add("_disabled");
-            nextBtn.disabled = true;
-          }
-          if (isCheck) {
-            nextBtn.classList.remove("_disabled");
-            nextBtn.disabled = false;
-          }
-        }
-      }
-      // ==============================================================================
-
-      // шаг вперед
-      function nextStep(e) {
-        ++currentStep;
-
-        isValidateFormService();
-
-        console.log(currentStep);
-        if (isCheck && currentStep === steps.length - 2) {
-          stepCurrentNumber.parentNode.classList.add("_ready");
-        }
-
-        if (!isCheck && currentStep === steps.length - 3) {
-          nextBtn.classList.add("_disabled");
-          nextBtn.disabled = true;
-        }
-        if (steps.length - 1 === currentStep) {
-          stepCurrentNumber.parentNode.style.display = "none";
-        }
-
-        if (steps.length - 2 === currentStep) {
-          panelNavigate.style.display = "none";
-        }
-
-        if (steps.length === currentStep) {
-          steps[currentStep - 1].style.display = "none";
-          return;
-        }
-
-        stepCurrentNumber.innerHTML = currentStep + 1;
-
-        prevBtn.classList.remove("_disabled");
-        prevBtn.disabled = false;
-        steps[currentStep - 1].classList.remove("_current");
-        steps[currentStep].classList.add("_current");
-      }
-      // шаг назад
-      function prevStep(e) {
-        if (currentStep === steps.length - 2) {
-          stepCurrentNumber.parentNode.classList.remove("_ready");
-        }
-
-        if (currentStep === steps.length - 3) {
-          nextBtn.classList.remove("_disabled");
-        }
-
-        if (prevBtn.classList.contains("_disabled")) {
-          return;
-        }
-        currentStep--;
-        stepCurrentNumber.innerHTML = currentStep + 1;
-
-        if (currentStep === 0) {
-          prevBtn.classList.add("_disabled");
-          prevBtn.disabled = true;
-        }
-        nextBtn.disabled = false;
-        steps[currentStep + 1].classList.remove("_current");
-        steps[currentStep].classList.add("_current");
-      }
-
-      // валидация чекбокса
-      function isValidateFormService() {
-        for (let i = 0; i < inputChecks.length; i++) {
-          const element = inputChecks[i];
-          if (element.checked) {
-            isCheck = true;
-            return;
-          }
-        }
-        isCheck = false;
-        return;
-      }
-      qwizFrom.addEventListener("submit", function (e) {
+    document.querySelectorAll(".popolar-services__btn").forEach((e) => {
+      e.addEventListener("click", function (e) {
         e.preventDefault();
-        var th = $("#services_quiz_form");
-        $(".load__preloader").fadeIn("", function () {
-          $.ajax({
-            type: "POST",
-            url: "/index.php?route=common/footer/quiz_submit",
-            data: th.serialize(),
-            dataType: "json",
-          }).done(function (json) {
-            if (json["success"]) {
-              $(".load__preloader").fadeOut("slow");
-              nextStep();
+      });
+    }),
+      (function () {
+        const e = document.querySelectorAll("[data-spollers]");
+        if (e.length > 0) {
+          const s = Array.from(e).filter(function (e, t, s) {
+            return !e.dataset.spollers.split(",")[0];
+          });
+          function n(e, t = !1) {
+            e.forEach((e) => {
+              (e = t ? e.item : e),
+                t.matches || !t
+                  ? (e.classList.add("_spoller-init"),
+                    o(e),
+                    e.addEventListener("click", l))
+                  : (e.classList.remove("_spoller-init"),
+                    o(e, !1),
+                    e.removeEventListener("click", l));
+            });
+          }
+          function o(e, t = !0) {
+            const s = e.querySelectorAll("[data-spoller]");
+            s.length > 0 &&
+              s.forEach((e) => {
+                t
+                  ? (e.removeAttribute("tabindex"),
+                    e.classList.contains("_spoller-active") ||
+                      (e.nextElementSibling.hidden = !0))
+                  : (e.setAttribute("tabindex", "-1"),
+                    (e.nextElementSibling.hidden = !1));
+              });
+          }
+          function l(e) {
+            const t = e.target;
+            if (t.closest("[data-spoller]")) {
+              const s = t.closest("[data-spoller]"),
+                n = s.closest("[data-spollers]"),
+                o = !!n.hasAttribute("data-one-spoller");
+              n.querySelectorAll("._slide").length ||
+                (o && !s.classList.contains("_spoller-active") && r(n),
+                s.classList.toggle("_spoller-active"),
+                i(s.nextElementSibling, 500)),
+                e.preventDefault();
             }
-          });
-        });
-        return false;
-      });
-    }
-    if (qwizCalc) {
-      const inputChecks = document.querySelectorAll(".form-qwiz__input");
-      const steps = document.querySelectorAll(".form-qwiz__step");
-      const prevBtn = document.querySelector(".qwiz-section__prev-btn");
-      const nextBtn = document.querySelector(".qwiz-section__next-btn");
-      const bottomPanel = document.querySelector(".qwiz-section__bottom");
-      const navigatePanel = document.querySelector(".qwiz-section__navigate ");
-      const stepCurrentNumber = document.querySelector(
-        ".qwiz-section__current-step",
-      );
-      const radioBtn = document.querySelectorAll(
-        'input[name="Место отвода воды из септика"]',
-      );
-      const oneRadioBtns = document.querySelectorAll(
-        'input[name="Глубина залегания трубы"]',
-      );
-      const twoRadioBtns = document.querySelectorAll(
-        'input[name="Место отвода воды из септика"]',
-      );
-      const threeRadioBtns = document.querySelectorAll(
-        'input[name="Количество колец"]',
-      );
-      const restartBtn = document.querySelector(".form-qwiz__restart-btn");
-      let currentStep = 0;
-      let isCheck = true;
-      let statusQuestion = false;
-
-      radioBtn.forEach((radio) => {
-        radio.addEventListener("change", () => {
-          if (radio.value === "Дренажный колодец") {
-            statusQuestion = true;
-            return;
           }
-          statusQuestion = false;
-        });
-      });
-
-      nextBtn.addEventListener("click", nextStep);
-      prevBtn.addEventListener("click", prevStep);
-
-      if (document.querySelector(".qwiz-section__finish-step")) {
-        document.querySelector(".qwiz-section__finish-step").innerHTML = `/${
-          steps.length - 1
-        }`;
-      }
-
-      // кнопка заказать занова
-      if (restartBtn) {
-        restartBtn.addEventListener("click", function (e) {
-          currentStep = 0;
-          stepCurrentNumber.innerHTML = "Шаг 1";
-          prevBtn.classList.add("_disabled");
-          steps[0].classList.add("_current");
-          steps[steps.length - 1].classList.remove("_current");
-          navigatePanel.style.display = "flex";
-          prevBtn.style.display = "none";
-          document.querySelector(".qwiz-section__progress-step").style.display =
-            "flex";
-          navigatePanel.style.justifyContent = "flex-end";
-          deleteCheck(oneRadioBtns);
-          deleteCheck(twoRadioBtns);
-          deleteCheck(threeRadioBtns);
-        });
-      }
-
-      // ==============================================================================
-
-      function deleteCheck(selector) {
-        selector.forEach((el) => {
-          el.checked = false;
-        });
-      }
-
-      function checkRadioValue(selector) {
-        let res = false;
-        selector.forEach((el) => {
-          if (el.checked) {
-            res = true;
+          function r(e) {
+            const s = e.querySelector("[data-spoller]._spoller-active");
+            s &&
+              (s.classList.remove("_spoller-active"),
+              t(s.nextElementSibling, 500));
           }
-        });
-        return res;
-      }
-
-      function eventRadio(selector) {
-        if (selector) {
-          selector.forEach((it) => {
-            it.addEventListener("click", () => clickRadioCheck(selector));
-          });
+          s.length && n(s);
         }
-      }
-
-      function clickRadioCheck(slector) {
-        checkRadioValue(slector);
-        nextBtn.classList.remove("_disabled");
-      }
-      eventRadio(oneRadioBtns);
-      eventRadio(twoRadioBtns);
-      eventRadio(threeRadioBtns);
-      // шаг вперед
-      function nextStep(e) {
-        let isOneRadio = checkRadioValue(oneRadioBtns);
-        let isTwoRadio = checkRadioValue(twoRadioBtns);
-        let isThreeRadio = checkRadioValue(threeRadioBtns);
-        console.log(currentStep);
-
-        if (currentStep == 2 && !statusQuestion) {
-          nextBtn.classList.remove("_disabled");
+      })(),
+      (function () {
+        const e = document.querySelectorAll("[data-tabs]");
+        let i = [""];
+        if (e.length > 0) {
+          "#tab-0-1".startsWith("tab-") && (i = "#tab-0-1"),
+            setTimeout(() => {
+              e.forEach((e, t) => {
+                e.classList.add("_tab-init"),
+                  e.setAttribute("data-tabs-index", t),
+                  e.addEventListener("click", n),
+                  (function (e) {
+                    const t = e.querySelectorAll("[data-tabs-titles]>*"),
+                      s = e.querySelectorAll("[data-tabs-body]>*"),
+                      n = e.dataset.tabsIndex,
+                      o = i[0] == n;
+                    if (o) {
+                      e.querySelector(
+                        "[data-tabs-titles]>._tab-active",
+                      ).classList.remove("_tab-active");
+                    }
+                    s.length > 0 &&
+                      s.forEach((e, s) => {
+                        t[s].setAttribute("data-tabs-title", ""),
+                          e.setAttribute("data-tabs-item", ""),
+                          o && s == i[1] && t[s].classList.add("_tab-active"),
+                          (e.hidden = !t[s].classList.contains("_tab-active"));
+                      });
+                  })(e);
+              });
+            }, 30);
         }
-        // ==== 3
-        if (currentStep === 2 && !isThreeRadio && statusQuestion) {
-          nextBtn.classList.add("_disabled");
-        }
-        if (currentStep === 3 && !isThreeRadio) {
-          return;
-        }
-        // ==== 2
-        if (currentStep === 1 && !isTwoRadio) {
-          nextBtn.classList.add("_disabled");
-        }
-        if (currentStep === 2 && !isTwoRadio) {
-          return;
-        }
-        // ==== 1
-        if (currentStep === 0 && !isOneRadio) {
-          nextBtn.classList.add("_disabled");
-        }
-
-        if (currentStep === 1 && !isOneRadio) {
-          return;
-        }
-        ++currentStep;
-
-        isValidateFormService();
-
-        if (steps.length === currentStep + 1) {
-          document.querySelector(".qwiz-section__progress-step").style.display =
-            "none";
-        }
-
-        if (steps.length - 2 === currentStep) {
-          navigatePanel.style.display = "none";
-        }
-        if (currentStep === 1) {
-          prevBtn.style.display = "inline-block";
-          navigatePanel.style.justifyContent = "space-between";
-        }
-
-        if (isCheck && currentStep === steps.length - 2) {
-          stepCurrentNumber.parentNode.classList.add("_ready");
-        }
-
-        if (steps.length - 1 === currentStep) {
-          navigatePanel.style.display = "none";
-        }
-        if (bottomPanel && steps.length - 2 === currentStep) {
-          bottomPanel.style.display = "none";
-        }
-
-        if (
-          steps[currentStep].closest("._additional-question") &&
-          !statusQuestion
-        ) {
-          switchCurrentClassName(currentStep - 1, currentStep + 1, nextBtn);
-          currentStep = 4;
-          editCountStepText(`Шаг ${currentStep}`);
-          return;
-        }
-        prevBtn.classList.remove("_disabled");
-        prevBtn.disabled = false;
-        //прибаляем шаги +1
-        if (statusQuestion) {
-          editCountStepText(`Шаг ${currentStep}`);
-        } else {
-          editCountStepText(`Шаг ${currentStep + 1}`);
-        }
-
-        // на последнем шагу добавляет текст 'Итоги'
-        if (steps.length - 1 === currentStep + 1) {
-          showReusltSeptik();
-          editCountStepText("Итоги");
-        }
-        //есди есть доп.вопрос добавляем 'Дополнительный вопрос'
-        if (
-          steps[currentStep].closest("._additional-question") &&
-          statusQuestion
-        ) {
-          editCountStepText("Дополнительный вопрос");
-
-          switchCurrentClassName(currentStep - 1, currentStep, prevBtn);
-          return;
-        }
-        switchCurrentClassName(currentStep - 1, currentStep, prevBtn);
-      }
-
-      // шаг назад
-      function prevStep(e) {
-        let isTwoRadio = checkRadioValue(twoRadioBtns);
-        if (currentStep == 3 && isTwoRadio) {
-          nextBtn.classList.remove("_disabled");
-        }
-        if (currentStep == 1) {
-          nextBtn.classList.remove("_disabled");
-        }
-
-        currentStep--;
-
-        // проверка, покать доп.вопрос
-        if (
-          steps[currentStep].closest("._additional-question") &&
-          !statusQuestion
-        ) {
-          switchCurrentClassName(currentStep + 1, currentStep - 1, nextBtn);
-          currentStep = 2;
-          editCountStepText(`Шаг ${currentStep + 1}`);
-          return;
-        }
-
-        //доп.вопрос проверка текст
-        if (
-          steps[currentStep].closest("._additional-question") &&
-          statusQuestion
-        ) {
-          editCountStepText("Дополнительный вопрос");
-        } else {
-          editCountStepText(`Шаг ${currentStep + 1}`);
-        }
-
-        if (currentStep === 0) {
-          prevBtn.style.display = "none";
-          navigatePanel.style.justifyContent = "flex-end";
-          prevBtn.classList.add("_disabled");
-          prevBtn.disabled = true;
-        }
-        nextBtn.disabled = false;
-        switchCurrentClassName(currentStep + 1, currentStep);
-      }
-
-      // валидация чекбокса
-      function isValidateFormService() {
-        for (let i = 0; i < inputChecks.length; i++) {
-          const element = inputChecks[i];
-          if (element.checked) {
-            isCheck = true;
-            return;
-          }
-        }
-        isCheck = false;
-        return;
-      }
-      // меняем текст шага
-      function editCountStepText(text) {
-        stepCurrentNumber.innerHTML = text;
-      }
-      // меняем класс  у текущего шага
-      function switchCurrentClassName(stepRemove, stepAdd) {
-        steps[stepRemove].classList.remove("_current");
-        steps[stepAdd].classList.add("_current");
-      }
-      qwizCalc.addEventListener("submit", function (e) {
-        e.preventDefault();
-        var th = $("#calc-septik");
-        $(".load__preloader").fadeIn("", function () {
-          $.ajax({
-            type: "POST",
-            url: "/index.php?route=common/footer/quiz_submit",
-            data: th.serialize(),
-            dataType: "json",
-          }).done(function (json) {
-            if (json["success"]) {
-              $(".load__preloader").fadeOut("slow");
-              nextStep();
+        function n(e) {
+          const i = e.target;
+          if (!i.closest(".block__more") && i.closest("[data-tabs-title]")) {
+            setTimeout(() => {
+              a();
+            }, 10);
+            const n = i.closest("[data-tabs-title]"),
+              o = n.closest("[data-tabs]");
+            if (
+              !n.classList.contains("_tab-active") &&
+              !o.querySelectorAll("._slide").length
+            ) {
+              const e = o.querySelector("[data-tabs-title]._tab-active");
+              e && e.classList.remove("_tab-active"),
+                n.classList.add("_tab-active"),
+                (function (e) {
+                  const i = e.querySelectorAll("[data-tabs-title]"),
+                    n = e.querySelectorAll("[data-tabs-item]"),
+                    o = e.dataset.tabsIndex,
+                    l = (function (e) {
+                      if (e.hasAttribute("data-tabs-animate"))
+                        return e.dataset.tabsAnimate > 0
+                          ? e.dataset.tabsAnimate
+                          : 500;
+                    })(e);
+                  n.length > 0 &&
+                    n.forEach((e, n) => {
+                      i[n].classList.contains("_tab-active")
+                        ? (l ? s(e, l) : (e.hidden = !1),
+                          e.closest(".popup") ||
+                            (location.hash = `tab-${o}-${n}`))
+                        : l
+                          ? t(e, l)
+                          : (e.hidden = !0);
+                    });
+                })(o);
             }
+            e.preventDefault();
+          }
+        }
+      })(),
+      a(),
+      new e({}),
+      $(window).on("load", function () {
+        !(function (e) {
+          function t(e) {
+            var t = $(e),
+              s = $(".splitpic-left-image", t),
+              i = ($(".splitpic-right-image", t), $(".splitpic-bar", t)),
+              n = !1;
+            function o(e, n) {
+              var o;
+              n ? (o = e) : (o = e - t.offset().left);
+              s.css("clip", "rect(0px, " + o + "px, auto, 0px)"),
+                i.css("left", o - i.width() / 2 + "px");
+            }
+            var l = parseInt(t.attr("data-start-percent"));
+            isNaN(l) && (l = 50), (l /= 100), o(t.width() * l, !0);
+            var r = !1,
+              a = 0,
+              c = 0;
+            t.on("touchmove touchstart", function (e) {
+              var s;
+              if (
+                (n || ($(".splitpic-info", t).fadeOut(200), (n = !0)),
+                e.touches
+                  ? (s = e.touches)
+                  : e.originalEvent &&
+                    e.originalEvent.touches &&
+                    (s = e.originalEvent.touches),
+                s)
+              ) {
+                var i = s[0],
+                  l = 0,
+                  d = 0;
+                r ? ((l = i.pageX - a), (d = i.pageY - c)) : (r = !0),
+                  Math.abs(l) > Math.abs(d) &&
+                    (e.preventDefault(), o(s[0].pageX)),
+                  (a = i.pageX),
+                  (c = i.pageY);
+              }
+            }),
+              t.on("touchend", function (e) {
+                r = !1;
+              }),
+              t.on("mouseenter mousemove mouseleave", function (e) {
+                n || ($(".splitpic-info", t).fadeOut(200), (n = !0)),
+                  o(e.pageX);
+              });
+          }
+          (e.SplitPic = t), (e.SplitPic = t);
+        })(window),
+          $(".splitpic-horizontal .splitpic-images").each(function (e, t) {
+            new SplitPic(t);
           });
-        });
-        return false;
       });
-    }
-  }
-  initQwiz();
-  // кнопеи сантехники
-  function countPlumbingItems(params) {
-    const plusBtn = document.querySelectorAll(".form-qwiz__btns-plumbing");
-
-    if (plusBtn) {
-      plusBtn.forEach((element) => {
-        element.addEventListener("click", function (e) {
-          let target = e.target;
-
-          if (target.closest("._plus-plumbing")) {
-            if (element.children[1].innerHTML >= 5) return;
-            element.children[1].innerHTML++;
-          }
-          if (target.closest("._minus-plumbing")) {
-            if (element.children[1].innerHTML <= 0) return;
-            element.children[1].innerHTML--;
-          }
-        });
-      });
-    }
-  }
-  countPlumbingItems();
-
-  // расчет производительности на всю сантехнику дома (раковины, ванна, туалет и т.д)
-  function getValueItemPlumbing() {
-    const selectorsCount = document.querySelectorAll(
-      ".form-qwiz__count-plumbing",
-    );
-    let resSum = 0;
-    let currentSum = 0;
-    selectorsCount.forEach((element) => {
-      let dataValue = element.dataset.plumbingValue;
-      currentSum = dataValue * element.innerHTML;
-      resSum += currentSum;
-    });
-
-    return resSum;
-  }
-
-  // выводим данные в итоги
-  function showReusltSeptik(res) {
-    const listResSelector = document.querySelectorAll(
-      ".form-qwiz__content-finish",
-    );
-    const result = collectDate();
-
-    listResSelector[0].innerHTML = result.onePoint;
-    listResSelector[1].innerHTML = result.threePoint;
-    listResSelector[2].innerHTML = result.twoPoint;
-
-    listResSelector[4].innerHTML = result.fourPoint;
-    if (!result.extraPoint) {
-      listResSelector[3].parentElement.remove();
-    } else {
-      listResSelector[3].innerHTML = result.extraPoint;
-    }
-    debugger;
-  }
-
-  function collectDate() {
-    const onePoint = document.querySelector(".noUi-handle").ariaValueText;
-    const twoPoint = document.querySelectorAll(
-      'input[name="Глубина залегания трубы"]',
-    );
-    const threePoint = document.querySelectorAll(
-      'input[name="Место отвода воды из септика"]',
-    );
-
-    const extraPoint = document.querySelectorAll(
-      'input[name="Количество колец"]',
-    );
-    const res = {
-      onePoint,
-      twoPoint: "",
-      threePoint: "",
-      fourPoint: "",
-      extraPoint: "",
-    };
-    if (twoPoint) {
-      twoPoint.forEach((el) => {
-        if (el.checked) {
-          res.twoPoint = el.value;
-        }
-      });
-    }
-    if (threePoint) {
-      threePoint.forEach((el) => {
-        if (el.checked) {
-          res.threePoint = el.value;
-        }
-      });
-    }
-    if (extraPoint) {
-      extraPoint.forEach((el) => {
-        if (el.checked) {
-          res.extraPoint = el.value;
-        }
-      });
-    }
-    res.fourPoint = getValueItemPlumbing();
-
-    return res;
-  } // CONCATENATED MODULE: ./src/js/app.js
-
-  // Подключение основного файла стилей
-
-  // Основные модули ========================================================================================================================================================================================================================================================
-
-  /*
-Модуль работы со спойлерами
-Документация:
-Сниппет (HTML): spollers
-*/
-  spollers();
-
-  /*
-Модуль работы с табами
-Документация:
-Сниппет (HTML): tabs
-*/
-  tabs();
-
-  /*
-Модуль "показать еще"
-Документация по работе в шаблоне:
-Сниппет (HTML): showmore
-*/
-  showMore();
-
-  /*
-Попапы
-Документация по работе в шаблоне:
-Сниппет (HTML): pl
-*/
-  initPopups();
-
-  // Модуль работы с ползунком  ===================================================================================================================================================================================================================================================================================
-  /*
-Подключение и настройка выполняется в файле js/files/forms/range.js
-Документация по работе в шаблоне:
-Документация плагина: https://refreshless.com/nouislider/
-Сниппет (HTML): range
-*/
-
-  /******/
+  })();
 })();
