@@ -329,35 +329,32 @@
             }, e);
         }
       };
-    const a = (e, t) => {
-      const s = document.querySelectorAll(t);
-      0 !== s.length &&
-        s.forEach((e) => {
-          e.parentElement.classList.contains("_showmore-active");
+    const a = (e, s) => {
+      const i = document.querySelectorAll(s);
+      0 !== i.length &&
+        i.forEach((s) => {
+          s.parentElement.classList.contains("_showmore-active") &&
+            (t(s, 500, e),
+            s.parentElement.classList.remove("_showmore-active"));
         });
     };
     function c() {
       const e = document.querySelectorAll("[data-showmore]");
-      let i, n;
-      function o(e) {
-        e.forEach((e) => {
-          l(e.itemsArray, e.matchMedia);
-        });
-      }
-      function l(e, i) {
+      let i;
+      function n(e, i) {
         e.forEach((e) => {
           !(function (e, i = !1) {
             e = i ? e.item : e;
             const n = e.querySelector("[data-showmore-content]"),
-              o = e.querySelector("[data-showmore-button]"),
-              l = r(e, n);
-            (i.matches || !i) && l < c(n)
-              ? (t(n, 0, l), (o.hidden = !1))
-              : (s(n, 0, l), (o.hidden = !0));
+              r = e.querySelector("[data-showmore-button]"),
+              a = o(e, n);
+            (i.matches || !i) && a < l(n)
+              ? (t(n, 0, a), (r.hidden = !1))
+              : (s(n, 0, a), (r.hidden = !0));
           })(e, i);
         });
       }
-      function r(e, t) {
+      function o(e, t) {
         let s = 0;
         if ("items" === (e.dataset.showmore ? e.dataset.showmore : "size")) {
           const e = t.dataset.showmoreContent ? t.dataset.showmoreContent : 3,
@@ -370,104 +367,47 @@
         }
         return s;
       }
-      function c(e) {
+      function l(e) {
         let t = e.offsetHeight;
         e.style.removeProperty("height");
         let s = e.offsetHeight;
         return (e.style.height = `${t}px`), s;
       }
-      function d(e) {
-        const d = e.target,
-          u = e.type;
-        if ("click" === u) {
-          if (d.closest("[data-showmore-button]")) {
-            const i = d
+      function r(e) {
+        const r = e.target,
+          c = e.type;
+        if ("click" === c) {
+          if (r.closest("[data-showmore-button]")) {
+            const i = r
                 .closest("[data-showmore-button]")
                 .closest("[data-showmore]"),
               n = i.querySelector("[data-showmore-content]");
-            c(n);
-            const o = i.dataset.showmoreButton
+            l(n);
+            const c = i.dataset.showmoreButton
                 ? i.dataset.showmoreButton
                 : "500",
-              l = r(i, n);
+              d = o(i, n);
             n.classList.contains("_slide") ||
               (e.target.closest("._showmore-active") ||
-                a(l, ".stages-work__content"),
+                a(d, ".stages-work__content"),
               i.classList.contains("_showmore-active")
-                ? t(n, o, l)
-                : s(n, o, l),
+                ? t(n, c, d)
+                : s(n, c, d),
               i.classList.toggle("_showmore-active"));
           }
-        } else "resize" === u && (i.length && l(i), n.length && o(n));
+        } else "resize" === c && i.length && n(i);
         document.querySelector(".ya-map__tab") &&
-          "click" === u &&
+          "click" === c &&
           (e.target.matches(".ya-map__tab") || e.stopImmediatePropagation());
       }
       e.length &&
         ((i = Array.from(e).filter(function (e, t, s) {
           return !e.dataset.showmoreMedia;
         })),
-        i.length && l(i),
+        i.length && n(i),
         document.querySelectorAll("[data-showmore-button]").forEach((e) => {
-          e.addEventListener("click", d, !0);
-        }),
-        window.addEventListener("resize", d),
-        (n = (function (e, t) {
-          const s = Array.from(e).filter(function (e, s, i) {
-            if (e.dataset[t]) return e.dataset[t].split(",")[0];
-          });
-          if (s.length) {
-            const e = [];
-            s.forEach((s) => {
-              const i = {},
-                n = s.dataset[t].split(",");
-              (i.value = n[0]),
-                (i.type = n[1] ? n[1].trim() : "max"),
-                (i.item = s),
-                e.push(i);
-            });
-            let i = e.map(function (e) {
-              return (
-                "(" +
-                e.type +
-                "-width: " +
-                e.value +
-                "px)," +
-                e.value +
-                "," +
-                e.type
-              );
-            });
-            i = (function (e) {
-              return e.filter(function (e, t, s) {
-                return s.indexOf(e) === t;
-              });
-            })(i);
-            const n = [];
-            if (i.length)
-              return (
-                i.forEach((t) => {
-                  const s = t.split(","),
-                    i = s[1],
-                    o = s[2],
-                    l = window.matchMedia(s[0]),
-                    r = e.filter(function (e) {
-                      if (e.value === i && e.type === o) return !0;
-                    });
-                  n.push({ itemsArray: r, matchMedia: l });
-                }),
-                n
-              );
-          }
-        })(e, "showmoreMedia")),
-        n &&
-          n.length &&
-          (n.forEach((e) => {
-            e.matchMedia.addEventListener("change", function () {
-              l(e.itemsArray, e.matchMedia);
-            });
-          }),
-          o(n)));
+          e.addEventListener("click", r, !0);
+        }));
     }
     var d, u;
     function p(e) {
@@ -799,24 +739,24 @@
         throw new Error("noUiSlider: 'keyboardMultiplier' is not numeric.");
       e.keyboardMultiplier = t;
     }
-    function M(e, t) {
+    function N(e, t) {
       if (!v(t))
         throw new Error("noUiSlider: 'keyboardDefaultStep' is not numeric.");
       e.keyboardDefaultStep = t;
     }
-    function N(e, t) {
+    function H(e, t) {
       if ("object" != typeof t || Array.isArray(t))
         throw new Error("noUiSlider: 'range' is not an object.");
       if (void 0 === t.min || void 0 === t.max)
         throw new Error("noUiSlider: Missing 'min' or 'max' in 'range'.");
       e.spectrum = new L(t, e.snap || !1, e.singleStep);
     }
-    function H(e, t) {
+    function z(e, t) {
       if (((t = S(t)), !Array.isArray(t) || !t.length))
         throw new Error("noUiSlider: 'start' option is incorrect.");
       (e.handles = t.length), (e.start = t);
     }
-    function z(e, t) {
+    function M(e, t) {
       if ("boolean" != typeof t)
         throw new Error("noUiSlider: 'snap' option must be a boolean.");
       e.snap = t;
@@ -1034,14 +974,14 @@
           step: { r: !1, t: B },
           keyboardPageMultiplier: { r: !1, t: D },
           keyboardMultiplier: { r: !1, t: T },
-          keyboardDefaultStep: { r: !1, t: M },
-          start: { r: !0, t: H },
+          keyboardDefaultStep: { r: !1, t: N },
+          start: { r: !0, t: z },
           connect: { r: !0, t: U },
           direction: { r: !0, t: Y },
-          snap: { r: !1, t: z },
+          snap: { r: !1, t: M },
           animate: { r: !1, t: R },
           animationDuration: { r: !1, t: j },
-          range: { r: !0, t: N },
+          range: { r: !0, t: H },
           orientation: { r: !1, t: I },
           margin: { r: !1, t: F },
           limit: { r: !1, t: W },
@@ -1149,7 +1089,7 @@
             (n.setAttribute("tabindex", "0"),
             n.addEventListener("keydown", function (e) {
               return (function (e, s) {
-                if (H() || z(s)) return !1;
+                if (z() || M(s)) return !1;
                 var i = ["Left", "Right"],
                   n = ["Down", "Up"],
                   o = ["PageDown", "PageUp"],
@@ -1208,19 +1148,19 @@
           i
         );
       }
-      function M(e, s) {
+      function N(e, s) {
         return !!s && $(e, t.cssClasses.connect);
       }
-      function N(e, s) {
+      function H(e, s) {
         return (
           !(!t.tooltips || !t.tooltips[s]) &&
           $(e.firstChild, t.cssClasses.tooltip)
         );
       }
-      function H() {
+      function z() {
         return b.hasAttribute("disabled");
       }
-      function z(e) {
+      function M(e) {
         return n[e].hasAttribute("disabled");
       }
       function R() {
@@ -1233,7 +1173,7 @@
       }
       function j() {
         R(),
-          (r = n.map(N)),
+          (r = n.map(H)),
           ie("update" + O.tooltips, function (e, s, i) {
             if (r && t.tooltips && !1 !== r[s]) {
               var n = e[s];
@@ -1439,7 +1379,7 @@
               })(o, n.pageOffset, n.target || s);
             return (
               !!a &&
-              !(H() && !n.doNotReject) &&
+              !(z() && !n.doNotReject) &&
               ((l = b),
               (r = t.cssClasses.tap),
               !(
@@ -1529,7 +1469,7 @@
           });
       }
       function ee(e, s) {
-        if (!s.handleNumbers.some(z)) {
+        if (!s.handleNumbers.some(M)) {
           var i;
           if (1 === s.handleNumbers.length)
             (i = n[s.handleNumbers[0]].children[0]),
@@ -1581,7 +1521,7 @@
               s = !1;
             return (
               n.forEach(function (i, n) {
-                if (!z(n)) {
+                if (!M(n)) {
                   var o = V[n],
                     l = Math.abs(o - e);
                   (l < t || (l <= t && e > o) || (100 === l && 100 === t)) &&
@@ -1824,9 +1764,9 @@
         (i = $(a, t.cssClasses.base)),
         (function (e, s) {
           var i = $(s, t.cssClasses.connects);
-          (n = []), (o = []).push(M(i, e[0]));
+          (n = []), (o = []).push(N(i, e[0]));
           for (var l = 0; l < t.handles; l++)
-            n.push(T(s, l)), (C[l] = l), o.push(M(i, e[l + 1]));
+            n.push(T(s, l)), (C[l] = l), o.push(N(i, e[l + 1]));
         })(t.connect, i),
         (c = t.events).fixed ||
           n.forEach(function (e, t) {
@@ -3297,9 +3237,9 @@
               L && (_.classList.remove("_disabled"), (_.disabled = !1)));
           }
           V.addEventListener("click", function (e) {
-            z();
+            M();
           }),
-            _.addEventListener("click", z),
+            _.addEventListener("click", M),
             b.addEventListener("click", R),
             g.addEventListener("click", A),
             document.querySelector(".qwiz-section__finish-step") &&
@@ -3315,21 +3255,21 @@
               'input[name="Место отвода воды из септика"]',
             ),
             T = document.querySelectorAll('input[name="Количество колец"]');
-          function M(e) {
+          function N(e) {
             e.forEach((e) => {
               e.checked = !1;
             });
           }
-          function N(e) {
+          function H(e) {
             e &&
               e.forEach((t) => {
-                t.addEventListener("click", () => H(e));
+                t.addEventListener("click", () => z(e));
               });
           }
-          function H(e) {
+          function z(e) {
             re(e), _.classList.remove("_disabled");
           }
-          function z() {
+          function M() {
             let e = re(B),
               t = re(D),
               s = re(T);
@@ -4017,9 +3957,9 @@
               q = "Дренажный колодец" === e.value;
             });
           }),
-            N(B),
-            N(D),
-            N(T),
+            H(B),
+            H(D),
+            H(T),
             C &&
               C.addEventListener("click", function (e) {
                 (P = 0),
@@ -4033,9 +3973,9 @@
                     ".qwiz-section__progress-step",
                   ).style.display = "flex"),
                   (k.style.justifyContent = "flex-end"),
-                  M(B),
-                  M(D),
-                  M(T);
+                  N(B),
+                  N(D),
+                  N(T);
               }),
             t &&
               t.addEventListener("submit", function (e) {
@@ -4049,7 +3989,7 @@
                       data: s.serialize(),
                       dataType: "json",
                     }).done(function (e) {
-                      e.success && ($(".load__preloader").fadeOut("slow"), z());
+                      e.success && ($(".load__preloader").fadeOut("slow"), M());
                     });
                   }),
                   !1
